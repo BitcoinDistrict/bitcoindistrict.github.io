@@ -1,23 +1,28 @@
 ---
 import Layout from '~/layouts/Layout.astro';
 import { getHomePermalink } from '~/utils/permalinks';
+import { Image } from 'astro:assets';
+import image404 from '~/assets/images/404.png';
 
-const title = `Error 404`;
+const title = `Not Found`;
 ---
 
 <Layout metadata={{ title }}>
   <section class="flex items-center h-full p-16">
     <div class="container flex flex-col items-center justify-center px-5 mx-auto my-8">
       <div class="max-w-md text-center">
-        <h2 class="mb-8 font-bold text-9xl">
-          <span class="sr-only">Error</span>
-          <span class="text-primary">404</span>
-        </h2>
-        <p class="text-3xl font-semibold md:text-3xl">Sorry, we couldn't find this page.</p>
-        <p class="mt-4 mb-8 text-lg text-muted dark:text-slate-400">
-          But dont worry, you can find plenty of other things on our homepage.
-        </p>
-        <a rel="noopener noreferrer" href={getHomePermalink()} class="btn ml-4">Back to homepage</a>
+        <div class="mb-8">
+          <Image
+            src={image404}
+            alt="404 Error - Page Not Found"
+            class="mx-auto max-w-full h-auto"
+            width={400}
+            height={300}
+          />
+        </div>
+        <p class="text-3xl font-semibold md:text-3xl">Sorry, this page is as elusive as Satoshi Nakamoto.</p>
+
+        <a rel="noopener noreferrer" href={getHomePermalink()} class="btn mt-6 ml-4">Back to homepage</a>
       </div>
     </div>
   </section>

@@ -1,30 +1,30 @@
 site:
-  name: AstroWind
-  site: 'https://astrowind.vercel.app'
+  name: Bitcoin District
+  site: 'https://bitcoindistrict.org'
   base: '/'
   trailingSlash: false
 
-  googleSiteVerificationId: orcPxI47GSa-cRvY11tUe6iGg2IO_RPvnA1q95iEM3M
+  googleSiteVerificationId: xxxxx
 
 # Default SEO metadata
 metadata:
   title:
-    default: AstroWind
-    template: '%s — AstroWind'
-  description: "\U0001F680 Suitable for Startups, Small Business, Sass Websites, Professional Portfolios, Marketing Websites, Landing Pages & Blogs."
+    default: Bitcoin District
+    template: '%s — Bitcoin District'
+  description: "Join a growing network of Bitcoiners living and working in the greater DC-Maryland-Virginia metro area. Newcomers are always welcome!"
   robots:
     index: true
     follow: true
   openGraph:
-    site_name: AstroWind
+    site_name: Bitcoin District
     images:
       - url: '~/assets/images/default.png'
         width: 1200
         height: 628
     type: website
   twitter:
-    handle: '@onwidget'
-    site: '@onwidget'
+    handle: '@BTCDistrict'
+    site: '@BTCDistrict'
     cardType: summary_large_image
 
 i18n:

@@ -1,0 +1,104 @@
+---
+alwaysApply: true
+---
+
+# Cursor Rules Prompt for AstroWind Project
+
+You are a coding assistant working on a modern Astro site built using the AstroWind theme. Always follow these rules to ensure maintainable, performant, and idiomatic code.
+
+## Project Structure & Conventions
+- Do not introduce new folder structures unless necessary — follow AstroWind's layout:
+  `pages/`, `components/`, `layouts/`, `partials/`, and `content/`
+- Use consistent naming, import paths, and placement conventions found in AstroWind
+- Reusable UI elements should go in `components/`
+- Markdown content should live in the `content/` directory using frontmatter-based organization
+- Follow AstroWind's component organization patterns (widgets, ui, common)
+- Follow AstroWind's navigation structure using `src/navigation.js`
+- Use the existing `src/utils/` directory patterns and helper functions
+
+## Styling & Responsiveness
+- Use TailwindCSS utility classes — do not write custom CSS unless absolutely necessary
+- All components must be mobile-first and fully responsive using Tailwind's responsive utilities
+- Avoid inline `style=""` attributes and custom media queries unless modifying Tailwind config
+- If a style already exists in AstroWind, reuse it instead of redefining it
+- Follow AstroWind's design system and spacing conventions
+- Use existing color schemes and typography scales defined in the theme
+
+## Content & Data Management
+- Use frontmatter for page and content metadata following AstroWind conventions
+- Leverage the existing content collections structure for blog posts, pages, etc.
+- When adding new content types, extend existing collection schemas rather than creating entirely new ones
+- Use the theme's existing image optimization patterns and directory structure (`src/assets/images/`)
+
+## Performance & SEO
+- Always use Astro's built-in image optimization (`astro:assets`) for images
+- Follow AstroWind's SEO patterns and metadata handling
+- Maintain the existing performance optimizations (lazy loading, code splitting, etc.)
+- Use the theme's existing analytics and tracking implementations as templates
+
+## Best Practices
+- Keep components clean, minimal, and reusable
+- Favor composition over duplication. Extract repeated patterns into shared components
+- Avoid over-engineering or introducing clever abstractions that are hard to maintain
+- Reuse existing AstroWind components, utility classes, and layout patterns
+- Use TypeScript interfaces and types consistently with the existing codebase
+- Follow the established import organization (external libs, then internal modules)
+
+## Pages & Routing
+- Only create new files in `pages/` when defining new routes
+- Use layout components like `BaseLayout` or `DefaultLayout` to maintain consistent structure
+- Do not hardcode site metadata or URLs; use `src/config.yaml` or layout props
+- Follow AstroWind's URL structure and navigation patterns
+- Maintain consistency with existing page templates and patterns
+
+## Component Architecture
+- Use Astro components (`.astro`) for server-rendered content
+- Only introduce framework components (React, Vue, etc.) when client-side interactivity is essential
+- Follow the existing widget pattern for larger page sections
+- Keep prop interfaces consistent with existing component patterns
+- Use slots appropriately for flexible content insertion
+
+## Future-Proofing (for SSR & Auth Support)
+- Write code that can scale to support server-side rendering and authentication in the future
+- Separate logic from markup wherever possible — use `utils/`, `lib/`, or Astro's data loading for future data handling
+- Avoid assumptions about static-only behavior; consider environment-aware behavior or hooks for dynamic features
+- Structure API integrations to be easily adaptable for server endpoints
+- Design components to handle both static and dynamic data sources
+
+## Interactivity & Client Scripts
+- If client-side interactivity is needed, use Astro's `client:*` directives and follow AstroWind's preferred islands architecture
+- Keep scripts small and colocated unless reused across routes
+- Ensure scripts degrade gracefully and don't block static rendering
+- Use the existing patterns for theme switching and interactive elements
+- Prefer CSS-only solutions over JavaScript where possible
+
+## Accessibility & Theming
+- Use semantic HTML elements appropriately
+- Include appropriate alt text, ARIA labels, and keyboard support
+- Ensure compatibility with both light and dark themes as provided by AstroWind
+- Maintain consistent focus states and keyboard navigation
+- Test color contrast ratios for accessibility compliance
+- Follow WCAG guidelines for interactive elements
+
+## Configuration & Environment
+- Use environment variables appropriately following AstroWind's configuration patterns
+- Follow the established `src/config.yaml` structure for site settings
+- Extend `astro.config.mjs` thoughtfully without breaking existing functionality
+- Follow the established build and deployment patterns
+- Maintain compatibility with the existing dev server setup
+
+## Error Handling & Debugging
+- Follow AstroWind's error page patterns for 404s and other errors
+- Use consistent error boundaries and fallback patterns
+- Implement proper error logging that won't interfere with static generation
+- Ensure graceful degradation for optional features
+
+## What Not To Do
+- Do not introduce third-party CSS frameworks or global resets
+- Do not create large one-off or tightly-coupled features
+- Avoid global state or config hacks unless absolutely required and justified
+- Do not duplicate patterns already implemented elsewhere in the theme — extend them instead
+- Avoid breaking the existing build process or deployment pipeline
+- Don't override core AstroWind functionality without careful consideration
+- Avoid creating components that are too specific and can't be reused
+- Don't introduce dependencies that conflict with existing ones or significantly increase bundle size
