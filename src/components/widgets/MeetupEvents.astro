@@ -1,0 +1,254 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import Button from '~/components/ui/Button.astro';
+import { Icon } from 'astro-icon/components';
+import { fetchMeetupEvents, formatEventDescription, formatEventTime, type MeetupEvent } from '~/utils/events';
+import { meetupSources } from '~/data/events-config';
+import { getFormattedDate } from '~/utils/utils';
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
+  id?: string;
+  isDark?: boolean;
+  classes?: {
+    container?: string;
+    headline?: Record<string, string>;
+  };
+  bg?: any;
+}
+
+const {
+  title = 'Upcoming Events',
+  subtitle = 'Join us at our upcoming Bitcoin District events',
+  tagline,
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+// Fetch events at build time (maxEvents limit is now handled in the utility)
+let events: MeetupEvent[] = [];
+try {
+  events = await fetchMeetupEvents();
+} catch (error) {
+  console.error('Failed to fetch meetup events:', error);
+}
+
+// Helper function to get meetup source info including logo
+const getMeetupSource = (eventSource: string) => {
+  return meetupSources.find(source => source.name === eventSource);
+};
+---
+
+<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-6xl mx-auto ${classes?.container ?? ''}`} bg={bg}>
+  <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline} />
+  
+  {events.length > 0 ? (
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {events.map((event) => (
+        <article class="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-slate-900 flex flex-col">
+          {/* Card Header with Date and Conditional Meetup Icon */}
+          <div class="bg-primary px-6 py-4 text-white flex items-center justify-between">
+            <div class="text-lg font-semibold">
+              {getFormattedDate(event.startDate)}
+            </div>
+            {/* Show Meetup icon only for events from configured meetup sources */}
+            {(() => {
+              const meetupSource = getMeetupSource(event.source);
+              return meetupSource ? (
+                <a 
+                  href={meetupSource.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="hover:opacity-100 transition-opacity"
+                  title={`Visit ${meetupSource.name} on Meetup`}
+                >
+                  <Icon name="tabler:brand-meetup" class="h-5 w-5 opacity-80 hover:opacity-100" />
+                </a>
+              ) : null;
+            })()}
+          </div>
+          
+          {/* Event Content - Flex grow to push button to bottom */}
+          <div class="p-6 space-y-4 flex-grow flex flex-col">
+            {/* Title */}
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">
+              {event.title}
+            </h3>
+            
+            {/* Time */}
+            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              <Icon name="tabler:clock" class="h-4 w-4" />
+              <span>{formatEventTime(event.startDate, event.endDate)}</span>
+            </div>
+            
+            {/* Location (if available) */}
+            {event.location && (
+              <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                <Icon name="tabler:map-pin" class="h-4 w-4" />
+                <span>{event.location}</span>
+              </div>
+            )}
+            
+            {/* Spacer to push button to bottom */}
+            <div class="flex-grow"></div>
+            
+            {/* Actions - Always at bottom */}
+            <div class="pt-2 mt-auto">
+              {event.url ? (
+                <div class="flex items-center gap-3">
+                  <Button
+                    variant="secondary"
+                    text="View Event"
+                    href={event.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-sm px-4 py-2 hover:scale-105 transition-transform flex-grow border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 hover:border-primary dark:hover:border-primary"
+                  />
+                  {/* Show meetup logo if available, or manual event icon */}
+                  {(() => {
+                    const meetupSource = getMeetupSource(event.source);
+                    const logoSrc = meetupSource?.logo || event.icon;
+                    const logoUrl = meetupSource?.url;
+                    const logoAlt = meetupSource ? `${meetupSource.name} logo` : `${event.source} logo`;
+                    
+                    if (!logoSrc) return null;
+                    
+                    const logoElement = (
+                      <img
+                        src={logoSrc}
+                        alt={logoAlt}
+                        class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 hover:border-primary transition-colors"
+                        width="40"
+                        height="40"
+                      />
+                    );
+                    
+                    return (
+                      <div class="flex-shrink-0">
+                        {logoUrl ? (
+                          <a 
+                            href={logoUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            title={`Visit ${meetupSource?.name || event.source}`}
+                            class="block hover:scale-105 transition-transform"
+                          >
+                            {logoElement}
+                          </a>
+                        ) : logoElement}
+                      </div>
+                    );
+                  })()}
+                </div>
+              ) : (
+                <div class="flex items-center gap-3">
+                  <div class="flex-grow"></div>
+                  {/* Show meetup logo if available, or manual event icon (for events without URLs) */}
+                  {(() => {
+                    const meetupSource = getMeetupSource(event.source);
+                    const logoSrc = meetupSource?.logo || event.icon;
+                    const logoUrl = meetupSource?.url;
+                    const logoAlt = meetupSource ? `${meetupSource.name} logo` : `${event.source} logo`;
+                    
+                    if (!logoSrc) return null;
+                    
+                    const logoElement = (
+                      <img
+                        src={logoSrc}
+                        alt={logoAlt}
+                        class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600 hover:border-primary transition-colors"
+                        width="40"
+                        height="40"
+                      />
+                    );
+                    
+                    return (
+                      <div class="flex-shrink-0">
+                        {logoUrl ? (
+                          <a 
+                            href={logoUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            title={`Visit ${meetupSource?.name || event.source}`}
+                            class="block hover:scale-105 transition-transform"
+                          >
+                            {logoElement}
+                          </a>
+                        ) : logoElement}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* Hover Effect Overlay */}
+          <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"></div>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <div class="text-center py-12">
+      <Icon name="tabler:calendar-off" class="h-16 w-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" />
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Upcoming Events</h3>
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        Check back soon for new Bitcoin District events, or follow us on social media for updates.
+      </p>
+      <Button
+        variant="primary"
+        text="Join Our Meetup Group"
+        href="https://www.meetup.com/bitcoin-district/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2"
+      >
+        <Icon name="tabler:external-link" class="h-4 w-4" />
+        Join Meetup
+      </Button>
+    </div>
+  )}
+  
+  {/* Call to Action */}
+  {events.length > 0 && (
+    <div class="mt-12 text-center">
+      <div class="rounded-lg bg-gray-50 p-8 dark:bg-slate-800">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Want to stay updated?
+        </h3>
+        <p class="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+          Join our Meetup group to get notified about all upcoming Bitcoin District events and never miss an opportunity to connect with fellow Bitcoiners.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button
+            variant="primary"
+            text="Join Meetup Group"
+            href="https://www.meetup.com/bitcoin-district/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2"
+          >
+            <Icon name="tabler:users" class="h-5 w-5" />
+            Join Meetup
+          </Button>
+          <Button
+            variant="secondary"
+            text="Follow on Twitter"
+            href="https://twitter.com/BTCDistrict"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2"
+          >
+            <Icon name="tabler:brand-x" class="h-5 w-5" />
+            Follow Us
+          </Button>
+        </div>
+      </div>
+    </div>
+  )}
+</WidgetWrapper>

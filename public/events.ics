@@ -1,0 +1,41 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Bitcoin District//Bitcoin Events//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Bitcoin District Events
+X-WR-CALDESC:Bitcoin and cryptocurrency events in the DC metro area
+X-WR-TIMEZONE:America/New_York
+BEGIN:VTIMEZONE
+TZID:America/New_York
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0500
+TZOFFSETTO:-0400
+TZNAME:EDT
+DTSTART:20070311T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=2SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0500
+TZNAME:EST
+DTSTART:20071104T020000
+RRULE:FREQ=YEARLY;BYMONTH=11;BYDAY=1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:sample-event-20250805T211603Z@bitcoindistrict.org
+DTSTAMP:20250805T211603Z
+DTSTART:20250812T211603Z
+DTEND:20250812T231603Z
+SUMMARY:Bitcoin District Events Calendar
+DESCRIPTION:This calendar aggregates Bitcoin and cryptocurrency events fro
+ m multiple sources in the DC metro area. Visit our website for the latest
+  events.
+URL:https://bitcoindistrict.org/events
+ORGANIZER;CN=Bitcoin District:mailto:events@bitcoindistrict.org
+CATEGORIES:Bitcoin,Cryptocurrency,Meetup
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

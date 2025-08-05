@@ -1,0 +1,70 @@
+export interface MeetupSource {
+  /** Name/identifier for this meetup group */
+  name: string;
+  /** Full iCal URL for this meetup group */
+  icalUrl: string;
+  /** Main meetup group URL */
+  url: string;
+  /** Optional description of the meetup group */
+  description?: string;
+  /** Path to logo image in assets directory */
+  logo?: string;
+  /** Whether this source is currently active */
+  enabled: boolean;
+}
+
+/**
+ * Configuration for meetup iCal sources
+ * Add new meetup groups here by including their iCal URLs
+ */
+export const meetupSources: MeetupSource[] = [
+  {
+    name: "Bitcoin District",
+    icalUrl: "https://www.meetup.com/bitcoin-district/events/ical/",
+    url: "https://www.meetup.com/bitcoin-district/",
+    description: "Bitcoin District community meetup group in DC metro area",
+    logo: "/src/assets/images/logos/bd.png",
+    enabled: true,
+  },
+  {
+    name: "DC BitDevs",
+    icalUrl: "https://www.meetup.com/dc-bit-devs/events/ical/",
+    url: "https://www.meetup.com/dc-bit-devs/",
+    description: "Community for discussing and advancing Bitcoin and related protocols.",
+    logo: "/src/assets/images/logos/dcbitdevs.png",
+    enabled: true,
+  },
+  // Add more meetup groups here as needed
+  // {
+  //   name: "DC Bitcoin Developers",
+  //   icalUrl: "https://www.meetup.com/example-group/events/ical/",
+  //   description: "Developer-focused Bitcoin meetup",
+  //   logo: "~/assets/images/dev-group-logo.png",
+  //   enabled: true,
+  // },
+  // {
+  //   name: "Northern Virginia Bitcoin",
+  //   icalUrl: "https://www.meetup.com/another-group/events/ical/",
+  //   description: "Bitcoin meetup for Northern Virginia",
+  //   logo: "~/assets/images/nova-bitcoin-logo.png",
+  //   enabled: false, // Disabled for now
+  // },
+];
+
+/**
+ * Events configuration
+ */
+export interface EventsConfig {
+  /** Maximum number of events to display */
+  maxEvents: number;
+  /** Whether to include manual events from events-data.ts */
+  includeManualEvents: boolean;
+  /** Whether to fetch from meetup iCal sources */
+  includeMeetupEvents: boolean;
+}
+
+export const eventsConfig: EventsConfig = {
+  maxEvents: 6,
+  includeManualEvents: true,
+  includeMeetupEvents: true,
+};
