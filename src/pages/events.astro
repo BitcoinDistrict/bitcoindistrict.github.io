@@ -1,0 +1,42 @@
+---
+import CallToAction from '~/components/widgets/CallToAction.astro';
+import Content from '~/components/widgets/Content.astro';
+import Features2 from '~/components/widgets/Features2.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Testimonials from '~/components/widgets/Testimonials.astro';
+import Layout from '~/layouts/PageLayout.astro';
+import coffeetourImage from '~/assets/images/coffeetour.jpg';
+
+const metadata = {
+  title: 'Events',
+};
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <Hero
+    title="Events in the District"
+    subtitle="Washington D.C. is becoming a hub for Bitcoiners as well as organizations and companies that are building on Bitcoin or advocating for good policy. This events page aims to be a central location for all Bitcoiners to find events in the District"
+    image={{
+      src: coffeetourImage,
+      alt: 'Bitcoin District',
+    }}
+  />
+
+
+
+  <!-- CallToAction Widget *********** -->
+
+  <CallToAction
+    actions={[
+      {
+        variant: 'primary',
+        text: 'Join our Meetup',
+        href: '/meetups',
+      },
+    ]}
+    title="Join us at our next event"
+    subtitle="Don't be shy! Come say hi and meet other Bitcoiners in the District. If you're new to Bitcoin, we'll be happy to answer any questions you have."
+  />
+</Layout>

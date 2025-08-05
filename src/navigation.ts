@@ -25,12 +25,6 @@ export const headerData = {
 export const footerData = {
   links: [
     {
-      title: 'Connect',
-      links: [
-        { text: 'Contact Us', href: '/contact' },
-      ],
-    },
-    {
       title: 'Meetups',
       links: [
         { text: 'Bitcoin District', href: 'https://www.meetup.com/bitcoin-district/' },
@@ -47,22 +41,11 @@ export const footerData = {
         { text: 'Bitcoin Academic Center', href: 'https://bitcoinacademic.center' },
       ],
     },
-//    {
-//      title: 'Company',
-//      links: [
-//        { text: 'About', href: '#' },
-//        { text: 'Blog', href: '#' },
-//        { text: 'Careers', href: '#' },
-//        { text: 'Press', href: '#' },
-//        { text: 'Inclusion', href: '#' },
-//        { text: 'Social Impact', href: '#' },
-//        { text: 'Shop', href: '#' },
-//      ],
-//    },
   ],
   secondaryLinks: [
     { text: 'Terms', href: getPermalink('/terms') },
     { text: 'Privacy Policy', href: getPermalink('/privacy') },
+    { text: 'Contact', href: '/contact' },
   ],
   socialLinks: [
     { ariaLabel: 'X', icon: 'tabler:brand-x', href: 'https://x.com/BTCDistrict' },

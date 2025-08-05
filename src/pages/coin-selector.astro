@@ -1,0 +1,129 @@
+---
+import PageLayout from '~/layouts/PageLayout.astro';
+import { Image } from 'astro:assets';
+import confusedmeme from '~/assets/images/confusedmeme.png';
+import nosecondbest from '~/assets/images/nosecondbest.jpg';
+
+const metadata = {
+  title: 'Coin Selector',
+  description: 'Choose a coin for a fun message.',
+  ignoreTitleTemplate: true,
+};
+---
+
+<PageLayout metadata={metadata}>
+  <div class="coin-selector-container px-4 py-16 mx-auto max-w-4xl">
+    <div class="coin-selector-content bg-white dark:bg-gray-800 p-8 pb-12 rounded-lg shadow-lg text-center min-h-fit">
+      <h1 class="text-4xl font-bold mb-8 text-gray-900 dark:text-white">Choose a Coin</h1>
+      
+      <div class="mb-6">
+        <select 
+          id="coinSelect" 
+          class="w-full max-w-xs mx-auto p-3 border border-gray-300 dark:border-gray-600 rounded-lg text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none transition-colors"
+        >
+          <option value="Bitcoin">Bitcoin (BTC)</option>
+          <option value="Ethereum">Ethereum (ETH)</option>
+          <option value="Tether">Tether (USDT)</option>
+          <option value="Binance Coin">Binance Coin (BNB)</option>
+          <option value="USD Coin">USD Coin (USDC)</option>
+          <option value="XRP">XRP (XRP)</option>
+          <option value="Cardano">Cardano (ADA)</option>
+          <option value="Dogecoin">Dogecoin (DOGE)</option>
+          <option value="Polygon">Polygon (MATIC)</option>
+          <option value="Solana">Solana (SOL)</option>
+          <option value="Polkadot">Polkadot (DOT)</option>
+          <option value="Shiba Inu">Shiba Inu (SHIB)</option>
+          <option value="Litecoin">Litecoin (LTC)</option>
+          <option value="Avalanche">Avalanche (AVAX)</option>
+          <option value="Uniswap">Uniswap (UNI)</option>
+          <option value="Chainlink">Chainlink (LINK)</option>
+          <option value="Algorand">Algorand (ALGO)</option>
+          <option value="Cosmos">Cosmos (ATOM)</option>
+          <option value="Terra">Terra (LUNA)</option>
+          <option value="FTX Token">FTX Token (FTT)</option>
+          <option value="VeChain">VeChain (VET)</option>
+          <option value="Filecoin">Filecoin (FIL)</option>
+          <option value="Internet Computer">Internet Computer (ICP)</option>
+          <option value="Hedera">Hedera (HBAR)</option>
+          <option value="Tezos">Tezos (XTZ)</option>
+          <option value="Elrond">Elrond (EGLD)</option>
+          <option value="Monero">Monero (XMR)</option>
+          <option value="Aave">Aave (AAVE)</option>
+          <option value="Decentraland">Decentraland (MANA)</option>
+          <option value="Thorchain">Thorchain (RUNE)</option>
+          <option value="Stacks">Stacks (STX)</option>
+          <option value="TRON">TRON (TRX)</option>
+          <option value="The Graph">The Graph (GRT)</option>
+          <option value="SushiSwap">SushiSwap (SUSHI)</option>
+          <option value="Zcash">Zcash (ZEC)</option>
+          <option value="PancakeSwap">PancakeSwap (CAKE)</option>
+          <option value="Fantom">Fantom (FTM)</option>
+          <option value="Kusama">Kusama (KSM)</option>
+          <option value="Ravencoin">Ravencoin (RVN)</option>
+          <option value="Chiliz">Chiliz (CHZ)</option>
+          <option value="Qtum">Qtum (QTUM)</option>
+          <option value="Basic Attention Token">Basic Attention Token (BAT)</option>
+          <option value="NEM">NEM (XEM)</option>
+          <option value="Gala">Gala (GALA)</option>
+          <option value="Harmony">Harmony (ONE)</option>
+          <option value="IOTA">IOTA (IOTA)</option>
+          <option value="Zilliqa">Zilliqa (ZIL)</option>
+          <option value="Waves">Waves (WAVES)</option>
+          <option value="Kadena">Kadena (KDA)</option>
+          <option value="Chia">Chia (XCH)</option>
+          <option value="Celo">Celo (CELO)</option>
+          <option value="NEXO">NEXO (NEXO)</option>
+          <option value="Hegic">Hegic (HEGIC)</option>
+          <option value="Balancer">Balancer (BAL)</option>
+          <option value="1inch">1inch (1INCH)</option>
+          <option value="Theta Network">Theta Network (THETA)</option>
+        </select>
+      </div>
+      
+      <div class="mb-8">
+        <button 
+          onclick="checkCoin()" 
+          class="!bg-blue-600 hover:!bg-blue-700 !text-white font-medium py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 !border-0"
+        >
+          Submit
+        </button>
+      </div>
+      
+      <div id="result" class="text-lg font-bold text-gray-900 dark:text-white min-h-[100px] flex flex-col items-center justify-center"></div>
+    </div>
+    
+    <div class="mt-8 text-center">
+      <a 
+        href="/flappy" 
+        class="inline-block text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors underline"
+      >
+        Want to play a game?
+      </a>
+    </div>
+  </div>
+</PageLayout>
+
+<script define:vars={{ nosecondbest: nosecondbest.src, confusedmeme: confusedmeme.src }}>
+  function checkCoin() {
+    const coinSelect = document.getElementById("coinSelect");
+    const selectedCoin = coinSelect.value;
+    const resultDiv = document.getElementById("result");
+
+    if (selectedCoin === "Bitcoin") {
+      resultDiv.innerHTML = `
+        <p class="mb-4">Hell yeah! There is no second best.</p>
+        <img src="${nosecondbest}" alt="There is no second best." class="mx-auto rounded-lg" width="150" />
+      `;
+    } else if (selectedCoin) {
+      resultDiv.innerHTML = `
+        <p class="mb-4">Come on... You're smarter than that.. Don't waste your time with ${selectedCoin}!</p>
+        <img src="${confusedmeme}" alt="Confused meme" class="mx-auto rounded-lg" width="150" />
+      `;
+    } else {
+      resultDiv.innerHTML = "";
+    }
+  }
+
+  // Make the function globally available
+  window.checkCoin = checkCoin;
+</script>

@@ -1,0 +1,356 @@
+---
+import type { Widget } from '~/types';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import { bookClubBooks } from '~/data/bookclub';
+import { Icon } from 'astro-icon/components';
+import { Image } from 'astro:assets';
+import { getBookImage } from '~/utils/bookImages';
+
+export interface Props extends Widget {
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
+}
+
+const {
+  title = await Astro.slots.render('title'),
+  subtitle = await Astro.slots.render('subtitle'),
+  tagline = await Astro.slots.render('tagline'),
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+// Sort books by date (newest first, then books without dates)
+const sortedBooks = [...bookClubBooks].sort((a, b) => {
+  if (!a.date && !b.date) return 0;
+  if (!a.date) return 1;
+  if (!b.date) return -1;
+  return new Date(b.date).getTime() - new Date(a.date).getTime();
+});
+
+const allBooks = sortedBooks;
+
+// Find the next book (earliest future date)
+const now = new Date();
+const futureBooks = allBooks.filter(book => book.date && new Date(book.date) > now);
+const nextBook = futureBooks.length > 0 ? 
+  futureBooks.reduce((earliest, current) => 
+    new Date(current.date!) < new Date(earliest.date!) ? current : earliest
+  ) : null;
+
+// Pre-format dates on the server side to avoid client-side work
+const booksWithFormattedDates = allBooks.map(book => ({
+  ...book,
+  formattedDate: book.date ? new Date(book.date).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  }) : null,
+  dateValue: book.date ? new Date(book.date).getTime() : null,
+  isNextBook: nextBook ? book.title === nextBook.title : false
+}));
+---
+
+<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-7xl !opacity-100 ${classes?.container ?? ''}`} bg={bg}>
+  <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline as Record<string, string>} />
+  
+  <div class="overflow-x-auto rounded-lg shadow-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+    <!-- Desktop Table View -->
+    <table class="w-full text-left hidden md:table" id="bookclub-table">
+      <thead class="bg-gray-50 dark:bg-slate-700">
+        <tr>
+          <th scope="col" class="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
+            <span>Cover</span>
+          </th>
+          <th scope="col" class="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors group" data-sort="title">
+            <div class="flex items-center space-x-2">
+              <span>Book Title</span>
+              <Icon name="tabler:arrows-right-left" class="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 rotate-90" />
+            </div>
+          </th>
+          <th scope="col" class="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors group" data-sort="author">
+            <div class="flex items-center space-x-2">
+              <span>Author</span>
+              <Icon name="tabler:arrows-right-left" class="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 rotate-90" />
+            </div>
+          </th>
+          <th scope="col" class="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors group" data-sort="date">
+            <div class="flex items-center space-x-2">
+              <span>Date Read</span>
+              <Icon name="tabler:arrows-right-left" class="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 rotate-90" />
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200 dark:divide-slate-600" id="bookclub-tbody">
+        {booksWithFormattedDates.map((book, index) => (
+          <tr class="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors" data-title={book.title} data-author={book.author} data-date={book.formattedDate || 'TBD'} data-date-value={book.dateValue || ''} data-is-next-book={book.isNextBook}>
+            <td class="px-6 py-4">
+              <a 
+                href={book.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="block"
+              >
+                <Image 
+                  src={getBookImage(book.image)} 
+                  alt={`Cover of ${book.title}`}
+                  width={40}
+                  height={60}
+                  class="rounded shadow-sm hover:shadow-md transition-shadow duration-200"
+                />
+              </a>
+            </td>
+            <td class="px-6 py-4">
+              <a 
+                href={book.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="text-primary hover:text-secondary dark:text-primary dark:hover:text-secondary font-medium transition-colors duration-200 flex items-center group"
+              >
+                <span class="mr-2">{book.title}</span>
+                <Icon name="tabler:external-link" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+              </a>
+            </td>
+            <td class="px-6 py-4 text-gray-900 dark:text-gray-300">{book.author}</td>
+            <td class="px-6 py-4 text-gray-600 dark:text-gray-400">
+              <div class="flex flex-col space-y-1">
+                <span>
+                  {book.formattedDate ? book.formattedDate : (
+                    <span class="italic text-gray-400 dark:text-gray-500">TBD</span>
+                  )}
+                </span>
+                {book.isNextBook && (
+                  <span class="inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700 w-fit">
+                    Next Book
+                  </span>
+                )}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <!-- Mobile Card View -->
+    <div class="md:hidden space-y-4 p-4" id="bookclub-cards">
+      {booksWithFormattedDates.map((book, index) => (
+        <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-sm overflow-hidden" data-title={book.title} data-author={book.author} data-date={book.formattedDate || 'TBD'} data-date-value={book.dateValue || ''} data-is-next-book={book.isNextBook}>
+          <div class="p-4">
+            <div class="flex gap-4">
+              <!-- Book Cover -->
+              <div class="flex-shrink-0">
+                <a 
+                  href={book.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="block"
+                >
+                  <Image 
+                    src={getBookImage(book.image)} 
+                    alt={`Cover of ${book.title}`}
+                    width={60}
+                    height={90}
+                    class="rounded shadow-sm hover:shadow-md transition-shadow duration-200"
+                  />
+                </a>
+              </div>
+              
+              <!-- Book Details -->
+              <div class="flex-1 space-y-3">
+                <div>
+                  <a 
+                    href={book.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="text-primary hover:text-secondary dark:text-primary dark:hover:text-secondary font-medium transition-colors duration-200 flex items-center group"
+                  >
+                    <span class="mr-2">{book.title}</span>
+                    <Icon name="tabler:external-link" class="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  </a>
+                  <div class="mt-1 text-gray-900 dark:text-gray-300">
+                    by {book.author}
+                  </div>
+                </div>
+                
+                <div class="text-gray-600 dark:text-gray-400">
+                  {book.formattedDate ? book.formattedDate : (
+                    <span class="italic text-gray-400 dark:text-gray-500">TBD</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          {book.isNextBook && (
+            <div class="bg-green-100 dark:bg-green-900/30 border-t border-green-200 dark:border-green-700 px-4 py-2">
+              <div class="flex items-center justify-center">
+                <span class="text-xs font-semibold text-green-800 dark:text-green-300 uppercase tracking-wide">
+                  Next Book
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</WidgetWrapper>
+
+<script>
+  class BookClubTable {
+    table: HTMLTableElement | null;
+    tbody: HTMLTableSectionElement | null;
+    cards: HTMLElement | null;
+    currentSort: { column: string; direction: string };
+
+    constructor() {
+      this.table = document.getElementById('bookclub-table') as HTMLTableElement | null;
+      this.tbody = document.getElementById('bookclub-tbody') as HTMLTableSectionElement | null;
+      this.cards = document.getElementById('bookclub-cards') as HTMLElement | null;
+      this.currentSort = { column: 'date', direction: 'desc' };
+      this.initializeEventListeners();
+    }
+
+    initializeEventListeners() {
+      if (!this.table) return;
+      
+      const headers = this.table.querySelectorAll('th[data-sort]');
+      headers.forEach((header: Element) => {
+        header.addEventListener('click', () => {
+          const column = header.getAttribute('data-sort');
+          if (column) {
+            this.sortTable(column);
+          }
+        });
+      });
+    }
+
+    sortTable(column: string) {
+      // Determine new direction
+      let direction = 'asc';
+      if (this.currentSort.column === column && this.currentSort.direction === 'asc') {
+        direction = 'desc';
+      }
+
+      // Update current sort state
+      this.currentSort = { column, direction };
+
+      // Sort table rows
+      this.sortTableRows(column, direction);
+      // Sort mobile cards
+      this.sortMobileCards(column, direction);
+      // Update sort indicators
+      this.updateSortIndicators(column, direction);
+    }
+
+    sortTableRows(column: string, direction: string) {
+      if (!this.tbody) return;
+
+      const rows = Array.from(this.tbody.querySelectorAll('tr')) as HTMLTableRowElement[];
+      
+      rows.sort((a, b) => {
+        let aVal: string | number | null;
+        let bVal: string | number | null;
+
+        if (column === 'date') {
+          aVal = a.dataset.dateValue ? parseInt(a.dataset.dateValue) : null;
+          bVal = b.dataset.dateValue ? parseInt(b.dataset.dateValue) : null;
+          
+          // Nulls (TBD dates) go to the end
+          if (aVal === null && bVal === null) return 0;
+          if (aVal === null) return 1;
+          if (bVal === null) return -1;
+          
+          return direction === 'asc' ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+        }
+
+        // String comparison for title and author
+        aVal = (a.dataset[column] || '').toLowerCase();
+        bVal = (b.dataset[column] || '').toLowerCase();
+
+        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      // Re-append sorted rows
+      rows.forEach(row => this.tbody!.appendChild(row));
+    }
+
+    sortMobileCards(column: string, direction: string) {
+      if (!this.cards) return;
+
+      const cards = Array.from(this.cards.querySelectorAll('div[data-title]')) as HTMLElement[];
+      
+      cards.sort((a, b) => {
+        let aVal: string | number | null;
+        let bVal: string | number | null;
+
+        if (column === 'date') {
+          aVal = a.dataset.dateValue ? parseInt(a.dataset.dateValue) : null;
+          bVal = b.dataset.dateValue ? parseInt(b.dataset.dateValue) : null;
+          
+          // Nulls (TBD dates) go to the end
+          if (aVal === null && bVal === null) return 0;
+          if (aVal === null) return 1;
+          if (bVal === null) return -1;
+          
+          return direction === 'asc' ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+        }
+
+        // String comparison for title and author
+        aVal = (a.dataset[column] || '').toLowerCase();
+        bVal = (b.dataset[column] || '').toLowerCase();
+
+        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      // Re-append sorted cards
+      cards.forEach(card => this.cards!.appendChild(card));
+    }
+
+    updateSortIndicators(activeColumn: string, direction: string) {
+      if (!this.table) return;
+      const headers = this.table.querySelectorAll('th[data-sort]');
+      headers.forEach((header: Element) => {
+        const icon = header.querySelector('[data-icon]');
+        if (!icon) return;
+
+        const column = header.getAttribute('data-sort');
+        if (column === activeColumn) {
+          // Show appropriate sort direction icon
+          const iconName = direction === 'asc' ? 'tabler:chevron-up' : 'tabler:chevron-down';
+          icon.setAttribute('data-icon', iconName);
+          icon.classList.add('text-primary');
+          icon.classList.remove('text-gray-400');
+          icon.classList.remove('rotate-90');
+        } else {
+          // Reset to default state
+          icon.setAttribute('data-icon', 'tabler:arrows-right-left');
+          icon.classList.remove('text-primary');
+          icon.classList.add('text-gray-400');
+          icon.classList.add('rotate-90');
+        }
+      });
+    }
+  }
+
+  function initializeBookClub() {
+    new BookClubTable();
+  }
+
+  // Initialize immediately - no loading states needed
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeBookClub);
+  } else {
+    initializeBookClub();
+  }
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener('astro:after-swap', initializeBookClub);
+</script>

@@ -1,0 +1,534 @@
+---
+import type { Widget } from '~/types';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Image from '~/components/common/Image.astro';
+import { bookClubBooks } from '~/data/bookclub';
+import { Icon } from 'astro-icon/components';
+import { findImage } from '~/utils/images';
+
+export interface Props extends Widget {
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
+  displayCount?: number;
+}
+
+const {
+  title = await Astro.slots.render('title'),
+  subtitle = await Astro.slots.render('subtitle'),
+  tagline = await Astro.slots.render('tagline'),
+  displayCount = 7,
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+// Find the featured book (next upcoming date in the future)
+const today = new Date();
+const upcomingBooks = bookClubBooks
+  .filter(book => book.date && new Date(book.date) > today)
+  .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+
+const featuredBook = upcomingBooks[0] || bookClubBooks[0];
+
+// Resolve all image paths to actual URLs for client-side use
+const resolvedBooks = await Promise.all(
+  bookClubBooks.map(async (book) => {
+    const resolvedImage = await findImage(book.image);
+    return {
+      ...book,
+      resolvedImageSrc: typeof resolvedImage === 'string' ? resolvedImage : resolvedImage?.src || book.image
+    };
+  })
+);
+
+// Create a shuffled array of all books for cycling
+const allBooksShuffled = [...resolvedBooks].sort(() => 0.5 - Math.random());
+
+// Find the featured book index in the shuffled array
+const featuredBookIndex = allBooksShuffled.findIndex(book => book.title === featuredBook.title && book.author === featuredBook.author);
+
+// If featured book isn't in the shuffled array (shouldn't happen), add it
+if (featuredBookIndex === -1) {
+  const resolvedFeatured = resolvedBooks.find(book => book.title === featuredBook.title && book.author === featuredBook.author);
+  if (resolvedFeatured) {
+    allBooksShuffled.unshift(resolvedFeatured);
+  }
+}
+
+// Create initial display centered on featured book
+const centerIndex = Math.floor(displayCount / 2);
+const displayBooks: Array<{ book: typeof allBooksShuffled[0]; isFeatured: boolean }> = [];
+
+for (let i = 0; i < displayCount; i++) {
+  const bookIndex = (featuredBookIndex - centerIndex + i + allBooksShuffled.length) % allBooksShuffled.length;
+  displayBooks.push({
+    book: allBooksShuffled[bookIndex],
+    isFeatured: i === centerIndex
+  });
+}
+---
+
+<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-7xl ${classes?.container ?? ''}`} bg={bg}>
+  <div class="book-ribbon-container relative overflow-hidden">
+    <!-- Gradient overlays for fade effect -->
+    <div class="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-page to-transparent z-10 pointer-events-none"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-page to-transparent z-10 pointer-events-none"></div>
+    
+    <!-- Main ribbon -->
+    <div class="book-ribbon flex items-center justify-center gap-4 py-8 px-8 transition-transform duration-500 ease-in-out">
+      {displayBooks.map(({ book, isFeatured }, index) => (
+        <div 
+          class={`book-cover-wrapper transition-all duration-300 cursor-pointer hover:scale-105 ${
+            isFeatured 
+              ? 'scale-110 z-20' 
+              : `scale-${90 - Math.abs(index - centerIndex) * 10} opacity-${100 - Math.abs(index - centerIndex) * 15} hover:opacity-100`
+          }`}
+          data-book-index={index}
+          data-is-featured={isFeatured}
+        >
+          <div class={`relative overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 ${
+            isFeatured ? 'ring-2 ring-primary/20' : 'shadow-md hover:shadow-xl'
+          }`}>
+            <Image
+              src={book.image}
+              alt={`${book.title} by ${book.author}`}
+              width={isFeatured ? 200 : 140}
+              height={isFeatured ? 300 : 210}
+              class={`object-cover transition-transform duration-300 ${
+                isFeatured ? 'w-40 h-60 sm:w-48 sm:h-72' : 'w-28 h-42 sm:w-32 sm:h-48'
+              }`}
+              loading="eager"
+            />
+            {isFeatured && (
+              <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+
+
+
+  </div>
+</WidgetWrapper>
+
+<!-- Pass book data to JavaScript -->
+<script type="application/json" id="book-data">
+  {
+    "allBooks": [],
+    "featuredBookIndex": 0,
+    "displayCount": 7
+  }
+</script>
+
+<script define:vars={{ allBooksShuffled, featuredBookIndex: featuredBookIndex === -1 ? 0 : featuredBookIndex, displayCount }}>
+  // Set the book data on window for the main script to access
+  window.bookRibbonData = {
+    allBooks: allBooksShuffled,
+    featuredBookIndex: featuredBookIndex,
+    displayCount: displayCount
+  };
+</script>
+
+<script>
+  interface BookData {
+    title: string;
+    author: string;
+    image: string;
+    date: string | null;
+    link: string;
+    resolvedImageSrc?: string;
+  }
+
+  declare global {
+    interface Window {
+      bookRibbonData?: {
+        allBooks: BookData[];
+        featuredBookIndex: number;
+        displayCount: number;
+      };
+    }
+  }
+
+  class BookRibbon {
+    private container: HTMLElement | null;
+    private ribbon: HTMLElement | null;
+    private bookElements: HTMLElement[];
+    private centerIndex: number;
+    private currentOffset: number = 0;
+    private allBooks: BookData[] = [];
+    private featuredBookIndex: number = 0;
+    private displayCount: number = 7;
+
+    constructor() {
+      this.container = document.querySelector('.book-ribbon-container');
+      this.ribbon = document.querySelector('.book-ribbon');
+      this.bookElements = Array.from(document.querySelectorAll('.book-cover-wrapper'));
+      this.centerIndex = Math.floor(this.bookElements.length / 2);
+      
+      this.loadBookData();
+      this.initializeEventListeners();
+      this.initializeIntersectionObserver();
+      
+      // Initialize the display with current book positions
+      console.log('Initializing book ribbon with', this.allBooks.length, 'books');
+      if (this.allBooks.length > 0) {
+        this.updateBookPositions();
+      }
+    }
+
+    loadBookData() {
+      // Load book data from the window object set by the define:vars script
+      if (window.bookRibbonData) {
+        try {
+          const data = window.bookRibbonData;
+          this.allBooks = data.allBooks || [];
+          this.featuredBookIndex = data.featuredBookIndex || 0;
+          this.displayCount = data.displayCount || 7;
+          this.currentOffset = 0; // Start with featured book in center
+          
+          console.log('Loaded book data:', {
+            totalBooks: this.allBooks.length,
+            featuredBookIndex: this.featuredBookIndex,
+            featuredBook: this.allBooks[this.featuredBookIndex]?.title,
+            displayCount: this.displayCount
+          });
+        } catch (e) {
+          console.error('Failed to load book data:', e);
+          this.allBooks = [];
+        }
+      } else {
+        console.error('Book data not found on window object');
+      }
+    }
+
+    initializeEventListeners() {
+      // Book click navigation
+      this.bookElements.forEach((book, index) => {
+        book.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (index !== this.centerIndex) {
+            this.slideToPosition(index);
+          }
+        });
+      });
+
+      // Touch/swipe support
+      this.initializeTouchEvents();
+    }
+
+    initializeTouchEvents() {
+      if (!this.ribbon) return;
+
+      let startX = 0;
+      let isDragging = false;
+
+      this.ribbon.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+      }, { passive: true });
+
+      this.ribbon.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+      });
+
+      this.ribbon.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        
+        const endX = e.changedTouches[0].clientX;
+        const deltaX = startX - endX;
+
+        // Only trigger swipe if movement is significant
+        if (Math.abs(deltaX) > 50) {
+          if (deltaX > 0) {
+            this.navigateRight();
+          } else {
+            this.navigateLeft();
+          }
+        }
+        
+        isDragging = false;
+      });
+
+      // Mouse drag support for desktop
+      let mouseStartX = 0;
+      let isMouseDragging = false;
+
+      this.ribbon.addEventListener('mousedown', (e) => {
+        mouseStartX = e.clientX;
+        isMouseDragging = true;
+        this.ribbon!.style.cursor = 'grabbing';
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!isMouseDragging) return;
+        e.preventDefault();
+      });
+
+      document.addEventListener('mouseup', (e) => {
+        if (!isMouseDragging) return;
+        
+        const endX = e.clientX;
+        const deltaX = mouseStartX - endX;
+
+        if (Math.abs(deltaX) > 50) {
+          if (deltaX > 0) {
+            this.navigateRight();
+          } else {
+            this.navigateLeft();
+          }
+        }
+        
+        isMouseDragging = false;
+        this.ribbon!.style.cursor = 'grab';
+      });
+    }
+
+    slideToPosition(targetIndex: number) {
+      const direction = targetIndex > this.centerIndex ? 1 : -1;
+      const steps = Math.abs(targetIndex - this.centerIndex);
+      
+      for (let i = 0; i < steps; i++) {
+        setTimeout(() => {
+          if (direction > 0) {
+            this.navigateRight();
+          } else {
+            this.navigateLeft();
+          }
+        }, i * 200);
+      }
+    }
+
+    navigateLeft() {
+      console.log('Navigate left - Old offset:', this.currentOffset);
+      this.currentOffset--;
+      console.log('Navigate left - New offset:', this.currentOffset);
+      this.updateBookPositions();
+    }
+
+    navigateRight() {
+      console.log('Navigate right - Old offset:', this.currentOffset);
+      this.currentOffset++;
+      console.log('Navigate right - New offset:', this.currentOffset);
+      this.updateBookPositions();
+    }
+
+    updateBookPositions() {
+      if (this.allBooks.length === 0) {
+        console.error('No books loaded for cycling');
+        return;
+      }
+
+      console.log('Updating positions - Current offset:', this.currentOffset, 'Featured book index:', this.featuredBookIndex);
+
+      this.bookElements.forEach((bookEl, index) => {
+        // Calculate which book should be displayed in this position
+        // Start from featured book index, adjust by current offset, then position relative to center
+        const baseIndex = this.featuredBookIndex + this.currentOffset;
+        const positionOffset = index - this.centerIndex;
+        const bookIndex = (baseIndex + positionOffset + this.allBooks.length * 100) % this.allBooks.length;
+        const book = this.allBooks[bookIndex];
+        
+        console.log(`Position ${index}: Book index ${bookIndex}, Book: ${book?.title || 'undefined'}`);
+        
+        // Calculate visual properties based on distance from center
+        const distanceFromCenter = Math.abs(index - this.centerIndex);
+        const isFeatured = index === this.centerIndex;
+        
+        // Update the book content (image and alt text)
+        const img = bookEl.querySelector('img');
+        if (img && book) {
+          const newSrc = book.resolvedImageSrc || book.image;
+          console.log(`Updating image for position ${index} to: ${newSrc}`);
+          
+          // Force image update with a slight delay to ensure visibility
+          img.style.opacity = '0.5';
+          setTimeout(() => {
+            img.src = newSrc;
+            img.alt = `${book.title} by ${book.author}`;
+            img.style.opacity = '';
+          }, 50);
+        } else {
+          console.error(`Missing img element or book data for position ${index}`);
+        }
+        
+        // Remove existing transform classes
+        bookEl.classList.remove(
+          'scale-50', 'scale-75', 'scale-90', 'scale-100', 'scale-110', 'scale-125',
+          'opacity-40', 'opacity-60', 'opacity-75', 'opacity-85', 'opacity-100',
+          'z-10', 'z-20', 'z-30'
+        );
+        
+        // Apply new transform based on position
+        if (isFeatured) {
+          bookEl.classList.add('scale-110', 'opacity-100', 'z-20');
+          bookEl.dataset.isFeatured = 'true';
+          
+          // Add special styling for featured book
+          const shadowDiv = bookEl.querySelector('.absolute.inset-0');
+          if (shadowDiv) {
+            shadowDiv.classList.remove('hidden');
+          }
+        } else {
+          let scale = 'scale-90';
+          let opacity = 'opacity-85';
+          let zIndex = 'z-10';
+          
+          if (distanceFromCenter === 1) {
+            scale = 'scale-100';
+            opacity = 'opacity-90';
+          } else if (distanceFromCenter === 2) {
+            scale = 'scale-90';
+            opacity = 'opacity-75';
+          } else if (distanceFromCenter >= 3) {
+            scale = 'scale-75';
+            opacity = 'opacity-60';
+          }
+          
+          bookEl.classList.add(scale, opacity, zIndex);
+          bookEl.dataset.isFeatured = 'false';
+          
+          // Hide shadow for non-featured books
+          const shadowDiv = bookEl.querySelector('.absolute.inset-0');
+          if (shadowDiv) {
+            shadowDiv.classList.add('hidden');
+          }
+        }
+      });
+      
+      // Add a visual feedback that something is happening
+      this.ribbon?.classList.add('transform-gpu');
+      setTimeout(() => {
+        this.ribbon?.classList.remove('transform-gpu');
+      }, 300);
+    }
+
+    initializeIntersectionObserver() {
+      const options = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const books = entry.target.querySelectorAll('.book-cover-wrapper');
+            books.forEach((book, index) => {
+              setTimeout(() => {
+                book.classList.add('animate-fade-in');
+              }, index * 100);
+            });
+          }
+        });
+      }, options);
+
+      if (this.container) {
+        observer.observe(this.container);
+      }
+    }
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    new BookRibbon();
+  });
+
+  // Re-initialize after Astro page transitions
+  document.addEventListener('astro:after-swap', () => {
+    new BookRibbon();
+  });
+</script>
+
+<style>
+  .book-ribbon {
+    perspective: 1000px;
+    cursor: grab;
+  }
+
+  .book-ribbon:active {
+    cursor: grabbing;
+  }
+
+  .book-cover-wrapper {
+    transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
+    transform-style: preserve-3d;
+  }
+
+  .book-cover-wrapper:not([data-is-featured="true"]) {
+    filter: brightness(0.8) saturate(0.9);
+  }
+
+  .book-cover-wrapper[data-is-featured="true"] {
+    filter: brightness(1.1) saturate(1.1);
+  }
+
+  .book-cover-wrapper:hover {
+    filter: brightness(1.1) saturate(1.1) !important;
+  }
+
+  .nav-arrow {
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .nav-dot {
+    cursor: pointer;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .book-cover-wrapper {
+      margin: 0 -8px;
+    }
+    
+    .book-ribbon {
+      gap: 8px;
+      padding: 16px;
+    }
+    
+    .nav-arrow {
+      padding: 8px;
+    }
+    
+    .nav-arrow .icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .book-cover-wrapper img {
+      width: 80px !important;
+      height: 120px !important;
+    }
+    
+    .book-cover-wrapper[data-is-featured="true"] img {
+      width: 120px !important;
+      height: 180px !important;
+    }
+    
+    .book-ribbon {
+      gap: 4px;
+      padding: 12px;
+    }
+  }
+</style>

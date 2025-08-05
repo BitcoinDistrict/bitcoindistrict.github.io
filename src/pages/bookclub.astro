@@ -1,0 +1,41 @@
+---
+import HeroText from '~/components/widgets/HeroText.astro';
+import BookClubList from '~/components/widgets/BookClubList.astro';
+import BookRibbon from '~/components/widgets/BookRibbon.astro';
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: 'Book Club',
+};
+
+// Preload the book club data to improve initial loading performance
+import { bookClubBooks } from '~/data/bookclub';
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Widget ******************* -->
+
+  <HeroText
+    title="Bitcoin District Book Club"
+    subtitle="We get together every month to discuss a book related to Bitcoin, money, economics, or other topics related to the Bitcoin ecosystem. All are welcome to join any time."
+  />
+
+  <!-- Book Ribbon Widget ******************* -->
+  <BookRibbon 
+    classes={{
+      container: "!py-6 md:!py-8" // Reduce from default spacing
+    }}
+  />
+
+  <!-- Book Club List Widget ******************* -->
+  
+  <BookClubList
+    title="Our Reading List"
+    subtitle="Explore the books we've read and plan to read together. Click on any book title to purchase it."
+    classes={{ 
+      container: "!pb-16 md:!pb-20",
+    }}
+  />
+
+
+</Layout>
