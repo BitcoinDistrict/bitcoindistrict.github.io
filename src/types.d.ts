@@ -141,6 +141,21 @@ export interface Item {
   image?: Image;
 }
 
+export interface Meetup {
+  id: string;
+  title: string;
+  description: string;
+  location: {
+    name: string;
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  meetupUrl: string;
+  icon?: ImageMetadata;
+  image?: Image;
+}
+
 export interface Price {
   title?: string;
   subtitle?: string;

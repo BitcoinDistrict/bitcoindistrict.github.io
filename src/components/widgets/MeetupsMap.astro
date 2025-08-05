@@ -1,0 +1,105 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import type { Meetup } from '~/types';
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  tagline?: string;
+  meetups: Meetup[];
+  id?: string;
+  isDark?: boolean;
+  classes?: Record<string, string | Record<string, string>>;
+  bg?: string;
+}
+
+const {
+  title = await Astro.slots.render('title'),
+  subtitle = await Astro.slots.render('subtitle'),
+  tagline = await Astro.slots.render('tagline'),
+  meetups = [],
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+
+// Center the map on Washington DC
+const centerLat = 38.9072;
+const centerLng = -77.0369;
+const zoom = 8;
+---
+
+<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-6xl ${classes?.container ?? ''}`} bg={bg}>
+  <Headline title={title} subtitle={subtitle} tagline={tagline} classes={(classes?.headline as Record<string, string>) ?? {}} />
+  
+  <div class="relative w-full">
+    <!-- Map container -->
+    <div id="meetups-map" class="w-full h-96 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"></div>
+    
+    <!-- Include Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="" />
+    
+    <!-- Map Script -->
+    <script is:inline type="module" define:vars={{ meetups, centerLat, centerLng, zoom }}>
+      // Import Leaflet dynamically
+      const L = await import('https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js');
+      
+      // Initialize the map with scroll wheel zoom disabled by default
+      const map = L.map('meetups-map', {
+        scrollWheelZoom: false
+      }).setView([centerLat, centerLng], zoom);
+      
+      // Enable scroll wheel zoom when user clicks on the map
+      map.on('click', function() {
+        map.scrollWheelZoom.enable();
+      });
+      
+      // Disable scroll wheel zoom when mouse leaves the map
+      map.on('mouseout', function() {
+        map.scrollWheelZoom.disable();
+      });
+      
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      }).addTo(map);
+      
+      // Custom Bitcoin icon for markers
+      const bitcoinIcon = L.divIcon({
+        html: `<div style="background: #f7931a; color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">₿</div>`,
+        className: 'custom-div-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -15]
+      });
+      
+      // Add markers for each meetup
+      meetups.forEach(meetup => {
+        const marker = L.marker([meetup.location.latitude, meetup.location.longitude], {
+          icon: bitcoinIcon
+        }).addTo(map);
+        
+        // Create popup content
+        const popupContent = `
+          <div class="max-w-xs">
+            <h3 class="font-semibold text-lg mb-2">
+              <a href="${meetup.meetupUrl}" target="_blank" rel="noopener noreferrer" 
+                 class="text-blue-900 hover:text-blue-700 transition-colors">
+                ${meetup.title}
+              </a>
+            </h3>
+            <p class="text-sm text-gray-600 mb-2">${meetup.description}</p>
+            <p class="text-xs text-gray-500">${meetup.location.name}</p>
+          </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+      });
+    </script>
+  </div>
+</WidgetWrapper>

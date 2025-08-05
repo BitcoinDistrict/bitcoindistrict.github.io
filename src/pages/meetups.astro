@@ -1,0 +1,58 @@
+---
+import Layout from '~/layouts/PageLayout.astro';
+import HeroText from '~/components/widgets/HeroText.astro';
+import MeetupsMap from '~/components/widgets/MeetupsMap.astro';
+import MeetupFeatures from '~/components/widgets/MeetupFeatures.astro';
+import { meetupsData } from '~/data/meetups';
+
+const metadata = {
+  title: 'Bitcoin Community Meetups - Bitcoin District',
+  description: 'Discover Bitcoin meetups in the DC, Maryland & Virginia greater metro area. Connect with local Bitcoiners and join our community events.',
+};
+
+// Meetups data is now used directly in the MeetupFeatures component
+---
+
+<Layout metadata={metadata}>
+  <!-- Hero Section -->
+  <HeroText
+    tagline="Community"
+    title="Bitcoin Community Meetups"
+    subtitle="These are the Bitcoin meetups in the DC, Maryland & Virginia greater metro area. Connect with local Bitcoiners, learn about Bitcoin, and join our growing community."
+  />
+
+  <!-- Interactive Map Section -->
+  <MeetupsMap
+    title="Find Meetups Near You"
+    subtitle="Explore Bitcoin meetups across the DMV area on our interactive map"
+    meetups={meetupsData}
+    id="meetups-map-section"
+    classes={{
+      container: 'mb-16',
+    }}
+  />
+
+  <!-- Meetup Groups List -->
+  <MeetupFeatures
+    id="meetup-groups"
+    title="Local Bitcoin Communities"
+    subtitle="Join these established Bitcoin meetup groups in the greater Washington DC area"
+    meetups={meetupsData}
+    columns={3}
+    classes={{
+      container: 'max-w-6xl',
+    }}
+  />
+</Layout>
+
+<style>
+  /* Ensure proper spacing and responsive design */
+  .meetup-section {
+    @apply py-8 md:py-12;
+  }
+  
+  /* Custom styling for meetup cards */
+  :global(.meetup-item) {
+    @apply transition-all duration-300 hover:shadow-lg;
+  }
+</style>

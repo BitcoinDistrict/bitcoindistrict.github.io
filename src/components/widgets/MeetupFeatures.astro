@@ -1,0 +1,81 @@
+---
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import Button from '~/components/ui/Button.astro';
+import { twMerge } from 'tailwind-merge';
+import { Image } from 'astro:assets';
+import type { Meetup, Widget, Headline as HeadlineType } from '~/types';
+
+export interface Props extends Omit<HeadlineType, 'classes'>, Widget {
+  meetups?: Meetup[];
+  columns?: number;
+}
+
+const {
+  title = await Astro.slots.render('title'),
+  subtitle = await Astro.slots.render('subtitle'),
+  tagline = await Astro.slots.render('tagline'),
+  meetups = [],
+  columns = 2,
+  id,
+  isDark = false,
+  classes = {},
+  bg = await Astro.slots.render('bg'),
+} = Astro.props;
+---
+
+<WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-6xl ${classes?.container ?? ''}`} bg={bg}>
+  <Headline title={title} subtitle={subtitle} tagline={tagline} classes={(classes?.headline as Record<string, string>) ?? {}} />
+  
+  {
+    meetups && meetups.length > 0 && (
+      <div
+        class={twMerge(
+          `grid mx-auto gap-8 md:gap-y-12 ${
+            columns === 4
+              ? 'lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2'
+              : columns === 3
+                ? 'lg:grid-cols-3 sm:grid-cols-2'
+                : columns === 2
+                  ? 'sm:grid-cols-2 '
+                  : ''
+          }`
+        )}
+      >
+        {meetups.map((meetup) => (
+          <div class="intersect-once motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
+            <div class="flex flex-row max-w-md bg-white dark:bg-slate-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6">
+              <div class="flex justify-center">
+                {meetup.icon && (
+                  <div class="flex-shrink-0 mr-4 rtl:mr-0 rtl:ml-4">
+                    <a href={meetup.meetupUrl} target="_blank" rel="noopener noreferrer" 
+                       class="block hover:opacity-80 transition-opacity">
+                      <Image
+                        src={meetup.icon}
+                        alt={`${meetup.title} logo`}
+                        width={60}
+                        height={60}
+                        class="w-16 h-16 object-contain rounded-lg"
+                        loading="lazy"
+                      />
+                    </a>
+                  </div>
+                )}
+              </div>
+              <div class="flex-1">
+                <h3 class="text-xl font-bold mb-2">
+                  <a href={meetup.meetupUrl} target="_blank" rel="noopener noreferrer" 
+                     class="text-blue-900 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                    {meetup.title}
+                  </a>
+                </h3>
+                <p class="text-muted dark:text-slate-300 mb-3 text-sm">{meetup.description}</p>
+                <p class="text-xs text-gray-500 dark:text-slate-400">{meetup.location.name}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+</WidgetWrapper>
