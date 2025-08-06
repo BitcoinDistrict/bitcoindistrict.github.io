@@ -13,6 +13,7 @@ import { findImage } from '~/utils/images';
 import type { MetaData } from '~/types';
 import RelatedPosts from '~/components/blog/RelatedPosts.astro';
 
+
 export const prerender = true;
 
 export const getStaticPaths = (async () => {
@@ -45,7 +46,14 @@ const metadata = merge(
 ) as MetaData;
 ---
 
-<Layout metadata={metadata}>
+<Layout 
+  metadata={metadata}
+  heroImage={{
+    src: '~/assets/images/hero-basin.jpg',
+    alt: 'Basin landscape background',
+    opacity: 'opacity-20 dark:opacity-25'
+  }}
+>
   <SinglePost post={{ ...post, image: image }} url={url}>
     {post.Content ? <post.Content /> : <Fragment set:html={post.content || ''} />}
   </SinglePost>

@@ -98,6 +98,13 @@ export interface Video {
   type?: string;
 }
 
+export interface VideoItem {
+  title: string;
+  author?: string;
+  embedUrl: string;
+  description?: string;
+}
+
 export interface Widget {
   id?: string;
   isDark?: boolean;
@@ -294,3 +301,8 @@ export interface Content extends Omit<Headline, 'classes'>, Widget {
 }
 
 export interface Contact extends Omit<Headline, 'classes'>, Form, Widget {}
+
+export interface VideoTiles extends Omit<Headline, 'classes'>, Widget {
+  videos?: Array<VideoItem>;
+  columns?: number;
+}

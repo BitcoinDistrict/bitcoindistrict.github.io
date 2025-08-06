@@ -34,11 +34,13 @@ export interface HeroConfig {
  * Default hero images for different sections of the site
  */
 export const HERO_IMAGES = {
-  default: '~/assets/images/hero.jpg',
+  default: '~/assets/images/hero-capitol.jpg',
   events: '~/assets/images/hero-lincoln.jpg',
   meetups: '~/assets/images/hero-metro.jpg',
   bookclub: '~/assets/images/hero-bridge.jpg',
   about: '~/assets/images/hero-mlk.jpg',
+  learn: '~/assets/images/hero-whitehouse.jpg',
+  blog: '~/assets/images/hero-basin.jpg',
   // Add more preset hero images here as needed
 } as const;
 

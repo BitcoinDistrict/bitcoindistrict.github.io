@@ -1,0 +1,188 @@
+---
+import HeroLayout from '~/layouts/HeroLayout.astro';
+import Content from '~/components/widgets/Content.astro';
+import Features from '~/components/widgets/Features.astro';
+import VideoTiles from '~/components/widgets/VideoTiles.astro';
+import ReferralCards from '~/components/widgets/ReferralCards.astro';
+import { createHero, HERO_IMAGES, SCROLL_INDICATOR_PRESETS } from '~/utils/hero';
+
+const metadata = {
+  title: 'Learn',
+};
+
+// Configure hero with Lincoln image and events content
+const hero = createHero({
+  image: HERO_IMAGES.learn, // This is hero-lincoln.jpg
+  alt: 'Bitcoin District',
+  opacity: 'opacity-30 dark:opacity-30',
+  title: 'Learn ₿itcoin',
+  subtitle: 'We\'ve put together some of our favorite resources to help you get started with Bitcoin.',
+});
+---
+
+<HeroLayout 
+  metadata={metadata} 
+  hero={hero}
+  scrollIndicator={SCROLL_INDICATOR_PRESETS.accent}
+>
+  <!-- Why Bitcoin Only Section -->
+  <Content
+    id="why-bitcoin-only"
+    title="Why Bitcoin Only?"
+    subtitle=""
+    items={[
+      {
+        title: "Bitcoin works without leaders",
+        description: "No presidents or CEOs!",
+        icon: "tabler:crown-off",
+      },
+      {
+        title: "Bitcoin had a fair launch",
+        description: "No pre‑mine and no corporate insiders enriching themselves (i.e. XRP).",
+        icon: "tabler:scale",
+      },
+      {
+        title: "Known issuance schedule",
+        description: "Bitcoin's issuance schedule is known and doesn't change.",
+        icon: "tabler:calendar-check",
+      },
+      {
+        title: "Real digital scarcity",
+        description: "Bitcoin's proof‑of‑work system ensures digital scarcity is real and more coins can't be created out of thin air.",
+        icon: "tabler:diamond",
+      },
+      {
+        title: "Most secure & decentralized",
+        description: "Bitcoin is better because it is the most secure, truly decentralized & censorship‑resistant monetary protocol that cannot be controlled.",
+        icon: "tabler:shield-check",
+      },
+    ]}
+    image={{
+      src: '~/assets/images/bitcoin-1.jpg',
+      alt: 'Bitcoin symbol representing decentralized money',
+      class: 'hidden md:block',
+    }}
+    isReversed={false}
+  />
+
+  <!-- Starter Videos Section -->
+  <VideoTiles
+    id="starter-videos"
+    title="Intro to Bitcoin Videos"
+    subtitle="Essential videos to understand Bitcoin fundamentals"
+    videos={[
+      {
+        title: "What's The Problem?",
+        author: "Joe Bryan",
+        embedUrl: "https://www.youtube.com/embed/YtFOxNbmD38",
+      },
+      {
+        title: "Intro to Bitcoin",
+        author: "Andreas Antonopoulos",
+        embedUrl: "https://www.youtube.com/embed/oiO8ruxp2IA",
+      },
+      {
+        title: "How Money & Banking Work",
+        author: "Lyn Alden",
+        embedUrl: "https://www.youtube.com/embed/jk_HWmmwiAs",
+      },
+      {
+        title: "Why Bitcoin Works",
+        author: "Art of the Problem",
+        embedUrl: "https://www.youtube.com/embed/ZKwqNgG-Sv4",
+      },
+    ]}
+    columns={4}
+  />
+
+  <!-- Buying Your First Coins Section -->
+  <ReferralCards
+    id="buying-coins"
+    title="Buying Your First Coins"
+    subtitle="When you're ready to get some Bitcoin, use a reputable Bitcoin‑only exchange."
+    cards={[
+      {
+        title: "River",
+        description: "Bitcoin-only exchange with excellent security and user experience.",
+        image: {
+          src: "~/assets/images/river.png",
+          alt: "River Bitcoin exchange logo",
+        },
+        link: "https://river.com",
+        buttonText: "Visit River",
+      },
+      {
+        title: "Strike",
+        description: "Fast and easy Bitcoin purchases with low fees.",
+        image: {
+          src: "~/assets/images/strike.png",
+          alt: "Strike Bitcoin app logo",
+        },
+        link: "https://strike.me",
+        buttonText: "Visit Strike",
+      },
+      {
+        title: "CashApp",
+        description: "Popular mobile app with simple Bitcoin buying.",
+        image: {
+          src: "~/assets/images/cashapp.png",
+          alt: "CashApp logo",
+        },
+        link: "https://cash.app",
+        buttonText: "Visit CashApp",
+      },
+    ]}
+    columns={3}
+  >
+  </ReferralCards>
+
+  <!-- Securing Your Coins Section -->
+  <ReferralCards
+    id="securing-coins"
+    title="Securing Your Coins"
+    subtitle="You don't have to trust an exchange with your Bitcoin. When you're ready, you can take full custody of your own coins."
+    cards={[
+      {
+        title: "BTC Sessions – Learn",
+        description: "Beginner guides to Bitcoin security and self-custody best practices.",
+        image: {
+          src: "~/assets/images/btcsessions.png",
+          alt: "BTC Sessions logo",
+        },
+        link: "https://www.youtube.com/watch?v=z3n1uZrNvXo",
+        buttonText: "Watch Guides",
+      },
+      {
+        title: "BitKey – For Beginners",
+        description: "Basic self‑custody setup made simple for newcomers to Bitcoin.",
+        image: {
+          src: "~/assets/images/bitkey.png",
+          alt: "BitKey hardware wallet logo",
+        },
+        link: "https://bitkey.world",
+        buttonText: "Learn More",
+      },
+      {
+        title: "ColdCard – More Advanced",
+        description: "Dedicated hardware wallet for serious Bitcoin security.",
+        image: {
+          src: "~/assets/images/coldcard.png",
+          alt: "ColdCard hardware wallet logo",
+        },
+        link: "https://coldcard.com",
+        buttonText: "Visit ColdCard",
+      },
+      {
+        title: "SeedSigner – Build Your Own",
+        description: "DIY fully offline wallet for the technically inclined.",
+        image: {
+          src: "~/assets/images/seedsigner.png",
+          alt: "SeedSigner DIY wallet logo",
+        },
+        link: "https://seedsigner.com/",
+        buttonText: "Visit SeedSigner",
+      },
+    ]}
+    columns={4}
+  />
+</HeroLayout>

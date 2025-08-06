@@ -15,11 +15,15 @@ export const headerData = {
       href: getPermalink('/about'),
     },
     {
+      text: 'Learn',
+      href: getPermalink('/learn'),
+    },
+    {
       text: 'News',
       href: getPermalink('https://news.bitcoindistrict.org'),
     },
   ],
-  actions: [{ text: 'Get Involved', href: '/join', target: '_self' }],
+  actions: [{ text: 'Blog', href: '/blog', target: '_self' }],
 };
 
 export const footerData = {
@@ -28,7 +32,7 @@ export const footerData = {
       title: 'Meetups',
       links: [
         { text: 'Bitcoin District', href: 'https://www.meetup.com/bitcoin-district/' },
-        { text: 'DC BitDevs', href: 'https://www.meetup.com/dcbitdevs/' },
+        { text: 'DC BitDevs', href: 'https://www.meetup.com/dc-bit-devs/' },
         { text: 'Shenandoah Bitcoin Club', href: 'https://www.meetup.com/shenandoah-bitcoin-club/' },
       ],
     },
