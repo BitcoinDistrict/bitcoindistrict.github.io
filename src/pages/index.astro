@@ -1,7 +1,5 @@
 ---
-import Layout from '~/layouts/PageLayout.astro';
-import Image from '~/components/common/Image.astro';
-import Hero from '~/components/widgets/Hero.astro';
+import HeroLayout from '~/layouts/HeroLayout.astro';
 import Features2 from '~/components/widgets/Features2.astro';
 import Stats from '~/components/widgets/Stats.astro';
 import BitcoinStats from '~/components/widgets/BitcoinStats.astro';
@@ -11,48 +9,30 @@ import { Icon } from 'astro-icon/components';
 import { communityReasons } from '~/data/reasons';
 import BookClubPreview from '~/components/widgets/BookClubPreview.astro';
 import { getCurrentBook } from '~/utils/bookclub';
+import { createHero, HERO_IMAGES, HERO_OPACITY } from '~/utils/hero';
 
 const metadata = {
   title: 'Bitcoin District',
   ignoreTitleTemplate: true,
 };
 
+// Hero configuration using utility function
+const hero = createHero({
+  image: HERO_IMAGES.default,
+  alt: 'Bitcoin District Hero Background',
+  opacity: HERO_OPACITY.light,
+  title: 'This is <span class="text-[#f7931a]"> ₿itcoin </span> District',
+  subtitle: '<span class="font-semibold">Bitcoin District</span> is a network of Bitcoiners living and working in the DC, Maryland & Virginia (DMV) area seeking to network, socialize & collaborate with other Bitcoiners.',
+});
+
 // Get the current book for the book club section
 const currentBook = getCurrentBook();
 ---
 
-<Layout metadata={metadata}>
-  <!-- Hero Widget ******************* -->
-
-  <div class="min-h-screen flex flex-col justify-start pt-4 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-18 relative">
-    <Hero>
-      <Fragment slot="bg">
-        <Image
-          src="~/assets/images/hero.jpg"
-          alt="Bitcoin District Hero Background"
-          class="fixed inset-0 object-cover w-full h-full opacity-25 dark:opacity-30 z-[-1]"
-          widths={[400, 768, 1024, 1920, 2560]}
-          sizes="100vw"
-          loading="eager"
-          width={1920}
-          height={1080}
-        />
-      </Fragment>
-
-      <Fragment slot="title">
-        This is <span class="text-[#f7931a]"> ₿itcoin </span> District
-      </Fragment>
-
-      <Fragment slot="subtitle">
-        <span class="font-semibold">Bitcoin District</span> is a network of Bitcoiners living and working in the DC, Maryland
-        & Virginia (DMV) area seeking to network, socialize & collaborate with other Bitcoiners.
-      </Fragment>
-    </Hero>
-
-    <!-- Bitcoin Live Stats Widget -->
-    <div class="relative z-10 -mt-20 pb-12">
-      <BitcoinStats class="px-4 sm:px-6" />
-    </div>
+<HeroLayout metadata={metadata} hero={hero}>
+  <!-- Bitcoin Live Stats Widget -->
+  <div slot="hero-bottom" class="relative z-10 -mt-20 pb-12">
+    <BitcoinStats class="px-4 sm:px-6" />
   </div>
 
   <!-- Upcoming Events Widget ********** -->
@@ -117,4 +97,4 @@ const currentBook = getCurrentBook();
       { title: 'Total ₿itcoin', amount: '21M' },
     ]}
   />
-</Layout>
+</HeroLayout>

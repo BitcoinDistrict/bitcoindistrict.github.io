@@ -1,0 +1,132 @@
+---
+/**
+ * HeroLayout - Layout component with full-viewport hero image support
+ * 
+ * This layout provides a clean way to add hero images that cover the entire viewport
+ * to any page. Perfect for landing pages and pages that need visual impact.
+ * 
+ * Usage examples:
+ * 
+ * 1. Basic hero with default image:
+ *    <HeroLayout metadata={metadata} />
+ * 
+ * 2. Custom hero image:
+ *    <HeroLayout metadata={metadata} hero={{ image: '~/assets/images/my-hero.jpg' }} />
+ * 
+ * 3. Full hero configuration:
+ *    <HeroLayout metadata={metadata} hero={{
+ *      image: '~/assets/images/hero.jpg',
+ *      title: 'Welcome to Bitcoin District',
+ *      subtitle: 'Your local Bitcoin community',
+ *      opacity: 'opacity-20 dark:opacity-25'
+ *    }} />
+ * 
+ * 4. Using utility functions for consistency:
+ *    import { createHero, HERO_IMAGES } from '~/utils/hero';
+ *    const hero = createHero({ image: HERO_IMAGES.events, title: 'Events' });
+ *    <HeroLayout metadata={metadata} hero={hero} />
+ * 
+ * 5. With text scroll indicator:
+ *    <HeroLayout metadata={metadata} hero={hero} 
+ *      scrollIndicator={{ text: 'Discover more', variant: 'both', color: 'accent' }} />
+ * 
+ * 6. Disable scroll indicator:
+ *    <HeroLayout metadata={metadata} hero={hero} showScrollIndicator={false} />
+ */
+import Layout from '~/layouts/Layout.astro';
+import Header from '~/components/widgets/Header.astro';
+import Footer from '~/components/widgets/Footer.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Image from '~/components/common/Image.astro';
+import ScrollIndicator from '~/components/ui/ScrollIndicator.astro';
+
+import { headerData, footerData } from '~/navigation';
+
+import type { MetaData } from '~/types';
+
+export interface Props {
+  metadata?: MetaData;
+  hero?: {
+    image?: string;
+    alt?: string;
+    opacity?: string;
+    title?: string;
+    subtitle?: string;
+    tagline?: string;
+    actions?: any[];
+    content?: string;
+  };
+  showScrollIndicator?: boolean;
+  scrollIndicator?: {
+    text?: string;
+    variant?: 'arrow' | 'text' | 'both';
+    position?: 'center' | 'left' | 'right';
+    color?: 'light' | 'dark' | 'accent';
+    size?: 'sm' | 'md' | 'lg';
+  };
+}
+
+const { metadata, hero, showScrollIndicator = true, scrollIndicator = {} } = Astro.props;
+
+// Default hero configuration
+const defaultHero = {
+  image: '~/assets/images/hero.jpg',
+  alt: 'Hero Background',
+  opacity: 'opacity-25 dark:opacity-30',
+};
+
+const heroConfig = { ...defaultHero, ...hero };
+---
+
+<Layout metadata={metadata}>
+  <slot name="header">
+    <Header {...headerData} isSticky showRssFeed showToggleTheme />
+  </slot>
+  
+  <main>
+    <!-- Hero Section with Background Image -->
+    <div class="min-h-screen flex flex-col justify-start pt-4 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-18 relative">
+      <Hero
+        tagline={heroConfig.tagline}
+        title={heroConfig.title}
+        subtitle={heroConfig.subtitle}
+        content={heroConfig.content}
+        actions={heroConfig.actions}
+      >
+        <Fragment slot="bg">
+          <Image
+            src={heroConfig.image}
+            alt={heroConfig.alt}
+            class={`fixed inset-0 object-cover w-full h-full ${heroConfig.opacity} z-[-1]`}
+            widths={[400, 768, 1024, 1920, 2560]}
+            sizes="100vw"
+            loading="eager"
+            width={1920}
+            height={1080}
+          />
+        </Fragment>
+      </Hero>
+
+      <!-- Additional content slot for widgets like BitcoinStats -->
+      <slot name="hero-bottom" />
+      
+      <!-- Scroll Indicator -->
+      {showScrollIndicator && (
+        <ScrollIndicator
+          text={scrollIndicator.text}
+          variant={scrollIndicator.variant}
+          position={scrollIndicator.position}
+          color={scrollIndicator.color}
+          size={scrollIndicator.size}
+        />
+      )}
+    </div>
+
+    <!-- Main content area -->
+    <slot />
+  </main>
+  
+  <slot name="footer">
+    <Footer {...footerData} />
+  </slot>
+</Layout>

@@ -1,27 +1,30 @@
 ---
-import Layout from '~/layouts/PageLayout.astro';
-import HeroText from '~/components/widgets/HeroText.astro';
+import HeroLayout from '~/layouts/HeroLayout.astro';
 import MeetupsMap from '~/components/widgets/MeetupsMap.astro';
 import MeetupFeatures from '~/components/widgets/MeetupFeatures.astro';
 import { meetupsData } from '~/data/meetups';
+import { createHero, HERO_IMAGES } from '~/utils/hero';
 
 const metadata = {
   title: 'Bitcoin Community Meetups - Bitcoin District',
   description: 'Discover Bitcoin meetups in the DC, Maryland & Virginia greater metro area. Connect with local Bitcoiners and join our community events.',
 };
 
+const hero = createHero({
+  image: HERO_IMAGES.meetups,
+  title: 'Bitcoin Community Meetups in the DMV',
+  subtitle: 'These are the Bitcoin meetups in and around the DC, Maryland & Virginia greater metro area. Connect with your community and learn more about Bitcoin and freedom tech!',
+  alt: 'Bitcoin meetups in the DC Metro area',
+});
+
 // Meetups data is now used directly in the MeetupFeatures component
 ---
 
-<Layout metadata={metadata}>
-  <!-- Hero Section -->
-  <HeroText
-    title="Bitcoin Community Meetups in the DMV"
-    subtitle="These are the Bitcoin meetups in and around the DC, Maryland & Virginia greater metro area. Connect with your community and learn more about Bitcoin and freedom tech!"
-  />
+<HeroLayout metadata={metadata} hero={hero}>
 
   <!-- Interactive Map Section -->
   <MeetupsMap
+    slot="hero-bottom"
     title="Find Meetups Near You"
     subtitle="Explore Bitcoin meetups across the DMV area on our interactive map. Many people living in the DMV are used to long drives, so we've added a few more meetups that are farther out."
     meetups={meetupsData}
@@ -42,7 +45,7 @@ const metadata = {
       container: 'max-w-6xl',
     }}
   />
-</Layout>
+</HeroLayout>
 
 <style>
   /* Ensure proper spacing and responsive design */

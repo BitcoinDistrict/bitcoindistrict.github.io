@@ -1,27 +1,30 @@
 ---
-import HeroText from '~/components/widgets/HeroText.astro';
 import BookClubList from '~/components/widgets/BookClubList.astro';
 import BookRibbon from '~/components/widgets/BookRibbon.astro';
-import Layout from '~/layouts/PageLayout.astro';
+import HeroLayout from '~/layouts/HeroLayout.astro';
+import { createHero, HERO_IMAGES } from '~/utils/hero';
 
 const metadata = {
-  title: 'Book Club',
+  title: 'Bitcoin District Book Club - Bitcoin District',
+  description: 'Join our monthly Bitcoin book club discussions. We explore books on Bitcoin, money, economics, and freedom tech topics. All are welcome to join any time.',
 };
+
+const hero = createHero({
+  image: HERO_IMAGES.bookclub,
+  title: 'Bitcoin District Book Club',
+  subtitle: 'We get together every month to discuss a book related to Bitcoin, money, economics, or other topics related to the Bitcoin ecosystem. All are welcome to join any time.',
+  alt: 'Bitcoin District Book Club meetings',
+});
 
 // Preload the book club data to improve initial loading performance
 import { bookClubBooks } from '~/data/bookclub';
 ---
 
-<Layout metadata={metadata}>
-  <!-- Hero Widget ******************* -->
+<HeroLayout metadata={metadata} hero={hero}>
 
-  <HeroText
-    title="Bitcoin District Book Club"
-    subtitle="We get together every month to discuss a book related to Bitcoin, money, economics, or other topics related to the Bitcoin ecosystem. All are welcome to join any time."
-  />
-
-  <!-- Book Ribbon Widget ******************* -->
+  <!-- Book Ribbon Widget in Hero Section ******************* -->
   <BookRibbon 
+    slot="hero-bottom"
     classes={{
       container: "!py-6 md:!py-8" // Reduce from default spacing
     }}
@@ -37,5 +40,4 @@ import { bookClubBooks } from '~/data/bookclub';
     }}
   />
 
-
-</Layout>
+</HeroLayout>

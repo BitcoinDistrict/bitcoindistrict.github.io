@@ -1,0 +1,165 @@
+---
+/**
+ * ScrollIndicator - A visual cue that encourages users to scroll down
+ * 
+ * Features:
+ * - Animated bouncing arrow or text
+ * - Smooth scroll behavior when clicked
+ * - Automatically hides when user scrolls
+ * - Accessible with proper ARIA labels
+ * - Customizable styling and text
+ */
+
+export interface Props {
+  text?: string;
+  variant?: 'arrow' | 'text' | 'both';
+  position?: 'center' | 'left' | 'right';
+  color?: 'light' | 'dark' | 'accent';
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const {
+  text,
+  variant = 'arrow',
+  position = 'center',
+  color = 'light',
+  size = 'md',
+  class: className = '',
+} = Astro.props;
+
+// Style mappings
+const positionClasses = {
+  center: 'left-1/2 transform -translate-x-1/2',
+  left: 'left-8',
+  right: 'right-8',
+};
+
+const colorClasses = {
+  light: 'text-white/80 hover:text-white',
+  dark: 'text-gray-800/80 hover:text-gray-800',
+  accent: 'text-[#f7931a]/80 hover:text-[#f7931a]',
+};
+
+const sizeClasses = {
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-lg',
+};
+
+const iconSizeClasses = {
+  sm: 'w-4 h-4',
+  md: 'w-5 h-5',
+  lg: 'w-6 h-6',
+};
+---
+
+<div 
+  class={`fixed bottom-8 z-20 ${positionClasses[position]} ${className}`}
+  id="scroll-indicator"
+>
+  <button
+    class={`
+      flex flex-col items-center gap-2 cursor-pointer transition-all duration-300
+      ${colorClasses[color]} ${sizeClasses[size]}
+      hover:transform hover:scale-110
+      focus:outline-none focus:ring-2 focus:ring-white/50 rounded-lg p-2
+    `}
+    aria-label="Scroll down to see more content"
+    onclick="scrollToContent()"
+  >
+    {(variant === 'text' || variant === 'both') && text && (
+      <span class="font-medium tracking-wide">
+        {text}
+      </span>
+    )}
+    
+    {(variant === 'arrow' || variant === 'both') && (
+      <svg 
+        class={`${iconSizeClasses[size]} animate-bounce`}
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          stroke-width="2" 
+          d="M19 14l-7 7m0 0l-7-7m7 7V3"
+        />
+      </svg>
+    )}
+  </button>
+</div>
+
+<script>
+  // Smooth scroll to main content
+  function scrollToContent() {
+    const heroHeight = window.innerHeight;
+    window.scrollTo({
+      top: heroHeight,
+      behavior: 'smooth'
+    });
+  }
+
+  // Hide scroll indicator when user scrolls
+  function handleScroll() {
+    const scrollIndicator = document.getElementById('scroll-indicator');
+    const scrollPosition = window.scrollY;
+    const threshold = window.innerHeight * 0.3; // Hide after scrolling 30% of viewport
+
+    if (scrollIndicator) {
+      if (scrollPosition > threshold) {
+        scrollIndicator.style.opacity = '0';
+        scrollIndicator.style.pointerEvents = 'none';
+      } else {
+        scrollIndicator.style.opacity = '1';
+        scrollIndicator.style.pointerEvents = 'auto';
+      }
+    }
+  }
+
+  // Initialize scroll behavior
+  document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('scroll', handleScroll);
+    
+    // Make scrollToContent globally available
+    (window as any).scrollToContent = scrollToContent;
+  });
+
+  // Clean up on page transitions (for Astro View Transitions)
+  document.addEventListener('astro:before-swap', () => {
+    window.removeEventListener('scroll', handleScroll);
+  });
+</script>
+
+<style>
+  /* Ensure smooth opacity transitions */
+  #scroll-indicator {
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  /* Enhanced bounce animation */
+  @keyframes enhanced-bounce {
+    0%, 20%, 53%, 80%, 100% {
+      animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+      transform: translate3d(0,0,0);
+    }
+    40%, 43% {
+      animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+      transform: translate3d(0, -8px, 0);
+    }
+    70% {
+      animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+      transform: translate3d(0, -4px, 0);
+    }
+    90% {
+      transform: translate3d(0,-1px,0);
+    }
+  }
+
+  .animate-bounce {
+    animation: enhanced-bounce 2s infinite;
+  }
+</style>

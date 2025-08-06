@@ -1,31 +1,33 @@
 ---
 import { Image } from 'astro:assets';
-import Layout from '~/layouts/PageLayout.astro';
-import HeroText from '~/components/widgets/HeroText.astro';
+import HeroLayout from '~/layouts/HeroLayout.astro';
 import Features3 from '~/components/widgets/Features3.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import featureImage from '~/assets/images/feature1.jpg';
 import { faqs } from '~/data/faqs';
+import { createHero, HERO_IMAGES } from '~/utils/hero';
 
 const metadata = {
-  title: 'About Us',
+  title: 'About Bitcoin District - Bitcoin District',
+  description: 'Learn about Bitcoin District, a network of Bitcoiners in the greater DC, Maryland and Virginia metro area. Discover our community, mission, and how to get involved.',
 };
+
+const hero = createHero({
+  image: HERO_IMAGES.about,
+  title: 'About Bitcoin District',
+  subtitle: 'Bitcoin District is a network of Bitcoiners who live and work around the greater DC, Maryland and Virginia (DMV) metro area.',
+  alt: 'About Bitcoin District community',
+});
 ---
 
-<Layout metadata={metadata}>
-  <!-- Hero Text Widget ********** -->
-
-  <HeroText
-    title="About Bitcoin District"
-    subtitle="Bitcoin District is a network of Bitcoiners who live and work around the greater DC, Maryland and Virginia (DMV) metro area."
-  />
+<HeroLayout metadata={metadata} hero={hero}>
 
   <!-- Features3 Widget with Image ********** -->
 
   <Features3
+    slot="hero-bottom"
     columns={3}
     isAfterContent={true}
-    imageHeight={480}
     items={[
       {
         title: 'Shared Interest',
@@ -61,4 +63,4 @@ const metadata = {
     classes={{ container: 'max-w-6xl' }}
     items={faqs.map(faq => ({ title: faq.question, description: faq.answer }))}
   />
-</Layout>
+</HeroLayout>

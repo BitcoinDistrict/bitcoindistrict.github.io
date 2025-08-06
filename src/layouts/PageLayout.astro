@@ -3,6 +3,8 @@ import Layout from '~/layouts/Layout.astro';
 import Header from '~/components/widgets/Header.astro';
 import Footer from '~/components/widgets/Footer.astro';
 import Announcement from '~/components/widgets/Announcement.astro';
+import Image from '~/components/common/Image.astro';
+import ScrollIndicator from '~/components/ui/ScrollIndicator.astro';
 
 import { headerData, footerData } from '~/navigation';
 
@@ -10,18 +12,59 @@ import type { MetaData } from '~/types';
 
 export interface Props {
   metadata?: MetaData;
+  heroImage?: {
+    src?: string;
+    alt?: string;
+    opacity?: string;
+  };
+  showScrollIndicator?: boolean;
+  scrollIndicator?: {
+    text?: string;
+    variant?: 'arrow' | 'text' | 'both';
+    position?: 'center' | 'left' | 'right';
+    color?: 'light' | 'dark' | 'accent';
+    size?: 'sm' | 'md' | 'lg';
+  };
 }
 
-const { metadata } = Astro.props;
+const { metadata, heroImage, showScrollIndicator = false, scrollIndicator = {} } = Astro.props;
 ---
 
 <Layout metadata={metadata}>
+  <!-- Optional Hero Background Image -->
+  {heroImage && (
+    <div class="fixed inset-0 z-[-1]">
+      <Image
+        src={heroImage.src || '~/assets/images/hero.jpg'}
+        alt={heroImage.alt || 'Background'}
+        class={`object-cover w-full h-full ${heroImage.opacity || 'opacity-25 dark:opacity-30'}`}
+        widths={[400, 768, 1024, 1920, 2560]}
+        sizes="100vw"
+        loading="eager"
+        width={1920}
+        height={1080}
+      />
+    </div>
+  )}
+  
   <slot name="header">
     <Header {...headerData} isSticky showRssFeed showToggleTheme />
   </slot>
   <main>
     <slot />
   </main>
+  
+  <!-- Scroll Indicator (only shown when heroImage is present and explicitly enabled) -->
+  {showScrollIndicator && heroImage && (
+    <ScrollIndicator
+      text={scrollIndicator.text}
+      variant={scrollIndicator.variant}
+      position={scrollIndicator.position}
+      color={scrollIndicator.color}
+      size={scrollIndicator.size}
+    />
+  )}
+  
   <slot name="footer">
     <Footer {...footerData} />
   </slot>
