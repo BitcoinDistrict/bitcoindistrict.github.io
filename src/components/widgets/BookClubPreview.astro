@@ -1,0 +1,122 @@
+---
+import Image from '~/components/common/Image.astro';
+import Button from '~/components/ui/Button.astro';
+import type { BookClubBook } from '~/data/bookclub';
+
+export interface Props {
+  tagline?: string;
+  title?: string;
+  subtitle?: string;
+  actions?: any[];
+  book: BookClubBook;
+  id?: string;
+  classes?: Record<string, string>;
+}
+
+const {
+  tagline,
+  title,
+  subtitle,
+  actions,
+  book,
+  id,
+  classes = {},
+} = Astro.props;
+---
+
+<section class={`relative py-12 md:py-20 ${classes.container ?? ''}`} {...id ? { id } : {}}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="lg:flex lg:items-center lg:gap-12">
+      <!-- Left Column: Text Content -->
+      <div class="lg:basis-1/2 text-center lg:text-left mb-8 lg:mb-0">
+        {
+          tagline && (
+            <p
+              class="text-base text-secondary dark:text-blue-200 font-bold tracking-wide uppercase mb-2"
+              set:html={tagline}
+            />
+          )
+        }
+        {
+          title && (
+            <h2
+              class="text-4xl md:text-5xl font-bold leading-tighter tracking-tighter mb-4 font-heading dark:text-gray-200"
+              set:html={title}
+            />
+          )
+        }
+        {
+          subtitle && (
+            <p
+              class="text-xl text-muted mb-6 dark:text-slate-300 max-w-2xl mx-auto lg:mx-0"
+              set:html={subtitle}
+            />
+          )
+        }
+
+        {
+          actions && actions.length > 0 && (
+            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              {actions.map((action) => (
+                <Button {...(action || {})} />
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Right Column: Book Cover -->
+      <div class="lg:basis-1/2 flex justify-center lg:justify-end">
+        <div class="book-cover-container">
+          <Image
+            src={book.image}
+            alt={`Cover of ${book.title} by ${book.author}`}
+            class="book-cover shadow-xl rounded-lg transform hover:scale-105 transition-transform duration-300"
+            width={400}
+            loading="eager"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .book-cover-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .book-cover {
+    width: 120px; /* Much smaller mobile size */
+    height: auto;
+    max-width: 50%; /* Prevent it from taking full width */
+  }
+  
+  /* Responsive sizing */
+  @media (min-width: 640px) {
+    .book-cover {
+      width: 180px; /* Small tablets */
+      max-width: 60%;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .book-cover {
+      width: 250px; /* Medium tablets */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .book-cover {
+      width: 300px; /* Desktop */
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .book-cover {
+      width: 350px; /* Large desktop */
+    }
+  }
+</style>

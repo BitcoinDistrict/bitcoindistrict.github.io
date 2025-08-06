@@ -1,5 +1,5 @@
 site:
-  name: Bitcoin District
+  name: ₿itcoin District
   site: 'https://bitcoindistrict.org'
   base: '/' # Keep empty for root domain
   trailingSlash: false
