@@ -36,7 +36,7 @@ export const manualEvents: ManualEvent[] = [
     url: "https://btcindc.com",
     location: "Washington, DC",
     source: "George Washington University",
-    icon: "/src/assets/images/logos/gw.png", // GW logo for the conference
+    icon: "~/assets/images/logos/gw.png", // GW logo for the conference
     enabled: true, // Set to true when you want this event to show
   },
   

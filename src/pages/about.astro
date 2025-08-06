@@ -1,9 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import Layout from '~/layouts/PageLayout.astro';
-import Content from '~/components/widgets/Content.astro';
+import HeroText from '~/components/widgets/HeroText.astro';
+import Features3 from '~/components/widgets/Features3.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
-import coffeetourImage from '~/assets/images/coffeetour.jpg';
+import featureImage from '~/assets/images/feature1.jpg';
 import { faqs } from '~/data/faqs';
 
 const metadata = {
@@ -12,20 +13,42 @@ const metadata = {
 ---
 
 <Layout metadata={metadata}>
-  <!-- About Content Widget ********** -->
+  <!-- Hero Text Widget ********** -->
 
-  <Content
-    title="About Us"
-    content={`
-      Bitcoin District is a network of Bitcoiners who live and work around the greater DC, Maryland and Virginia (DMV) metro area.
-      
-      Most importantly, we're a group of people from all walks of life brought together by the common belief that Bitcoin can help make the world a better place.
-      
-      The Bitcoin District website and any social media accounts are tools to help communicate public events organized by local Bitcoiners.
-    `}
+  <HeroText
+    title="About Bitcoin District"
+    subtitle="Bitcoin District is a network of Bitcoiners who live and work around the greater DC, Maryland and Virginia (DMV) metro area."
+  />
+
+  <!-- Features3 Widget with Image ********** -->
+
+  <Features3
+    columns={3}
+    isAfterContent={true}
+    imageHeight={480}
+    items={[
+      {
+        title: 'Shared Interest',
+        description:
+          'We come from all walks of life brought together by the common belief that Bitcoin can help make the world a better place',
+        icon: 'tabler:heart-handshake',
+      },
+      {
+        title: 'Community',
+        description:
+          'We’re not a lobby, a company, an institute, a foundation, a building or a coworking space​.',
+        icon: 'tabler:users-group',
+      },
+      {
+        title: 'Volunteers',
+        description:
+          'The Bitcoin District website and any social media accounts are tools to help communicate public events organized by local Bitcoiners.',
+        icon: 'tabler:mood-happy',
+      },
+    ]}
     image={{
-      src: coffeetourImage,
-      alt: 'Bitcoin District group photo',
+      src: featureImage,
+      alt: 'Bitcoin District Photos',
     }}
   />
 

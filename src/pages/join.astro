@@ -1,12 +1,13 @@
 ---
-import CallToAction from '~/components/widgets/CallToAction.astro';
 import Content from '~/components/widgets/Content.astro';
 import Features2 from '~/components/widgets/Features2.astro';
 import Hero from '~/components/widgets/Hero.astro';
+import NewsletterSubscribe from '~/components/widgets/NewsletterSubscribe.astro';
 import Testimonials from '~/components/widgets/Testimonials.astro';
 import Layout from '~/layouts/PageLayout.astro';
 import coffeetourImage from '~/assets/images/coffeetour.jpg';
 import { communityReasons } from '~/data/reasons';
+import { testimonials } from '~/data/testimonials';
 
 const metadata = {
   title: 'Join Us',
@@ -36,77 +37,21 @@ const metadata = {
   <!-- Testimonials Widget *********** -->
 
   <Testimonials
-    title="Totally Real Testimonials from the Community",
+    title="Totally Real Testimonials from the Community"
     subtitle="(Don't trust us. Verify by coming to a meetup to see for yourself!)"
-    testimonials={[
-      {
-        testimonial: `I emerged from the digital shadows to attend a Bitcoin District meetup, and wow, what a blast! Between the real good coffee and debates over inscriptions, I nearly revealed my identity just to settle a 10-minute rant about forks—turns out, staying mysterious is cheaper than winning arguments. The coffee was as strong as the hodlers, though, so I’ll be back!`,
-        name: 'Satoshi Nakamoto',
-        job: 'Elusive Creator of Bitcoin',
-        image: {
-          src: 'https://images.unsplash.com/photo-1618835962148-cf177563c6c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=930&q=80',
-          alt: 'Satoshi Nakamoto',
-        },
-      },
-      {
-        testimonial: `I rolled into the Bitcoin District meetup thinking I’d school these degens on why QE infinity keeps the world spinning. Big nope. They hit me with 'inflation is theft' and '1 BTC = 1 BTC' so hard I nearly choked on my freshly printed dollar bills. By the end, they were preaching 'HODL forever' while I was googling how to escape a room full of laser-eyed maxis. 10/10, my printer’s still shaking.`,
-        name: 'Jerome Powell',
-        job: 'Fiat Overlord of the Federal Reserve',
-        image: {
-          src: 'https://images.unsplash.com/photo-1561406636-b80293969660?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80',
-          alt: 'Fiat Overlord',
-        },
-      },
-      {
-        testimonial: `I strolled into the Bitcoin District meetup, ready to dazzle everyone with XRP’s genius as a bridge currency. Oops. The maxis stared at me like I’d just praised paper money, then broke into a chorus of 'there’s only one coin' and 'enjoy your altcoin fantasy.' One guy even slipped me a 'hope you recover' note for my XRP stash. I walked out humbled—slightly toasted—but clutching a shiny new Bitcoin sticker. Worth it?`,
-        name: 'Chad Moonboy',
-        job: 'XRP Army',
-        image: {
-          src: 'https://images.unsplash.com/photo-1545167622-3a6ac756afa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=824&q=80',
-          alt: 'Chad Moonboi',
-        },
-      },
-      {
-        testimonial: `The Bitcoin District meetup was a refreshing dive into a community passionate about sound money and decentralization. Their engaging discussions on node running and layer-2 solutions inspired me to contribute more to Bitcoin’s ecosystem.`,
-        name: 'Elena Sato',
-        job: 'Developer',
-        image: {
-          src: 'https://images.unsplash.com/photo-1545167622-3a6ac756afa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=824&q=80',
-          alt: 'Elena Sato',
-        },
-      },
-      {
-        testimonial: `I showed up to the Bitcoin & Coffee Meetup ready to casually mention my old altcoin bags, but the Bitcoin District crew shut that down faster than China banned Bitcoin... again. They preached ‘work hard, stay humble, stack sats’ with such enthusiasm I’m now dreaming in orange and quoting Satoshi in my sleep—send help and more coffee!`,
-        name: 'Vicky HODLsworth',
-        job: 'Former Altcoin Dabbler turned Bitcoin Maxi',
-        image: {
-          src: 'https://images.unsplash.com/photo-1545167622-3a6ac756afa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=824&q=80',
-          alt: 'Chad Moonboy',
-        },
-      },
-      {
-        testimonial: `I rolled into the Bitcoin District’s Bitcoin and Cigars Meetup expecting a chill smoke sesh, but these maxis lit up the room with ‘HODL or bust’ quips sharper than my cigar cutter! By the time we debated Satoshi’s whitepaper over a cloud of Cubans, I was ready to trade my entire humidor for a full node setup—puff, puff, pass the sats!`,
-        name: 'Tommy Calzone',
-        job: 'I just like cigars',
-        image: {
-          src: 'https://images.unsplash.com/photo-1545167622-3a6ac756afa4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=824&q=80',
-          alt: 'Tommy Calzone',
-        },
-      },
-    ]}
+    testimonials={testimonials}
   />
 
-  <!-- CallToAction Widget *********** -->
+  <!-- Newsletter Subscribe Widget *** -->
 
-  <CallToAction
-    actions={[
-      {
-        variant: 'primary',
-        text: 'Subscribe',
-        href: '/',
-      },
-    ]}
-    title="Subscribe to our newsletter"
-    subtitle="We'll send you weekly updates about upcoming events, news, and other community announcements about Bitcoin in the District."
-  />
+  <section class="bg-gray-50 dark:bg-gray-900 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <NewsletterSubscribe
+        title="Subscribe to our newsletter"
+        subtitle="We'll send you weekly updates about upcoming events, news, and other community announcements about Bitcoin in the District."
+        showName={true}
+        label="Bitcoin District - Join Page"
+      />
+    </div>
+  </section>
 </Layout>

@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import { SITE } from 'astrowind:config';
 import { getHomePermalink } from '~/utils/permalinks';
+import NewsletterSubscribe from '~/components/widgets/NewsletterSubscribe.astro';
 
 interface Link {
   text?: string;
@@ -21,9 +22,14 @@ export interface Props {
   socialLinks: Array<Link>;
   footNote?: string;
   theme?: string;
+  newsletter?: {
+    title?: string;
+    description?: string;
+    enabled?: boolean;
+  };
 }
 
-const { socialLinks = [], secondaryLinks = [], links = [], footNote = '', theme = 'light' } = Astro.props;
+const { socialLinks = [], secondaryLinks = [], links = [], footNote = '', theme = 'light', newsletter } = Astro.props;
 ---
 
 <footer class:list={[{ dark: theme === 'dark' }, 'relative border-t border-gray-200 dark:border-slate-800 not-prose']}>
@@ -36,7 +42,7 @@ const { socialLinks = [], secondaryLinks = [], links = [], footNote = '', theme 
         <div class="mb-2">
           <a class="inline-block font-bold text-xl" href={getHomePermalink()}>{SITE?.name}</a>
         </div>
-        <div class="text-sm text-muted flex gap-1">
+        <div class="text-sm text-muted flex gap-1 mb-4">
           {
             secondaryLinks.map(({ text, href }, index) => (
               <>
@@ -50,6 +56,23 @@ const { socialLinks = [], secondaryLinks = [], links = [], footNote = '', theme 
             ))
           }
         </div>
+        
+        {newsletter?.enabled && (
+          <div class="max-w-sm hidden lg:block">
+            <div class="mb-2">
+              <h3 class="text-sm font-medium dark:text-gray-300">{newsletter.title || 'Newsletter'}</h3>
+              {newsletter.description && (
+                <p class="text-xs text-muted dark:text-gray-400 mt-1">{newsletter.description}</p>
+              )}
+            </div>
+            <NewsletterSubscribe
+              variant="compact"
+              placeholder="Your email"
+              buttonText="Subscribe"
+              label="Bitcoin District - Footer"
+            />
+          </div>
+        )}
       </div>
       {
         links.length > 0 && (
@@ -80,6 +103,25 @@ const { socialLinks = [], secondaryLinks = [], links = [], footNote = '', theme 
         )
       }
     </div>
+    
+    <!-- Newsletter for mobile - appears above social links -->
+    {newsletter?.enabled && (
+      <div class="lg:hidden border-t border-gray-200 dark:border-slate-700 pt-6 pb-6">
+        <div class="mb-3">
+          <h3 class="text-sm font-medium dark:text-gray-300">{newsletter.title || 'Newsletter'}</h3>
+          {newsletter.description && (
+            <p class="text-xs text-muted dark:text-gray-400 mt-1">{newsletter.description}</p>
+          )}
+        </div>
+        <NewsletterSubscribe
+          variant="compact"
+          placeholder="Your email"
+          buttonText="Subscribe"
+          label="Bitcoin District - Footer"
+        />
+      </div>
+    )}
+    
     <div class="md:flex md:items-center md:justify-between py-6 md:py-8">
       {
         socialLinks?.length ? (

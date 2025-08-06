@@ -19,7 +19,7 @@ export const headerData = {
       href: getPermalink('https://news.bitcoindistrict.org'),
     },
   ],
-  actions: [{ text: 'Join Us', href: '/join', target: '_blank' }],
+  actions: [{ text: 'Get Involved', href: '/join', target: '_blank' }],
 };
 
 export const footerData = {
@@ -47,6 +47,10 @@ export const footerData = {
     { text: 'Privacy Policy', href: getPermalink('/privacy') },
     { text: 'Contact', href: '/contact' },
   ],
+  newsletter: {
+    title: 'Subscribe to our newsletter',
+    enabled: true
+  },
   socialLinks: [
     { ariaLabel: 'X', icon: 'tabler:brand-x', href: 'https://x.com/BTCDistrict' },
     { ariaLabel: 'Nostr', icon: 'tabler:feather', href: 'https://primal.net/p/npub1mcke7stw5mrqp97lmdu0qdrfcz2uertdsy2n9pzvfnsdutx3hvkq7d5mnw' },

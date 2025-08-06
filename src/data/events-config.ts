@@ -23,7 +23,7 @@ export const meetupSources: MeetupSource[] = [
     icalUrl: "https://www.meetup.com/bitcoin-district/events/ical/",
     url: "https://www.meetup.com/bitcoin-district/",
     description: "Bitcoin District community meetup group in DC metro area",
-    logo: "/src/assets/images/logos/bd.png",
+    logo: "~/assets/images/logos/bd.png",
     enabled: true,
   },
   {
@@ -31,7 +31,7 @@ export const meetupSources: MeetupSource[] = [
     icalUrl: "https://www.meetup.com/dc-bit-devs/events/ical/",
     url: "https://www.meetup.com/dc-bit-devs/",
     description: "Community for discussing and advancing Bitcoin and related protocols.",
-    logo: "/src/assets/images/logos/dcbitdevs.png",
+    logo: "~/assets/images/logos/dcbitdevs.png",
     enabled: true,
   },
   // Add more meetup groups here as needed

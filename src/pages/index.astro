@@ -1,12 +1,15 @@
 ---
 import Layout from '~/layouts/PageLayout.astro';
-
+import Image from '~/components/common/Image.astro';
 import Hero from '~/components/widgets/Hero.astro';
-import Note from '~/components/widgets/Note.astro';
 import Features2 from '~/components/widgets/Features2.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import Stats from '~/components/widgets/Stats.astro';
 import CallToAction from '~/components/widgets/CallToAction.astro';
+import BitcoinStats from '~/components/widgets/BitcoinStats.astro';
+import MeetupEvents from '~/components/widgets/MeetupEvents.astro';
+import Button from '~/components/ui/Button.astro';
+import { Icon } from 'astro-icon/components';
 import { communityReasons } from '~/data/reasons';
 import { faqs } from '~/data/faqs';
 
@@ -19,40 +22,71 @@ const metadata = {
 <Layout metadata={metadata}>
   <!-- Hero Widget ******************* -->
 
-  <Hero
-    image={{ src: '~/assets/images/hero-flag.png', alt: 'Bitcoin District Hero' }}
-  >
-    <Fragment slot="title">
-      This is <span class="text-accent dark:text-white"> Bitcoin District</span>
-    </Fragment>
+  <div class="min-h-screen flex flex-col justify-start pt-4 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-18 relative">
+    <Hero>
+      <Fragment slot="bg">
+        <Image
+          src="~/assets/images/hero.jpg"
+          alt="Bitcoin District Hero Background"
+          class="fixed inset-0 object-cover w-full h-full opacity-25 dark:opacity-30 z-[-1]"
+          widths={[400, 768, 1024, 1920, 2560]}
+          sizes="100vw"
+          loading="eager"
+          width={1920}
+          height={1080}
+        />
+      </Fragment>
 
-    <Fragment slot="subtitle">
-      <span class="hidden sm:inline">
-        <span class="font-semibold">Bitcoin District</span> is a network of Bitcoiners living and working in the DC, Maryland & Virginia (DMV) area seeking to network, socialize & collaborate with other Bitcoiners.
-    </Fragment>
-  </Hero>
+      <Fragment slot="title">
+        This is <span class="text-[#f7931a]"> Bitcoin </span> District
+      </Fragment>
 
-  <!-- Note Widget ******************* -->
+      <Fragment slot="subtitle">
+        <span class="font-semibold">Bitcoin District</span> is a network of Bitcoiners living and working in the DC, Maryland
+        & Virginia (DMV) area seeking to network, socialize & collaborate with other Bitcoiners.
+      </Fragment>
+    </Hero>
 
-  <Note title="We are Bitcoin only:" description="Not crypto. Not blockchain. Not altcoins. Just Bitcoin." />
+    <!-- Bitcoin Live Stats Widget -->
+    <div class="relative z-10 -mt-20 pb-12">
+      <BitcoinStats class="px-4 sm:px-6" />
+    </div>
+  </div>
+
+  <!-- Upcoming Events Widget ********** -->
+
+  <MeetupEvents
+    tagline="Get Involved"
+    title="Upcoming Events"
+    subtitle="Don't miss out on these upcoming Bitcoin District events"
+    maxEvents={3}
+    showCallToAction={false}
+  />
+
+  <!-- View All Events Button ******** -->
+  
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
+    <div class="text-center">
+      <Button
+        variant="secondary"
+        text="View All Events"
+        href="/events"
+        class="inline-flex items-center gap-2"
+      >
+        <Icon name="tabler:calendar" class="h-4 w-4" />
+        View All Events
+      </Button>
+    </div>
+  </div>
 
   <!-- Features Widget *************** -->
 
   <Features2
+    tagline="Community"
     title="Be part of a growing community"
     subtitle="Just a few good reasons to get involved with Bitcoin District"
     columns={3}
     items={communityReasons}
-  />
-
-  <!-- FAQs Widget ******************* -->
-
-  <FAQs
-    title="Frequently Asked Questions"
-    subtitle="Get answers to common questions about Bitcoin District, our community, and how you can get involved."
-    tagline="FAQs"
-    classes={{ container: 'max-w-6xl' }}
-    items={faqs.map(faq => ({ title: faq.question, description: faq.answer }))}
   />
 
   <!-- Stats Widget ****************** -->
@@ -65,33 +99,4 @@ const metadata = {
       { title: 'Sats/Bitcoin', amount: '100M' },
     ]}
   />
-
-  <!-- CallToAction Widget *********** -->
-
-  <CallToAction
-    actions={[
-      {
-        variant: 'primary',
-        text: 'Subscribe',
-        href: 'https://github.com/onwidget/astrowind',
-        target: '_blank',
-        icon: 'tabler:mail-opened',
-      },
-      {
-        variant: 'secondary',
-        text: 'News',
-        href: 'https://news.bitcoindistrict.org',
-        target: '_blank',
-        icon: 'tabler:news',
-      },
-    ]}
-  >
-    <Fragment slot="title">
-      Stay in the Loop
-    </Fragment>
-
-    <Fragment slot="subtitle">
-      Subscribe to our newsletter to see what's happening in the District.
-    </Fragment>
-  </CallToAction>
 </Layout>

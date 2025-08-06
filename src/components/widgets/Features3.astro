@@ -10,6 +10,7 @@ const {
   subtitle = await Astro.slots.render('subtitle'),
   tagline = await Astro.slots.render('tagline'),
   image,
+  imageHeight = 320, // Default height in pixels
   items = [],
   columns,
   defaultIcon,
@@ -33,18 +34,18 @@ const {
 >
   <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline as Record<string, string>} />
 
-  <div aria-hidden="true" class="aspect-w-16 aspect-h-7">
+  <div aria-hidden="true" class="w-full max-w-6xl mx-auto">
     {
       image && (
-        <div class="w-full h-80 object-cover rounded-xl mx-auto bg-gray-500 shadow-lg">
+        <div class="relative w-full overflow-hidden rounded-xl shadow-lg" style={`height: ${imageHeight}px`}>
           {typeof image === 'string' ? (
             <Fragment set:html={image} />
           ) : (
             <Image
-              class="w-full h-80 object-cover rounded-xl mx-auto bg-gray-500 shadow-lg"
-              width="auto"
-              height={320}
-              widths={[400, 768]}
+              class="w-full h-full object-cover object-center"
+              width={1200}
+              height={imageHeight}
+              widths={[400, 768, 1200]}
               layout="fullWidth"
               {...image}
             />
