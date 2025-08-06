@@ -107,7 +107,7 @@ const iconSizeClasses = {
   function handleScroll() {
     const scrollIndicator = document.getElementById('scroll-indicator');
     const scrollPosition = window.scrollY;
-    const threshold = window.innerHeight * 0.3; // Hide after scrolling 30% of viewport
+    const threshold = 50; // Hide after scrolling just 50px - much more responsive
 
     if (scrollIndicator) {
       if (scrollPosition > threshold) {
@@ -120,18 +120,46 @@ const iconSizeClasses = {
     }
   }
 
+  // Track if we've already initialized to prevent duplicates
+  let isInitialized = false;
+
   // Initialize scroll behavior
-  document.addEventListener('DOMContentLoaded', () => {
-    window.addEventListener('scroll', handleScroll);
+  function initScrollIndicator() {
+    if (isInitialized) {
+      return;
+    }
+    
+    const scrollIndicator = document.getElementById('scroll-indicator');
+    
+    if (!scrollIndicator) {
+      return;
+    }
+    
+    // Mark as initialized
+    isInitialized = true;
+    
+    // Check initial scroll position in case page is already scrolled
+    handleScroll();
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
     
     // Make scrollToContent globally available
     (window as any).scrollToContent = scrollToContent;
-  });
+  }
 
-  // Clean up on page transitions (for Astro View Transitions)
-  document.addEventListener('astro:before-swap', () => {
+  // Clean up function
+  function cleanup() {
     window.removeEventListener('scroll', handleScroll);
-  });
+    isInitialized = false;
+  }
+
+  // Initialize on different events to ensure it works with Astro's lifecycle
+  document.addEventListener('DOMContentLoaded', initScrollIndicator);
+  document.addEventListener('astro:page-load', initScrollIndicator);
+  
+  // Clean up on page transitions
+  document.addEventListener('astro:before-swap', cleanup);
 </script>
 
 <style>
