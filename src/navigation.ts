@@ -19,7 +19,7 @@ export const headerData = {
       href: getPermalink('https://news.bitcoindistrict.org'),
     },
   ],
-  actions: [{ text: 'Get Involved', href: '/join', target: '_blank' }],
+  actions: [{ text: 'Get Involved', href: '/join', target: '_self' }],
 };
 
 export const footerData = {

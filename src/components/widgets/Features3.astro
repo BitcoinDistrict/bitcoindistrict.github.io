@@ -34,19 +34,36 @@ const {
 >
   <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline as Record<string, string>} />
 
-  <div aria-hidden="true" class="w-full max-w-6xl mx-auto">
+  <div aria-hidden="true" class="w-full mx-auto px-4 sm:px-6 lg:max-w-6xl">
     {
       image && (
-        <div class="relative w-full overflow-hidden rounded-xl shadow-lg" style={`height: ${imageHeight}px`}>
+        <div class="relative w-full max-w-full overflow-hidden rounded-lg sm:rounded-xl shadow-lg">
+          <style>
+            .features3-responsive-image {
+              height: ${Math.round(imageHeight * 0.6)}px;
+              width: 100%;
+            }
+            @media (min-width: 640px) {
+              .features3-responsive-image {
+                height: ${Math.round(imageHeight * 0.75)}px;
+              }
+            }
+            @media (min-width: 768px) {
+              .features3-responsive-image {
+                height: ${imageHeight}px;
+              }
+            }
+          </style>
           {typeof image === 'string' ? (
             <Fragment set:html={image} />
           ) : (
             <Image
-              class="w-full h-full object-cover object-center"
+              class="features3-responsive-image object-cover object-center"
               width={1200}
               height={imageHeight}
-              widths={[400, 768, 1200]}
-              layout="fullWidth"
+              widths={[320, 640, 768, 1024, 1200, 1600]}
+              sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 768px) calc(100vw - 3rem), (max-width: 1024px) calc(90vw), 1200px"
+              layout="responsive"
               {...image}
             />
           )}
