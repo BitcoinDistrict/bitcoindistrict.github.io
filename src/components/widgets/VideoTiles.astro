@@ -33,39 +33,52 @@ const {
     'grid-cols-1 md:grid-cols-2'
   }`}>
     {videos.map((video) => (
-      <div class="text-center">
-        <h3 class={`font-bold mb-3 ${
-          columns >= 3 ? 'text-xl' : 'text-2xl'
-        }`}>
-          {video.title}
-        </h3>
-        {video.author && (
-          <p class={`text-muted mb-4 ${
-            columns >= 3 ? 'text-sm' : 'text-base'
-          }`}>
-            by {video.author}
-          </p>
-        )}
-        <div class="aspect-video">
-          <iframe 
-            width="100%" 
-            height="100%" 
-            src={getPrivacyEnhancedUrl(video.embedUrl)}
-            title={video.title}
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-            class="rounded-lg shadow-lg"
-          ></iframe>
+      <div class="intersect-once motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
+        <div class="flex flex-col h-full bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+          <!-- Title and Author -->
+          <div class="p-6 text-center flex-shrink-0">
+            <h3 class={`font-bold mb-3 text-gray-900 dark:text-gray-100 ${
+              columns >= 3 ? 'text-xl' : 'text-2xl'
+            }`}>
+              {video.title}
+            </h3>
+            {video.author && (
+              <p class={`text-muted mb-4 ${
+                columns >= 3 ? 'text-sm' : 'text-base'
+              }`}>
+                by {video.author}
+              </p>
+            )}
+          </div>
+          
+          <!-- Description -->
+          {video.description && (
+            <div class="px-6 text-center flex-shrink-0">
+              <p class={`text-muted ${
+                columns >= 3 ? 'text-sm' : 'text-base'
+              }`}>
+                {video.description}
+              </p>
+            </div>
+          )}
+          
+          <!-- Video - positioned at bottom -->
+          <div class="flex-1 flex items-end p-6 pt-0">
+            <div class="w-full aspect-video">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src={getPrivacyEnhancedUrl(video.embedUrl)}
+                title={video.title}
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                class="rounded-lg shadow-lg"
+              ></iframe>
+            </div>
+          </div>
         </div>
-        {video.description && (
-          <p class={`text-muted mt-3 ${
-            columns >= 3 ? 'text-sm' : 'text-base'
-          }`}>
-            {video.description}
-          </p>
-        )}
       </div>
     ))}
   </div>

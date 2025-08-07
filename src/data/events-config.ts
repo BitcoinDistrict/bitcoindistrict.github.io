@@ -34,6 +34,14 @@ export const meetupSources: MeetupSource[] = [
     logo: "~/assets/images/logos/dcbitdevs.png",
     enabled: true,
   },
+  {
+    name: "Shenandoah Bitcoin Club",
+    icalUrl: "https://www.meetup.com/shenandoah-bitcoin-club/events/ical/",
+    url: "https://www.meetup.com/shenandoah-bitcoin-club/",
+    description: "Education and collaboration in and around Bitcoin, a new digital money based on the truth of mathematics.",
+    logo: "~/assets/images/logos/shenandoah.png",
+    enabled: true,
+  },
   // Add more meetup groups here as needed
   // {
   //   name: "DC Bitcoin Developers",
