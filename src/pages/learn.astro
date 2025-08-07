@@ -4,6 +4,7 @@ import Content from '~/components/widgets/Content.astro';
 import Features from '~/components/widgets/Features.astro';
 import VideoTiles from '~/components/widgets/VideoTiles.astro';
 import ReferralCards from '~/components/widgets/ReferralCards.astro';
+import Image from '~/components/common/Image.astro';
 import { createHero, HERO_IMAGES, SCROLL_INDICATOR_PRESETS } from '~/utils/hero';
 
 const metadata = {
@@ -14,9 +15,10 @@ const metadata = {
 const hero = createHero({
   image: HERO_IMAGES.learn, // This is hero-lincoln.jpg
   alt: 'Bitcoin District',
-  opacity: 'opacity-30 dark:opacity-30',
+  opacity: 'opacity-40 dark:opacity-30',
   title: 'Learn ₿itcoin',
   subtitle: 'We\'ve put together some of our favorite resources to help you get started with Bitcoin.',
+  content: `<div class="mt-8"><img src="/src/assets/images/plato.png" alt="Plato" class="max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg mx-auto" /></div>`,
 });
 ---
 
@@ -30,31 +32,31 @@ const hero = createHero({
     slot="hero-bottom"
     id="why-bitcoin-only"
     title="Why Bitcoin Only?"
-    subtitle=""
+    subtitle="Bitcoin District is a community of Bitcoiners. We focus our time and energy on Bitcoin because it’s the only truly decentralized digital monetary network that respects that time and energy. Other coins and tokens carry significant tradeoffs and risks that Bitcoin avoids."
     items={[
       {
         title: "Bitcoin works without leaders",
-        description: "No presidents or CEOs!",
+        description: "Bitcoin operates without centralized leadership, relying on a distributed network of nodes to maintain its integrity. No single president or CEO controls its direction or decisions.",
         icon: "tabler:crown-off",
       },
       {
         title: "Bitcoin had a fair launch",
-        description: "No pre‑mine and no corporate insiders enriching themselves (i.e. XRP).",
+        description: "Bitcoin's launch was transparent and fair, with no pre-mine or allocation to corporate insiders, unlike some cryptocurrencies like XRP. This ensured no group unfairly enriched themselves at the start.",
         icon: "tabler:scale",
       },
       {
         title: "Known issuance schedule",
-        description: "Bitcoin's issuance schedule is known and doesn't change.",
+        description: "Bitcoin’s supply issuance follows a predictable, fixed schedule coded into its protocol. This schedule remains unchangeable, providing certainty to users.",
         icon: "tabler:calendar-check",
       },
       {
         title: "Real digital scarcity",
-        description: "Bitcoin's proof‑of‑work system ensures digital scarcity is real and more coins can't be created out of thin air.",
+        description: "Bitcoin’s proof-of-work mechanism enforces true digital scarcity by making it computationally expensive to create new coins. This prevents arbitrary inflation, as no additional coins can be created beyond the protocol’s limits.",
         icon: "tabler:diamond",
       },
       {
         title: "Most secure & decentralized",
-        description: "Bitcoin is better because it is the most secure, truly decentralized & censorship‑resistant monetary protocol that cannot be controlled.",
+        description: "Bitcoin is the most secure and decentralized monetary protocol, resistant to censorship and control by any single entity. Its robust network ensures unparalleled reliability and autonomy. This is crucial for a long-term store of value.",
         icon: "tabler:shield-check",
       },
     ]}
@@ -100,7 +102,8 @@ const hero = createHero({
   <ReferralCards
     id="buying-coins"
     title="Buying Your First Coins"
-    subtitle="When you're ready to get some Bitcoin, use a reputable Bitcoin‑only exchange."
+    subtitle="When you're ready to get some Bitcoin, consider using a reputable Bitcoin‑only exchange. We've listed a few of our favorites below."
+    disclaimer="ℹ️ These are custodial exchanges that require KYC information to use."
     cards={[
       {
         title: "River",
@@ -109,6 +112,18 @@ const hero = createHero({
           src: "~/assets/images/river.png",
           alt: "River Bitcoin exchange logo",
         },
+        points: {
+        title: "Why we like River:",
+          points: [
+            "Bitcoin-only",
+            "Proof of Reserves",
+            "Excellent security practices",
+            "User-friendly interface",
+            "Zero-fee recurring orders",
+            "Excellent customer support",
+            "Great leadership",
+          ]
+      },
         link: "https://river.com",
         buttonText: "Visit River",
       },
@@ -119,6 +134,18 @@ const hero = createHero({
           src: "~/assets/images/strike.png",
           alt: "Strike Bitcoin app logo",
         },
+        points: {
+        title: "Why we like Strike:",
+          points: [
+            "Bitcoin-only",
+            "Global reach for the unbanked",
+            "Free on-chain withdrawals",
+            "Convert paycheck to Bitcoin & bill pay",
+            "User-friendly interface",
+            "Excellent customer support",
+            "Great leadership",
+          ]
+        },
         link: "https://strike.me",
         buttonText: "Visit Strike",
       },
@@ -128,6 +155,18 @@ const hero = createHero({
         image: {
           src: "~/assets/images/cashapp.png",
           alt: "CashApp logo",
+        },
+        points: {
+        title: "Why we like CashApp:",
+          points: [
+            "Bitcoin-only",
+            "Super easy to use",
+            "Round-ups on purchases for micro stacking",
+            "Convert paycheck to Bitcoin & bill pay",
+            "Mass adoption (Everyone's already got it)",
+            "Great for beginners",
+            "Easy onboarding",
+          ]
         },
         link: "https://cash.app",
         buttonText: "Visit CashApp",
@@ -142,6 +181,7 @@ const hero = createHero({
     id="securing-coins"
     title="Securing Your Coins"
     subtitle="You don't have to trust an exchange with your Bitcoin. When you're ready, you can take full custody of your own coins."
+    disclaimer="⚠️ NEVER NEVER NEVER provide your seed phrase to anyone or type it into any internet connected device. Your seed phrase is the key to your Bitcoin and if exposed, you could lose all of your Bitcoin."
     cards={[
       {
         title: "BTC Sessions – Learn",

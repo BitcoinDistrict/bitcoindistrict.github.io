@@ -14,12 +14,18 @@ export interface ReferralCard {
   };
   link: string;
   buttonText?: string;
+  points?: {
+    title: string;
+    points: string[];
+  };
+  alignment?: 'left' | 'center' | 'right';
 }
 
 export interface Props {
   title?: string;
   subtitle?: string;
   tagline?: string;
+  disclaimer?: string;
   cards: ReferralCard[];
   columns?: number;
   id?: string;
@@ -32,6 +38,7 @@ const {
   title = await Astro.slots.render('title'),
   subtitle = await Astro.slots.render('subtitle'),
   tagline = await Astro.slots.render('tagline'),
+  disclaimer,
   cards = [],
   columns = 3,
   id,
@@ -45,9 +52,18 @@ const {
   <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline ? (classes.headline as unknown as Record<string, string>) : {}} />
   
   <!-- Custom subtitle slot content -->
-  <div class="text-center mb-8">
+  <div class="text-center mb-4">
     <slot name="subtitle" />
   </div>
+  
+  <!-- Disclaimer Section -->
+  {disclaimer && (
+    <div class="max-w-4xl mx-auto mb-8 text-center">
+      <p class="text-sm font-bold text-gray-700 dark:text-gray-300 leading-relaxed">
+        {disclaimer}
+      </p>
+    </div>
+  )}
   
   {cards && cards.length > 0 && (
     <div
@@ -64,12 +80,17 @@ const {
         classes?.grid ?? ''
       )}
     >
-      {cards.map(({ title: cardTitle, description, image, link, buttonText = 'Visit Website' }) => (
+      {cards.map(({ title: cardTitle, description, image, link, buttonText = 'Visit Website', points, alignment = 'center' }) => {
+        const alignmentClass = alignment === 'left' ? 'text-left' : alignment === 'right' ? 'text-right' : 'text-center';
+        const imageAlignmentClass = alignment === 'left' ? 'justify-start' : alignment === 'right' ? 'justify-end' : 'justify-center';
+        const buttonAlignmentClass = alignment === 'center' ? 'justify-center' : '';
+        
+        return (
         <div class="intersect-once motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
           <div class="flex flex-col h-full bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
             <!-- Title and Description -->
-            <div class="p-6 text-center">
-              <h3 class="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">
+            <div class={`p-6 ${alignmentClass}`}>
+              <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">
                 {cardTitle}
               </h3>
               <p class="text-muted text-sm leading-relaxed">
@@ -78,7 +99,7 @@ const {
             </div>
             
             <!-- Image -->
-            <div class="flex-1 flex items-center justify-center p-6 pt-0">
+            <div class={`flex-1 flex items-center ${imageAlignmentClass} p-6 pt-0`}>
               <a 
                 href={link} 
                 target="_blank" 
@@ -97,6 +118,23 @@ const {
               </a>
             </div>
             
+            <!-- Points Section -->
+            {points && (
+              <div class={`px-6 pb-6 ${alignmentClass}`}>
+                <h4 class="text-sm font-semibold mb-3 text-gray-800 dark:text-gray-200">
+                  {points.title}
+                </h4>
+                <ul class="space-y-2">
+                  {points.points.map((point) => (
+                    <li class={`flex text-xs text-muted ${alignment === 'right' ? 'flex-row-reverse' : 'items-start'}`}>
+                      <span class={`flex-shrink-0 w-1.5 h-1.5 bg-primary rounded-full mt-1.5 ${alignment === 'right' ? 'ml-2' : 'mr-2'}`}></span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
             <!-- Button -->
             <div class="p-6 pt-0">
               <Button
@@ -104,14 +142,15 @@ const {
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="w-full justify-center"
+                class={`w-full ${buttonAlignmentClass || 'justify-center'}`}
               >
                 {buttonText}
               </Button>
             </div>
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   )}
   
