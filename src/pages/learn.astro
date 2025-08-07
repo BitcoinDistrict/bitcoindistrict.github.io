@@ -1,10 +1,8 @@
 ---
 import HeroLayout from '~/layouts/HeroLayout.astro';
 import Content from '~/components/widgets/Content.astro';
-import Features from '~/components/widgets/Features.astro';
 import VideoTiles from '~/components/widgets/VideoTiles.astro';
 import ReferralCards from '~/components/widgets/ReferralCards.astro';
-import Image from '~/components/common/Image.astro';
 import { createHero, HERO_IMAGES, SCROLL_INDICATOR_PRESETS } from '~/utils/hero';
 
 const metadata = {
@@ -18,7 +16,7 @@ const hero = createHero({
   opacity: 'opacity-40 dark:opacity-30',
   title: 'Learn ₿itcoin',
   subtitle: 'We\'ve put together some of our favorite resources to help you get started with Bitcoin.',
-  content: `<div class="mt-8"><img src="/src/assets/images/plato.png" alt="Plato" class="max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg mx-auto" /></div>`,
+  content: `<div class="mt-8"><img src="/images/plato.png" alt="Plato" class="max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg mx-auto" /></div>`,
 });
 ---
 

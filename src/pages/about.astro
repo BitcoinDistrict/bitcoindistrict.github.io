@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import HeroLayout from '~/layouts/HeroLayout.astro';
-import Features3 from '~/components/widgets/Features3.astro';
+import Content from '~/components/widgets/Content.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
 import featureImage from '~/assets/images/feature1.jpg';
 import { faqs } from '~/data/faqs';
@@ -35,32 +35,6 @@ const hero = createHero({
     </div>
   </div>
 
-  <Features3
-    slot="hero-bottom"
-    columns={3}
-    isAfterContent={true}
-    items={[
-      {
-        title: 'Shared Interest',
-        description:
-          'We come from all walks of life brought together by the common belief that Bitcoin can help make the world a better place',
-        icon: 'tabler:heart-handshake',
-      },
-      {
-        title: 'Community',
-        description:
-          "We're not a lobby, a company, an institute, a foundation, a building or a coworking space.",
-        icon: 'tabler:users-group',
-      },
-      {
-        title: 'Volunteers',
-        description:
-          'The Bitcoin District website and any social media accounts are tools to help communicate public events organized by local Bitcoiners.',
-        icon: 'tabler:mood-happy',
-      },
-    ]}
-  />
-
   <!-- FAQs Widget ******************* -->
 
   <FAQs
@@ -69,5 +43,12 @@ const hero = createHero({
     tagline="FAQs"
     classes={{ container: 'max-w-6xl' }}
     items={faqs.map(faq => ({ title: faq.question, description: faq.answer }))}
+  />
+
+  <Content
+    title="Volunteers"
+
+    subtitle="This website and any social media accounts are managed by volunteers from the community. If you'd like to help out, please email hey📧bitcoindistrict.org"
+    isAfterContent={false}
   />
 </HeroLayout>
