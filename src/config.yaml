@@ -10,7 +10,7 @@ site:
 metadata:
   title:
     default: Bitcoin District
-    template: '%s — Bitcoin District'
+    template: '%s • Bitcoin District'
   description: "Join a growing network of Bitcoiners living and working in the greater DC-Maryland-Virginia metro area. Newcomers are always welcome!"
   robots:
     index: true
