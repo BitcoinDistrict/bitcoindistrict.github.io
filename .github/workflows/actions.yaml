@@ -6,6 +6,8 @@ on:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab on GitHub.
   workflow_dispatch:
+  schedule:
+    - cron: '0 17 * * *' # run at 5pm EST daily automatically (rebuilds ics calendar and gets new events from meetups)
 
 # Allow this job to clone the repo and create a page deployment
 permissions:
