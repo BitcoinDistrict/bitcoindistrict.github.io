@@ -17,7 +17,7 @@ const {
   title = await Astro.slots.render('title'),
   subtitle = await Astro.slots.render('subtitle'),
   tagline = await Astro.slots.render('tagline'),
-  displayCount = 7,
+  displayCount = 7, // 7 on desktop, will be responsive
   id,
   isDark = false,
   classes = {},
@@ -57,7 +57,7 @@ if (featuredBookIndex === -1) {
   }
 }
 
-// Create initial display centered on featured book
+// Create initial display centered on featured book (desktop: 7, mobile will be handled by JS)
 const centerIndex = Math.floor(displayCount / 2);
 const displayBooks: Array<{ book: typeof allBooksShuffled[0]; isFeatured: boolean }> = [];
 
@@ -83,8 +83,8 @@ for (let i = 0; i < displayCount; i++) {
           class={`book-cover-wrapper transition-all duration-300 cursor-pointer hover:scale-105 ${
             isFeatured 
               ? 'scale-110 z-20' 
-              : `scale-${90 - Math.abs(index - centerIndex) * 10} opacity-${100 - Math.abs(index - centerIndex) * 15} hover:opacity-100`
-          }`}
+              : `scale-${Math.max(75, 95 - Math.abs(index - centerIndex) * 10)} opacity-${Math.max(70, 100 - Math.abs(index - centerIndex) * 15)} hover:opacity-100`
+          } ${index >= 5 ? 'hidden md:flex' : ''}`}
           data-book-index={index}
           data-is-featured={isFeatured}
         >
@@ -97,7 +97,7 @@ for (let i = 0; i < displayCount; i++) {
               width={isFeatured ? 200 : 140}
               height={isFeatured ? 300 : 210}
               class={`object-cover transition-transform duration-300 ${
-                isFeatured ? 'w-40 h-60 sm:w-48 sm:h-72' : 'w-28 h-42 sm:w-32 sm:h-48'
+                isFeatured ? 'w-32 h-48 sm:w-40 sm:h-60 md:w-48 md:h-72' : 'w-20 h-30 sm:w-24 sm:h-36 md:w-32 md:h-48'
               }`}
               loading="eager"
             />
@@ -162,6 +162,7 @@ for (let i = 0; i < displayCount; i++) {
     private allBooks: BookData[] = [];
     private featuredBookIndex: number = 0;
     private displayCount: number = 7;
+    private mobileDisplayCount: number = 5;
 
     constructor() {
       this.container = document.querySelector('.book-ribbon-container');
@@ -170,8 +171,10 @@ for (let i = 0; i < displayCount; i++) {
       this.centerIndex = Math.floor(this.bookElements.length / 2);
       
       this.loadBookData();
+      this.updateDisplayCountForScreenSize();
       this.initializeEventListeners();
       this.initializeIntersectionObserver();
+      this.initializeResizeListener();
       
       // Initialize the display with current book positions
       console.log('Initializing book ribbon with', this.allBooks.length, 'books');
@@ -205,8 +208,21 @@ for (let i = 0; i < displayCount; i++) {
       }
     }
 
-    initializeEventListeners() {
-      // Book click navigation
+    updateDisplayCountForScreenSize() {
+      // Get only visible book elements for responsive behavior
+      this.bookElements = Array.from(document.querySelectorAll('.book-cover-wrapper:not(.hidden)'));
+      this.centerIndex = Math.floor(this.bookElements.length / 2);
+      
+      // Re-initialize event listeners for visible elements
+      this.initializeBookClickListeners();
+      
+      // Update book positions with new layout
+      if (this.allBooks.length > 0) {
+        this.updateBookPositions();
+      }
+    }
+
+    initializeBookClickListeners() {
       this.bookElements.forEach((book, index) => {
         book.addEventListener('click', (e) => {
           e.preventDefault();
@@ -215,7 +231,22 @@ for (let i = 0; i < displayCount; i++) {
           }
         });
       });
+    }
 
+    initializeResizeListener() {
+      let resizeTimeout: NodeJS.Timeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          this.updateDisplayCountForScreenSize();
+        }, 250);
+      });
+    }
+
+    initializeEventListeners() {
+      // Initialize book click listeners
+      this.initializeBookClickListeners();
+      
       // Touch/swipe support
       this.initializeTouchEvents();
     }
@@ -497,12 +528,12 @@ for (let i = 0; i < displayCount; i++) {
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .book-cover-wrapper {
-      margin: 0 -8px;
+      margin: 0 -4px;
     }
     
     .book-ribbon {
-      gap: 8px;
-      padding: 16px;
+      gap: 6px;
+      padding: 16px 8px;
     }
     
     .nav-arrow {
@@ -513,22 +544,35 @@ for (let i = 0; i < displayCount; i++) {
       width: 20px;
       height: 20px;
     }
+    
+
+  }
+
+  @media (max-width: 640px) {
+    .book-ribbon {
+      gap: 4px;
+      padding: 12px 4px;
+    }
   }
 
   @media (max-width: 480px) {
     .book-cover-wrapper img {
-      width: 80px !important;
-      height: 120px !important;
+      width: 64px !important;
+      height: 96px !important;
     }
     
     .book-cover-wrapper[data-is-featured="true"] img {
-      width: 120px !important;
-      height: 180px !important;
+      width: 96px !important;
+      height: 144px !important;
     }
     
     .book-ribbon {
-      gap: 4px;
-      padding: 12px;
+      gap: 2px;
+      padding: 8px 2px;
+    }
+    
+    .book-cover-wrapper {
+      margin: 0 -2px;
     }
   }
 </style>

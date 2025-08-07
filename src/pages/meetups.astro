@@ -20,6 +20,12 @@ const hero = createHero({
 // Meetups data is now used directly in the MeetupFeatures component
 ---
 
+<!-- Preload map resources for better performance -->
+<link rel="preconnect" href="https://unpkg.com" />
+<link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+<link rel="modulepreload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js" />
+<link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style" />
+
 <HeroLayout metadata={metadata} hero={hero}>
 
   <!-- Interactive Map Section -->

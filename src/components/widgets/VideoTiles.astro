@@ -35,13 +35,13 @@ const {
     {videos.map((video) => (
       <div class="text-center">
         <h3 class={`font-bold mb-3 ${
-          columns >= 3 ? 'text-lg' : 'text-xl'
+          columns >= 3 ? 'text-xl' : 'text-2xl'
         }`}>
           {video.title}
         </h3>
         {video.author && (
           <p class={`text-muted mb-4 ${
-            columns >= 3 ? 'text-xs' : 'text-sm'
+            columns >= 3 ? 'text-sm' : 'text-base'
           }`}>
             by {video.author}
           </p>
