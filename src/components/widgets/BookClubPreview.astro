@@ -71,7 +71,7 @@ const {
           <Image
             src={book.image}
             alt={`Cover of ${book.title} by ${book.author}`}
-            class="book-cover shadow-xl rounded-lg transform hover:scale-105 transition-transform duration-300"
+            class="book-club-preview-cover shadow-xl rounded-lg transform hover:scale-105 transition-transform duration-300"
             width={400}
             loading="eager"
           />
@@ -88,35 +88,9 @@ const {
     justify-content: center;
   }
   
-  .book-cover {
-    width: 120px; /* Much smaller mobile size */
-    height: auto;
-    max-width: 50%; /* Prevent it from taking full width */
-  }
-  
-  /* Responsive sizing */
-  @media (min-width: 640px) {
-    .book-cover {
-      width: 180px; /* Small tablets */
-      max-width: 60%;
-    }
-  }
-  
-  @media (min-width: 768px) {
-    .book-cover {
-      width: 250px; /* Medium tablets */
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    .book-cover {
-      width: 300px; /* Desktop */
-    }
-  }
-  
-  @media (min-width: 1280px) {
-    .book-cover {
-      width: 350px; /* Large desktop */
-    }
+  .book-club-preview-cover {
+    width: 60% !important;
+    height: auto !important;
+    max-width: 60% !important;
   }
 </style>
