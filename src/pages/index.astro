@@ -22,7 +22,8 @@ const hero = createHero({
   alt: 'Bitcoin District Hero Background',
   opacity: HERO_OPACITY.light,
   title: 'This is <span class="text-[#f7931a]"> ₿itcoin </span> District',
-  subtitle: '<span class="font-semibold">Bitcoin District</span> is a network of Bitcoiners living and working in the DC, Maryland & Virginia (DMV) area seeking to network, socialize & collaborate with other Bitcoiners.',
+  subtitle:
+    '<span class="font-semibold">Bitcoin District</span> is a community of Bitcoiners living and working in the DC, Maryland & Virginia (DMV) area. <span class="hidden sm:inline">We come together to network, socialize and learn from each other.</span>',
 });
 
 // Get the current book for the book club section
@@ -37,64 +38,62 @@ const currentBook = getCurrentBook();
 
   <!-- Upcoming Events Widget ********** -->
 
-  <MeetupEvents
-    tagline="Get Involved"
-    title="Upcoming Events"
-    subtitle="Don't miss out on these upcoming Bitcoin District events"
-    maxEvents={3}
-    showCallToAction={false}
-  />
+  <div slot="hero-bottom" class="sm:block">
+    <MeetupEvents
+      tagline="Get Involved"
+      title="Upcoming Events"
+      subtitle="Don't miss out on these upcoming Bitcoin District events"
+      maxEvents={3}
+      showCallToAction={false}
+    />
+</div>
 
-  <!-- View All Events Button ******** -->
-  
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
-    <div class="text-center">
-      <Button
-        variant="secondary"
-        text="View All Events"
-        href="/events"
-        class="inline-flex items-center gap-2"
-      >
-        <Icon name="tabler:calendar" class="h-4 w-4" />
-        View All Events
-      </Button>
-    </div>
+<!-- View All Events Button ******** -->
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
+  <div class="text-center">
+    <Button variant="secondary" text="View All Events" href="/events" class="inline-flex items-center gap-2">
+      <Icon name="tabler:calendar" class="h-4 w-4" />
+      View All Events
+    </Button>
   </div>
+</div>
 
-  <!-- Book Club Widget *************** -->
+<!-- Book Club Widget *************** -->
 
-  <BookClubPreview
-    tagline="Study ₿itcoin"
-    title="Join Our Monthly Book Club"
-    subtitle="We get together every month to discuss books related to Bitcoin, money, economics, and the broader ecosystem. All skill levels welcome!"
-    book={currentBook}
-    actions={[
-      {
-        variant: "primary",
-        text: "See What We're Reading",
-        href: "/bookclub",
-        icon: "tabler:book",
-      },
-    ]}
-  />
+<BookClubPreview
+  tagline="Study ₿itcoin"
+  title="Join Our Monthly Book Club"
+  subtitle="We get together every month to discuss books related to Bitcoin, money, economics, and the broader ecosystem. All skill levels welcome!"
+  book={currentBook}
+  actions={[
+    {
+      variant: 'primary',
+      text: "See What We're Reading",
+      href: '/bookclub',
+      icon: 'tabler:book',
+    },
+  ]}
+/>
 
-  <!-- Features Widget *************** -->
+<!-- Features Widget *************** -->
 
-  <Features2
-    tagline="Community"
-    title="Be part of a growing community"
-    subtitle="Just a few good reasons to get involved with Bitcoin District"
-    columns={3}
-    items={communityReasons}
-  />
+<Features2
+  tagline="Community"
+  title="Be part of a growing community"
+  subtitle="Just a few good reasons to get involved with Bitcoin District"
+  columns={3}
+  items={communityReasons}
+/>
 
-  <!-- Stats Widget ****************** -->
+<!-- Stats Widget ****************** -->
 
-  <Stats
-    stats={[
-      { title: 'Meetup Size', amount: '590+' },
-      { title: '⭐⭐⭐⭐⭐', amount: '165' },
-      { title: 'Total ₿itcoin', amount: '21M' },
-    ]}
-  />
+<Stats
+  stats={[
+    { title: 'Meetup Size', amount: '590+' },
+    { title: '⭐⭐⭐⭐⭐', amount: '165' },
+    { title: 'Total ₿itcoin', amount: '21M' },
+  ]}
+/>
+
 </HeroLayout>

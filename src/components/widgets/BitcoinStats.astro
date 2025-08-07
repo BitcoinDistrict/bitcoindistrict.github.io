@@ -10,72 +10,70 @@ const { class: className = '' } = Astro.props;
 ---
 
 <div class={`bitcoin-stats-widget ${className}`}>
-  <!-- Mobile Layout: Single column with horizontal cards -->
-  <div class="md:hidden space-y-3 max-w-sm mx-auto">
+  <!-- Mobile Layout: 2-column grid -->
+  <div class="md:hidden grid grid-cols-2 gap-3 max-w-md mx-auto">
     <!-- Bitcoin Price Card -->
-    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-4 border border-white/20 dark:border-gray-700/30">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <Icon name="tabler:currency-bitcoin" class="w-6 h-6 text-orange-500 flex-shrink-0" />
-          <div>
-            <div class="text-lg font-bold text-gray-900 dark:text-white" id="bitcoin-price-mobile">
-              Loading...
-            </div>
-            <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
-              Bitcoin Price
-            </div>
-          </div>
+    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-3 border border-white/20 dark:border-gray-700/30">
+      <div class="text-center">
+        <div class="flex items-center justify-center mb-2">
+          <Icon name="tabler:currency-bitcoin" class="w-5 h-5 text-orange-500" />
         </div>
-        <div class="text-xs text-right" id="price-change-mobile">
+        <div class="text-sm font-bold text-gray-900 dark:text-white" id="bitcoin-price-mobile">
+          Loading...
+        </div>
+        <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
+          Bitcoin Price
+        </div>
+        <div class="text-xs mt-1" id="price-change-mobile">
           <span class="price-change-indicator-mobile"></span>
         </div>
       </div>
     </div>
 
     <!-- Bitcoin Hashrate Card -->
-    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-4 border border-white/20 dark:border-gray-700/30">
-      <div class="flex items-center space-x-3">
-        <Icon name="tabler:cpu" class="w-6 h-6 text-blue-500 flex-shrink-0" />
-        <div>
-          <div class="text-lg font-bold text-gray-900 dark:text-white" id="bitcoin-hashrate-mobile">
-            Loading...
-          </div>
-          <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
-            Network Hashrate
-          </div>
+    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-3 border border-white/20 dark:border-gray-700/30">
+      <div class="text-center">
+        <div class="flex items-center justify-center mb-2">
+          <Icon name="tabler:cpu" class="w-5 h-5 text-blue-500" />
+        </div>
+        <div class="text-sm font-bold text-gray-900 dark:text-white" id="bitcoin-hashrate-mobile">
+          Loading...
+        </div>
+        <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
+          Network Hashrate
         </div>
       </div>
     </div>
 
     <!-- Halving Progress Card -->
-    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-4 border border-white/20 dark:border-gray-700/30">
-      <div class="flex items-center space-x-3 mb-2">
-        <Icon name="tabler:hourglass" class="w-6 h-6 text-purple-500 flex-shrink-0" />
-        <div>
-          <div class="text-lg font-bold text-gray-900 dark:text-white" id="halving-progress-mobile">
-            Loading...
-          </div>
-          <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
-            Until Halving
-          </div>
+    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-3 border border-white/20 dark:border-gray-700/30">
+      <div class="text-center">
+        <div class="flex items-center justify-center mb-2">
+          <Icon name="tabler:hourglass" class="w-5 h-5 text-purple-500" />
         </div>
-      </div>
-      <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-1.5">
-        <div class="bg-purple-500 h-1.5 rounded-full transition-all duration-500" id="halving-bar-mobile" style="width: 0%"></div>
+        <div class="text-sm font-bold text-gray-900 dark:text-white" id="halving-progress-mobile">
+          Loading...
+        </div>
+        <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
+          Until Halving
+        </div>
+        <div class="w-full bg-gray-300 dark:bg-gray-700 rounded-full h-1 mt-2">
+          <div class="bg-purple-500 h-1 rounded-full transition-all duration-500" id="halving-bar-mobile" style="width: 0%"></div>
+        </div>
       </div>
     </div>
 
     <!-- Bitcoin Dominance Card -->
-    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-4 border border-white/20 dark:border-gray-700/30">
-      <div class="flex items-center space-x-3">
-        <Icon name="tabler:chart-pie" class="w-6 h-6 text-green-500 flex-shrink-0" />
-        <div>
-          <div class="text-lg font-bold text-gray-900 dark:text-white" id="bitcoin-dominance-mobile">
-            Loading...
-          </div>
-          <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
-            Bitcoin Dominance
-          </div>
+    <div class="bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm rounded-lg p-3 border border-white/20 dark:border-gray-700/30">
+      <div class="text-center">
+        <div class="flex items-center justify-center mb-2">
+          <Icon name="tabler:chart-pie" class="w-5 h-5 text-green-500" />
+        </div>
+        <div class="text-sm font-bold text-gray-900 dark:text-white" id="bitcoin-dominance-mobile">
+          Loading...
+        </div>
+        <div class="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-400">
+          Bitcoin Dominance
         </div>
       </div>
     </div>
