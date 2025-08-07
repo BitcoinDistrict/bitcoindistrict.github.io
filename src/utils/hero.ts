@@ -35,7 +35,8 @@ export interface HeroConfig {
  */
 export const HERO_IMAGES = {
   default: '~/assets/images/hero-capitol.jpg',
-  events: '~/assets/images/hero-lincoln.jpg',
+  index: '~/assets/images/hero-lincoln.jpg',
+  events: '~/assets/images/hero-capitol.jpg',
   meetups: '~/assets/images/hero-metro.jpg',
   bookclub: '~/assets/images/hero-bridge.jpg',
   about: '~/assets/images/hero-mlk.jpg',
