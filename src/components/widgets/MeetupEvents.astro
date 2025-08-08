@@ -54,12 +54,12 @@ const getMeetupSource = (eventSource: string) => {
   <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline} />
   
   {events.length > 0 ? (
-    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
       {events.map((event) => (
         <article class="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-slate-900 flex flex-col">
           {/* Card Header with Date and Conditional Meetup Icon */}
-          <div class="bg-primary px-6 py-4 text-white flex items-center justify-between">
-            <div class="text-lg font-semibold">
+          <div class="bg-primary px-4 py-3 md:px-6 md:py-4 text-white flex items-center justify-between">
+            <div class="text-base md:text-lg font-semibold">
               {getFormattedDate(event.startDate)}
             </div>
             {/* Show Meetup icon only for events from configured meetup sources */}
@@ -80,15 +80,33 @@ const getMeetupSource = (eventSource: string) => {
           </div>
           
           {/* Event Content - Flex grow to push button to bottom */}
-          <div class="p-6 space-y-4 flex-grow flex flex-col">
+          <div class="p-4 md:p-6 space-y-3 md:space-y-4 flex-grow flex flex-col">
             {/* Title */}
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">
-              {event.title}
-            </h3>
+            {event.url ? (
+              <>
+                {/* Mobile: title becomes link */}
+                <a
+                  href={event.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="md:hidden text-base font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors"
+                >
+                  {event.title}
+                </a>
+                {/* Desktop/tablet: normal title */}
+                <h3 class="hidden md:block text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">
+                  {event.title}
+                </h3>
+              </>
+            ) : (
+              <h3 class="text-base md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">
+                {event.title}
+              </h3>
+            )}
             
             {/* Time */}
             <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              <Icon name="tabler:clock" class="h-4 w-4" />
+              <Icon name="tabler:clock" class="hidden md:inline-block h-4 w-4" />
               <span>{formatEventTime(event.startDate, event.endDate)}</span>
             </div>
             
@@ -100,13 +118,13 @@ const getMeetupSource = (eventSource: string) => {
               </div>
             )}
             
-            {/* Spacer to push button to bottom */}
-            <div class="flex-grow"></div>
+            {/* Spacer to push button to bottom (desktop/tablet only) */}
+            <div class="hidden md:block md:flex-grow"></div>
             
-            {/* Actions - Always at bottom */}
-            <div class="pt-2 mt-auto">
+            {/* Actions - Always at bottom (hidden on mobile to save space) */}
+            <div class="pt-2 mt-auto hidden md:block">
               {event.url ? (
-                <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-3">
                   <Button
                     variant="secondary"
                     text="View Event"
@@ -136,7 +154,7 @@ const getMeetupSource = (eventSource: string) => {
                     );
                     
                     return (
-                      <div class="flex-shrink-0">
+                      <div class="flex-shrink-0 hidden md:block">
                         {logoUrl ? (
                           <a 
                             href={logoUrl} 
@@ -153,7 +171,7 @@ const getMeetupSource = (eventSource: string) => {
                   })()}
                 </div>
               ) : (
-                <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-3">
                   <div class="flex-grow"></div>
                   {/* Show meetup logo if available, or manual event icon (for events without URLs) */}
                   {(() => {
@@ -176,7 +194,7 @@ const getMeetupSource = (eventSource: string) => {
                     );
                     
                     return (
-                      <div class="flex-shrink-0">
+                      <div class="flex-shrink-0 hidden md:block">
                         {logoUrl ? (
                           <a 
                             href={logoUrl} 
