@@ -104,22 +104,13 @@ const getMeetupSource = (eventSource: string) => {
               </h3>
             )}
             
-            {/* Time */}
-            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              <Icon name="tabler:clock" class="hidden md:inline-block h-4 w-4" />
-              <span>{formatEventTime(event.startDate, event.endDate)}</span>
-            </div>
-            
-            {/* Location (if available) */}
-            {event.location && (
-              <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <Icon name="tabler:map-pin" class="h-4 w-4" />
-                <span>{event.location}</span>
-              </div>
-            )}
-            
             {/* Spacer to push button to bottom (desktop/tablet only) */}
             <div class="hidden md:block md:flex-grow"></div>
+            
+            {/* Time - moved to bottom, aligned left */}
+            <div class="text-sm text-gray-600 dark:text-gray-300">
+              {formatEventTime(event.startDate, event.endDate)}
+            </div>
             
             {/* Actions - Always at bottom (hidden on mobile to save space) */}
             <div class="pt-2 mt-auto hidden md:block">
