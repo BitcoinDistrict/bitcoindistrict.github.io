@@ -68,13 +68,15 @@ const {
       <!-- Right Column: Book Cover -->
       <div class="lg:basis-1/2 flex justify-center lg:justify-end">
         <div class="book-cover-container">
-          <Image
-            src={book.image}
-            alt={`Cover of ${book.title} by ${book.author}`}
-            class="book-club-preview-cover shadow-xl rounded-lg transform hover:scale-105 transition-transform duration-300"
-            width={400}
-            loading="eager"
-          />
+          <a href="/bookclub" class="book-cover-link">
+            <Image
+              src={book.image}
+              alt={`Cover of ${book.title} by ${book.author}`}
+              class="book-club-preview-cover shadow-xl rounded-lg transform hover:scale-105 transition-transform duration-300"
+              width={400}
+              loading="eager"
+            />
+          </a>
         </div>
       </div>
     </div>
@@ -92,5 +94,15 @@ const {
     width: 60% !important;
     height: auto !important;
     max-width: 60% !important;
+  }
+  
+  .book-cover-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .book-cover-link:hover {
+    text-decoration: none;
   }
 </style>

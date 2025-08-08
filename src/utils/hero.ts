@@ -49,9 +49,9 @@ export const HERO_IMAGES = {
  * Default opacity settings for different themes
  */
 export const HERO_OPACITY = {
-  light: 'opacity-25 dark:opacity-30',
-  lighter: 'opacity-15 dark:opacity-20',
-  darker: 'opacity-35 dark:opacity-40',
+  light: 'opacity-15 dark:opacity-20',
+  lighter: 'opacity-10 dark:opacity-15',
+  darker: 'opacity-25 dark:opacity-10',
 } as const;
 
 /**
