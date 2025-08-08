@@ -1,4 +1,3 @@
-import { getFormattedDate } from '~/utils/utils';
 import { meetupSources, eventsConfig, type MeetupSource } from '~/data/events-config';
 import { manualEvents, type ManualEvent } from '~/data/events-data';
 
@@ -20,22 +19,71 @@ export interface MeetupEvent {
  * Parses the iCal format without external dependencies
  */
 class ICalParser {
-  private parseDateTime(dateTimeStr: string): Date {
-    // Handle TZID format: DTSTART;TZID=America/New_York:20250805T180000
-    const dateMatch = dateTimeStr.match(/(\d{8}T\d{6})/);
-    if (!dateMatch) {
+  private parseDateTime(dateTimeStr: string, tzid?: string): Date {
+    // Supports formats like:
+    // - 20250805T180000Z (UTC)
+    // - 20250805T180000 (interpreted with TZID if provided, default ET)
+    // - 20250805 (all-day, interpreted midnight with TZID if provided, default ET)
+    const dateTimeMatch = dateTimeStr.match(/^(\d{8})(?:T(\d{6}))(Z)?$/) || dateTimeStr.match(/^(\d{8})$/);
+    if (!dateTimeMatch) {
       throw new Error(`Invalid date format: ${dateTimeStr}`);
     }
-    
-    const dateStr = dateMatch[1];
-    const year = parseInt(dateStr.substring(0, 4));
-    const month = parseInt(dateStr.substring(4, 6)) - 1; // Month is 0-indexed
-    const day = parseInt(dateStr.substring(6, 8));
-    const hour = parseInt(dateStr.substring(9, 11));
-    const minute = parseInt(dateStr.substring(11, 13));
-    const second = parseInt(dateStr.substring(13, 15));
-    
-    return new Date(year, month, day, hour, minute, second);
+
+    const hasTime = dateTimeStr.includes('T');
+    const hasZulu = dateTimeStr.endsWith('Z');
+    const ymd = (hasTime ? dateTimeMatch[1] : dateTimeMatch[1]) as string;
+    const hms = hasTime ? (dateTimeMatch[2] as string) : '000000';
+
+    const year = parseInt(ymd.substring(0, 4));
+    const month = parseInt(ymd.substring(4, 6)) - 1; // Month is 0-indexed
+    const day = parseInt(ymd.substring(6, 8));
+    const hour = parseInt(hms.substring(0, 2));
+    const minute = parseInt(hms.substring(2, 4));
+    const second = parseInt(hms.substring(4, 6));
+
+    // If the string has a trailing Z, treat as UTC
+    if (hasZulu) {
+      return new Date(Date.UTC(year, month, day, hour, minute, second));
+    }
+
+    // Determine timezone to interpret the local wall time
+    const timezone = tzid || 'America/New_York';
+
+    // Compute DST-aware offset for Eastern time without external deps
+    const offsetMinutes = this.getEasternOffsetMinutes(year, month + 1, day, hour);
+
+    // Convert local time in ET to UTC by subtracting the offset (note: ET offsets are negative)
+    // Example: ET offset -240 => UTC = local + 240 minutes
+    const utcMs = Date.UTC(year, month, day, hour, minute, second) - offsetMinutes * 60_000;
+    return new Date(utcMs);
+  }
+
+  // Returns offset minutes relative to UTC for America/New_York at the given local time
+  // Standard Time: -300 (UTC-5), Daylight Time: -240 (UTC-4)
+  private getEasternOffsetMinutes(year: number, month1Based: number, day: number, hour: number): number {
+    // Calculate DST start (second Sunday in March, 2:00 local time)
+    const march = 2; // 0-based month index for March is 2, but we use 1-based input
+    const november = 10; // 1-based input for November is 11, index 10 here
+
+    const secondSundayInMarch = this.getNthWeekdayOfMonth(year, 3, 0, 2); // March (3), Sunday (0), 2nd
+    const firstSundayInNovember = this.getNthWeekdayOfMonth(year, 11, 0, 1); // November (11), Sunday (0), 1st
+
+    // Compare input date to DST window [second Sunday in March 02:00, first Sunday in Nov 02:00)
+    const dateKey = Number(`${year}${String(month1Based).padStart(2, '0')}${String(day).padStart(2, '0')}${String(hour).padStart(2, '0')}`);
+    const dstStartKey = Number(`${year}${'03'}${String(secondSundayInMarch).padStart(2, '0')}${'02'}`);
+    const dstEndKey = Number(`${year}${'11'}${String(firstSundayInNovember).padStart(2, '0')}${'02'}`);
+
+    const isDST = dateKey >= dstStartKey && dateKey < dstEndKey;
+    return isDST ? -240 : -300;
+  }
+
+  // Get the Nth weekday of a month. month1Based (1-12), weekday: 0=Sun..6=Sat
+  private getNthWeekdayOfMonth(year: number, month1Based: number, weekday: number, nth: number): number {
+    const firstOfMonth = new Date(Date.UTC(year, month1Based - 1, 1));
+    const firstWeekday = firstOfMonth.getUTCDay();
+    const delta = (7 + weekday - firstWeekday) % 7;
+    const day = 1 + delta + (nth - 1) * 7;
+    return day;
   }
 
   private unescapeText(text: string): string {
@@ -97,14 +145,16 @@ class ICalParser {
         currentEvent.description = description;
         // Extract URL from description if present
         if (!currentEvent.url) {
-          currentEvent.url = this.extractUrl(fullLine);
+          currentEvent.url = this.extractUrl(description);
         }
       } else if (fullLine.startsWith('DTSTART')) {
+        const tzidMatch = fullLine.match(/TZID=([^;:]+)/);
         const dateStr = fullLine.split(':')[1];
-        currentEvent.startDate = this.parseDateTime(dateStr);
+        currentEvent.startDate = this.parseDateTime(dateStr, tzidMatch?.[1]);
       } else if (fullLine.startsWith('DTEND')) {
+        const tzidMatch = fullLine.match(/TZID=([^;:]+)/);
         const dateStr = fullLine.split(':')[1];
-        currentEvent.endDate = this.parseDateTime(dateStr);
+        currentEvent.endDate = this.parseDateTime(dateStr, tzidMatch?.[1]);
       } else if (fullLine.startsWith('URL;VALUE=URI:')) {
         currentEvent.url = fullLine.substring(14);
       } else if (fullLine.startsWith('LOCATION:')) {

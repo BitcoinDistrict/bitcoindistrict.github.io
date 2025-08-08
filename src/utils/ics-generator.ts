@@ -24,10 +24,33 @@ import { fetchMeetupEvents, type MeetupEvent } from './events';
  */
 
 /**
- * Formats a date for ICS format (YYYYMMDDTHHMMSSZ)
+ * Formats a date for ICS UTC format (YYYYMMDDTHHMMSSZ)
  */
-function formatICSDate(date: Date): string {
+function formatICSDateUTC(date: Date): string {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+}
+
+/**
+ * Formats a date in a given TZID for ICS (local time, no Z)
+ * Example output: 20250805T180000
+ */
+function formatICSDateInTZID(date: Date, tzid: string): string {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: tzid,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+  const parts = dtf.formatToParts(date);
+  const lookup = (type: string) => parts.find(p => p.type === type)?.value || '';
+  const [month, day, year] = [lookup('month'), lookup('day'), lookup('year')];
+  const [hour, minute, second] = [lookup('hour'), lookup('minute'), lookup('second')];
+  // Ensure YYYYMMDDTHHMMSS
+  return `${year}${month}${day}T${hour}${minute}${second}`;
 }
 
 /**
@@ -88,9 +111,10 @@ function generateUID(event: MeetupEvent): string {
  */
 function generateICSEvent(event: MeetupEvent): string {
   const uid = generateUID(event);
-  const dtstart = formatICSDate(event.startDate);
-  const dtend = formatICSDate(event.endDate);
-  const dtstamp = formatICSDate(new Date()); // Current timestamp
+  const tzid = 'America/New_York';
+  const dtstartLocal = formatICSDateInTZID(event.startDate, tzid);
+  const dtendLocal = formatICSDateInTZID(event.endDate, tzid);
+  const dtstamp = formatICSDateUTC(new Date()); // Current timestamp in UTC
   const summary = escapeICSText(event.title);
   const description = escapeICSText(event.description);
   const location = event.location ? escapeICSText(event.location) : '';
@@ -99,8 +123,8 @@ function generateICSEvent(event: MeetupEvent): string {
   let icsEvent = `BEGIN:VEVENT\r\n`;
   icsEvent += foldLine(`UID:${uid}`) + `\r\n`;
   icsEvent += foldLine(`DTSTAMP:${dtstamp}`) + `\r\n`;
-  icsEvent += foldLine(`DTSTART:${dtstart}`) + `\r\n`;
-  icsEvent += foldLine(`DTEND:${dtend}`) + `\r\n`;
+  icsEvent += foldLine(`DTSTART;TZID=${tzid}:${dtstartLocal}`) + `\r\n`;
+  icsEvent += foldLine(`DTEND;TZID=${tzid}:${dtendLocal}`) + `\r\n`;
   icsEvent += foldLine(`SUMMARY:${summary}`) + `\r\n`;
   icsEvent += foldLine(`DESCRIPTION:${description}`) + `\r\n`;
   
