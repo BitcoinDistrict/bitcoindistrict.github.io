@@ -301,8 +301,8 @@ const ribbonData = {
 
       this.ribbon.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        e.preventDefault();
-      });
+        // no-op: allow browser to handle scrolling (passive)
+      }, { passive: true });
 
       this.ribbon.addEventListener('touchend', (e) => {
         if (!isDragging) return;
@@ -320,7 +320,7 @@ const ribbonData = {
         }
 
         isDragging = false;
-      });
+      }, { passive: true });
 
       // Mouse drag support for desktop
       let mouseStartX = 0;
@@ -330,12 +330,12 @@ const ribbonData = {
         mouseStartX = e.clientX;
         isMouseDragging = true;
         this.ribbon!.style.cursor = 'grabbing';
-      });
+      }, { passive: true });
 
       document.addEventListener('mousemove', (e) => {
         if (!isMouseDragging) return;
-        e.preventDefault();
-      });
+        // no-op to keep UI responsive; avoid preventDefault on mousemove
+      }, { passive: true });
 
       document.addEventListener('mouseup', (e) => {
         if (!isMouseDragging) return;
@@ -353,7 +353,7 @@ const ribbonData = {
 
         isMouseDragging = false;
         this.ribbon!.style.cursor = 'grab';
-      });
+      }, { passive: true });
     }
 
     slideToPosition(targetIndex: number) {
