@@ -25,51 +25,11 @@ const hero = createHero({
   scrollIndicator={SCROLL_INDICATOR_PRESETS.accent}
   contentBackground={{ type: 'solid', opacityClass: 'opacity-90' }}>
 >
-  <!-- Why Bitcoin Only Section -->
-  <Content
-    id="why-bitcoin-only"
-    title="Why Bitcoin Only?"
-    subtitle="Bitcoin District is a community of Bitcoiners. We focus our time and energy on Bitcoin because it’s the only truly decentralized digital monetary network that respects that time and energy. Other coins and tokens carry significant tradeoffs and risks that Bitcoin does not."
-    items={[
-      {
-        title: "Bitcoin works without leaders",
-        description: "Bitcoin operates without centralized leadership, relying on a distributed network of nodes to maintain its integrity. No single president or CEO controls its direction or decisions.",
-        icon: "tabler:crown-off",
-      },
-      {
-        title: "Bitcoin had a fair launch",
-        description: "Bitcoin's launch was transparent and fair, with no pre-mine or allocation to corporate insiders, unlike some cryptocurrencies like XRP. This ensured no group unfairly enriched themselves at the start.",
-        icon: "tabler:scale",
-      },
-      {
-        title: "Known issuance schedule",
-        description: "Bitcoin’s supply issuance follows a predictable, fixed schedule coded into its protocol. This schedule remains unchangeable, providing certainty to users.",
-        icon: "tabler:calendar-check",
-      },
-      {
-        title: "Real digital scarcity",
-        description: "Bitcoin’s proof-of-work mechanism enforces true digital scarcity by making it computationally expensive to create new coins. This prevents arbitrary inflation, as no additional coins can be created beyond the protocol’s limits.",
-        icon: "tabler:diamond",
-      },
-      {
-        title: "Most secure & decentralized",
-        description: "Bitcoin is the most secure and decentralized monetary protocol, resistant to censorship and control by any single entity. Its robust network ensures unparalleled reliability and autonomy. This is crucial for a long-term store of value.",
-        icon: "tabler:shield-check",
-      },
-    ]}
-    image={{
-      src: '~/assets/images/bitcoin-1.jpg',
-      alt: 'Bitcoin symbol representing decentralized money',
-      class: 'hidden md:block',
-    }}
-    isReversed={false}
-  />
-
   <!-- Starter Videos Section -->
   <VideoTiles
     id="starter-videos"
     title="Intro to Bitcoin Videos"
-    subtitle="These are some of the BEST videos to watch when starting to learn about Bitcoin and why it matters. Watch them all in this order."
+    subtitle="These are some of the BEST videos to watch when starting to learn about Bitcoin and why it matters."
     videos={[
       {
         title: "What's The Problem?",
@@ -177,8 +137,8 @@ const hero = createHero({
   <ReferralCards
     id="securing-coins"
     title="Securing Your Coins"
-    subtitle="You don't have to trust an exchange with your Bitcoin. When you're ready, you can take full custody of your own coins."
-    disclaimer="⚠️ NEVER NEVER NEVER provide your seed phrase to anyone or type it into any internet connected device. Your seed phrase is the key to your Bitcoin and if exposed, you could lose all of your Bitcoin."
+    subtitle="You don't have to trust an exchange with your Bitcoin. When you're ready, you can take full custody of your own coins for long-term safe keeping."
+    disclaimer="⚠️ NEVER NEVER NEVER give your seed phrase to anyone or type it into any internet connected device. Your seed phrase is the key to your Bitcoin and if exposed, you could lose all of your Bitcoin."
     cards={[
       {
         title: "BTC Sessions – Learn",
@@ -192,7 +152,7 @@ const hero = createHero({
       },
       {
         title: "BitKey – For Beginners",
-        description: "Basic self‑custody setup made simple for newcomers to Bitcoin.",
+        description: "Basic self‑custody setup made simple for newcomers to Bitcoin. No seed phrase backup needed.",
         image: {
           src: "~/assets/images/bitkey.png",
           alt: "BitKey hardware wallet logo",
@@ -223,4 +183,46 @@ const hero = createHero({
     ]}
     columns={4}
   />
+
+    <!-- Why Bitcoin Only Section -->
+    <Content
+    id="why-bitcoin-only"
+    title="Why Bitcoin Only?"
+    subtitle="Bitcoin District is a community of Bitcoiners. We focus our time and energy on Bitcoin because it’s the only truly decentralized digital monetary network that respects that time and energy. Other coins and tokens carry significant tradeoffs and risks that Bitcoin does not."
+    items={[
+      {
+        title: "Bitcoin works without leaders",
+        description: "Bitcoin operates without centralized leadership, relying on a distributed network of nodes to maintain its integrity. No single president or CEO controls its direction or decisions.",
+        icon: "tabler:crown-off",
+      },
+      {
+        title: "Bitcoin had a fair launch",
+        description: "Bitcoin's launch was transparent and fair, with no pre-mine or allocation to corporate insiders, unlike some cryptocurrencies like XRP. This ensured no group unfairly enriched themselves at the start.",
+        icon: "tabler:scale",
+      },
+      {
+        title: "Known issuance schedule",
+        description: "Bitcoin’s supply issuance follows a predictable, fixed schedule coded into its protocol. This schedule remains unchangeable, providing certainty to users.",
+        icon: "tabler:calendar-check",
+      },
+      {
+        title: "Real digital scarcity",
+        description: "Bitcoin’s proof-of-work mechanism enforces true digital scarcity by making it computationally expensive to create new coins. This prevents arbitrary inflation, as no additional coins can be created beyond the protocol’s limits.",
+        icon: "tabler:diamond",
+      },
+      {
+        title: "Most secure & decentralized",
+        description: "Bitcoin is the most secure and decentralized monetary protocol, resistant to censorship and control by any single entity. Its robust network ensures unparalleled reliability and autonomy. This is crucial for a long-term store of value.",
+        icon: "tabler:shield-check",
+      },
+    ]}
+    image={{
+      src: '~/assets/images/bitcoin-1.jpg',
+      alt: 'Bitcoin symbol representing decentralized money',
+      class: 'hidden md:block',
+    }}
+    isReversed={false}
+  />
+
+
 </HeroLayout>
