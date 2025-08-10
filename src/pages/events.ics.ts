@@ -1,6 +1,9 @@
 import type { APIRoute } from 'astro';
 import { getICSContent } from '~/utils/ics-generator';
 
+// Ensure this endpoint is prerendered to a static file at build time
+export const prerender = true;
+
 /**
  * API endpoint to generate and serve the ICS calendar file
  * Accessible at /events.ics

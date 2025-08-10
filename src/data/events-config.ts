@@ -69,10 +69,13 @@ export interface EventsConfig {
   includeManualEvents: boolean;
   /** Whether to fetch from meetup iCal sources */
   includeMeetupEvents: boolean;
+  /** Default months-ahead window for UI display (widgets may override) */
+  defaultMaxMonthsAhead: number;
 }
 
 export const eventsConfig: EventsConfig = {
   maxEvents: 6,
   includeManualEvents: true,
   includeMeetupEvents: true,
+  defaultMaxMonthsAhead: 9,
 };

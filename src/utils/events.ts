@@ -1,5 +1,7 @@
 import { meetupSources, eventsConfig, type MeetupSource } from '~/data/events-config';
 import { manualEvents, type ManualEvent } from '~/data/events-data';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export interface MeetupEvent {
   id: string;
@@ -170,19 +172,50 @@ class ICalParser {
  * Fetches events from a single meetup iCal source
  */
 async function fetchSingleMeetupSource(source: MeetupSource): Promise<MeetupEvent[]> {
+  const parser = new ICalParser();
+
+  // Lightweight build-time cache for iCal content
+  const cacheDir = path.join(process.cwd(), '.cache', 'meetup-icals');
+  const slug = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const cacheFile = path.join(cacheDir, `${slug(source.name || source.icalUrl)}.ics`);
+
+  async function readCache(): Promise<string | null> {
+    try {
+      await fs.promises.mkdir(cacheDir, { recursive: true });
+      const data = await fs.promises.readFile(cacheFile, 'utf8');
+      return data || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function writeCache(data: string): Promise<void> {
+    try {
+      await fs.promises.mkdir(cacheDir, { recursive: true });
+      await fs.promises.writeFile(cacheFile, data, 'utf8');
+    } catch (err) {
+      // Non-fatal: cache write failure shouldn't break build
+      console.warn(`Warning: could not write cache for ${source.name}:`, (err as Error).message);
+    }
+  }
+
   try {
     const response = await fetch(source.icalUrl);
-    
     if (!response.ok) {
       throw new Error(`Failed to fetch events from ${source.name}: ${response.status} ${response.statusText}`);
     }
-    
     const icalData = await response.text();
-    const parser = new ICalParser();
+    // Update cache on successful fetch
+    await writeCache(icalData);
     return parser.parse(icalData, source.name);
-      
   } catch (error) {
     console.error(`Error fetching events from ${source.name}:`, error);
+    // Fallback to cache if available
+    const cached = await readCache();
+    if (cached) {
+      console.log(`Using cached iCal for ${source.name}`);
+      return parser.parse(cached, source.name);
+    }
     return [];
   }
 }
@@ -204,6 +237,39 @@ function convertManualEvents(): MeetupEvent[] {
       source: event.source,
       icon: event.icon,
     }));
+}
+
+/**
+ * Removes duplicate events by primary key UID (id) or by fallback key (normalized title + start timestamp)
+ */
+function dedupeEvents(events: MeetupEvent[]): MeetupEvent[] {
+  const seenById = new Set<string>();
+  const seenByComposite = new Set<string>();
+  const result: MeetupEvent[] = [];
+
+  for (const evt of events) {
+    const hasId = typeof evt.id === 'string' && evt.id.trim().length > 0;
+    if (hasId) {
+      if (seenById.has(evt.id)) {
+        continue;
+      }
+    }
+
+    const normalizedTitle = (evt.title || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    const compositeKey = `${normalizedTitle}|${evt.startDate.getTime()}`;
+
+    if (seenByComposite.has(compositeKey)) {
+      continue;
+    }
+
+    if (hasId) {
+      seenById.add(evt.id);
+    }
+    seenByComposite.add(compositeKey);
+    result.push(evt);
+  }
+
+  return result;
 }
 
 /**
@@ -232,8 +298,8 @@ export async function fetchMeetupEvents(): Promise<MeetupEvent[]> {
     allEvents.push(...manualEventsList);
   }
   
-  // Filter to only future events and sort by start date
-  const upcomingEvents = allEvents
+  // Dedupe, filter to only future events and sort by start date
+  const upcomingEvents = dedupeEvents(allEvents)
     .filter(event => event.startDate >= new Date())
     .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
   
@@ -243,6 +309,33 @@ export async function fetchMeetupEvents(): Promise<MeetupEvent[]> {
   }
   
   return upcomingEvents;
+}
+
+/**
+ * Fetches all upcoming events without applying a global max limit.
+ * Intended for uses where we need the full set (e.g., ICS generation).
+ */
+export async function fetchAllUpcomingEvents(): Promise<MeetupEvent[]> {
+  const allEvents: MeetupEvent[] = [];
+
+  if (eventsConfig.includeMeetupEvents) {
+    const activeSources = meetupSources.filter(source => source.enabled);
+    const meetupEventPromises = activeSources.map(source => fetchSingleMeetupSource(source));
+    const meetupEventArrays = await Promise.all(meetupEventPromises);
+    meetupEventArrays.forEach(events => {
+      allEvents.push(...events);
+    });
+  }
+
+  if (eventsConfig.includeManualEvents) {
+    const manualEventsList = convertManualEvents();
+    allEvents.push(...manualEventsList);
+  }
+
+  // Dedupe and only filter out past events; do not apply any upper window or max limit
+  return dedupeEvents(allEvents)
+    .filter(event => event.startDate >= new Date())
+    .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
 }
 
 /**

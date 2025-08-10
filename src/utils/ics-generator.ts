@@ -1,4 +1,4 @@
-import { fetchMeetupEvents, type MeetupEvent } from './events';
+import { fetchAllUpcomingEvents, type MeetupEvent } from './events';
 
 /**
  * ICS Generator Utility
@@ -203,7 +203,7 @@ export function generateICSContent(events: MeetupEvent[]): string {
 export async function generateICSFile(): Promise<string> {
   try {
     // Fetch all events from all sources
-    const events = await fetchMeetupEvents();
+    const events = await fetchAllUpcomingEvents();
     
     // Generate ICS content
     const icsContent = generateICSContent(events);
@@ -223,6 +223,6 @@ export async function generateICSFile(): Promise<string> {
  * Get all events and return ICS content (for API endpoints)
  */
 export async function getICSContent(): Promise<string> {
-  const events = await fetchMeetupEvents();
+  const events = await fetchAllUpcomingEvents();
   return generateICSContent(events);
 }

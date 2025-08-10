@@ -5,7 +5,7 @@ import Button from '~/components/ui/Button.astro';
 import Image from '~/components/common/Image.astro';
 import { Icon } from 'astro-icon/components';
 import { fetchMeetupEvents, formatEventDescription, formatEventTime, type MeetupEvent } from '~/utils/events';
-import { meetupSources } from '~/data/events-config';
+import { meetupSources, eventsConfig } from '~/data/events-config';
 import { getFormattedDate } from '~/utils/utils';
 
 export interface Props {
@@ -21,6 +21,8 @@ export interface Props {
   bg?: any;
   maxEvents?: number;
   showCallToAction?: boolean;
+  /** Maximum months ahead to display in UI (no effect on ICS). Default 9. */
+  maxMonthsAhead?: number;
 }
 
 const {
@@ -33,13 +35,19 @@ const {
   bg = await Astro.slots.render('bg'),
   maxEvents,
   showCallToAction = true,
+  maxMonthsAhead = eventsConfig.defaultMaxMonthsAhead,
 } = Astro.props;
 
 // Fetch events at build time and limit if maxEvents is specified
 let events: MeetupEvent[] = [];
 try {
   const allEvents = await fetchMeetupEvents();
-  events = maxEvents ? allEvents.slice(0, maxEvents) : allEvents;
+  // Apply UI-only upper window filter by months ahead
+  const now = new Date();
+  const monthsAheadDate = new Date(now);
+  monthsAheadDate.setMonth(monthsAheadDate.getMonth() + (maxMonthsAhead ?? 9));
+  const filteredByWindow = allEvents.filter(e => e.startDate <= monthsAheadDate);
+  events = maxEvents ? filteredByWindow.slice(0, maxEvents) : filteredByWindow;
 } catch (error) {
   console.error('Failed to fetch meetup events:', error);
 }
