@@ -106,12 +106,26 @@ const contentBgConfig = {
 ---
 
 <Layout metadata={metadata}>
+  <!-- Global fixed background image so it appears behind the entire page (including footer) -->
+  <div class="fixed inset-0 z-[-1]">
+    <Image
+      src={heroConfig.image}
+      alt={heroConfig.alt}
+      class={`object-cover w-full h-full ${heroConfig.opacity}`}
+      widths={[400, 768, 1024, 1920, 2560]}
+      sizes="100vw"
+      loading="eager"
+      width={1920}
+      height={1080}
+    />
+  </div>
+
   <slot name="header">
     <Header {...headerData} isSticky showRssFeed showToggleTheme />
   </slot>
   
   <main>
-    <!-- Hero Section with Background Image -->
+    <!-- Hero Section (background provided globally above) -->
     <div class="min-h-screen flex flex-col justify-start pt-4 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-18 relative">
       <Hero
         tagline={heroConfig.tagline}
@@ -120,18 +134,7 @@ const contentBgConfig = {
         content={heroConfig.content}
         actions={heroConfig.actions}
       >
-        <Fragment slot="bg">
-          <Image
-            src={heroConfig.image}
-            alt={heroConfig.alt}
-            class={`fixed inset-0 object-cover w-full h-full ${heroConfig.opacity} z-[-1]`}
-            widths={[400, 768, 1024, 1920, 2560]}
-            sizes="100vw"
-            loading="eager"
-            width={1920}
-            height={1080}
-          />
-        </Fragment>
+        <!-- No per-hero background; using global fixed image above -->
       </Hero>
 
       <!-- Additional content slot for widgets like BitcoinStats -->

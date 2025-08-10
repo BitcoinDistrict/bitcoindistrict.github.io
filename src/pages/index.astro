@@ -30,7 +30,7 @@ const hero = createHero({
 const currentBook = getCurrentBook();
 ---
 
-<HeroLayout metadata={metadata} hero={hero}>
+<HeroLayout metadata={metadata} hero={hero} contentBackground={{ type: 'transparent' }}>
   <!-- Bitcoin Live Stats Widget -->
   <div slot="hero-bottom" class="relative z-10 -mt-20 pb-12">
     <BitcoinStats class="px-4 sm:px-6" />
