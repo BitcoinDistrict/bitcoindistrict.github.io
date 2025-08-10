@@ -18,72 +18,68 @@ const {
   title = await Astro.slots.render('title'),
   subtitle = await Astro.slots.render('subtitle'),
   tagline = await Astro.slots.render('tagline'),
-  displayCount = 7, // 7 on desktop, will be responsive
+  displayCount = 7, // 7 on desktop, JS will adapt for mobile
   id,
   isDark = false,
   classes = {},
   bg = await Astro.slots.render('bg'),
 } = Astro.props;
 
-// Find the featured book using the consistent utility function
-const featuredBook = getCurrentBook();
-
-// Resolve all image paths to actual URLs for client-side use
+// Resolve images once on the server to avoid client-side swaps
 const resolvedBooks = await Promise.all(
   bookClubBooks.map(async (book) => {
     const resolvedImage = await findImage(book.image);
     return {
       ...book,
-      resolvedImageSrc: typeof resolvedImage === 'string' ? resolvedImage : resolvedImage?.src || book.image
+      resolvedImage, // ImageMetadata | string | null
+      resolvedImageSrc: typeof resolvedImage === 'string' ? resolvedImage : resolvedImage?.src || book.image,
     };
   })
 );
 
-// Create a shuffled array of all books for cycling
-const allBooksShuffled = [...resolvedBooks].sort(() => 0.5 - Math.random());
+// Canonical ordering: books with dates first (ascending by date), then undated
+const booksWithDates = resolvedBooks
+  .filter((b) => b.date)
+  .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+const booksWithoutDates = resolvedBooks.filter((b) => !b.date);
+const orderedBooks = [...booksWithDates, ...booksWithoutDates];
 
-// Find the featured book index in the shuffled array
-const featuredBookIndex = allBooksShuffled.findIndex(book => book.title === featuredBook.title && book.author === featuredBook.author);
-
-// If featured book isn't in the shuffled array (shouldn't happen), add it
-if (featuredBookIndex === -1) {
-  const resolvedFeatured = resolvedBooks.find(book => book.title === featuredBook.title && book.author === featuredBook.author);
-  if (resolvedFeatured) {
-    allBooksShuffled.unshift(resolvedFeatured);
-  }
+// Determine the featured book (next by date or last past)
+const featuredBook = getCurrentBook();
+let featuredIndex = orderedBooks.findIndex(
+  (b) => b.title === featuredBook.title && b.author === featuredBook.author
+);
+if (featuredIndex === -1) {
+  // Fallback: center on the most recent dated book, or first item
+  featuredIndex = Math.max(booksWithDates.length - 1, 0);
 }
 
-// Check for empty book list and provide fallback
-const hasBooks = allBooksShuffled.length > 0;
-
-  // Create initial display centered on featured book (desktop: 7, mobile will be handled by JS)
-  const centerIndex = Math.floor(displayCount / 2);
-  const displayBooks: Array<{ book: typeof allBooksShuffled[0]; isFeatured: boolean }> = [];
-
-  // Use the most recent books by date for the display
-  // Sort books by date, with null dates at the end
-  const sortedBooks = [...allBooksShuffled].sort((a, b) => {
-    if (!a.date) return 1;
-    if (!b.date) return -1;
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
+// Prepare initial display window centered on featured book
+const hasBooks = orderedBooks.length > 0;
+const centerIndex = Math.floor(displayCount / 2);
+const displayBooks: Array<{ book: typeof orderedBooks[0]; isFeatured: boolean }> = [];
+for (let i = 0; i < displayCount && hasBooks; i++) {
+  const bookIndex = (featuredIndex - centerIndex + i + orderedBooks.length) % orderedBooks.length;
+  displayBooks.push({
+    book: orderedBooks[bookIndex],
+    isFeatured: i === centerIndex,
   });
+}
 
-  // Find the featured book in the sorted array
-  const sortedFeaturedIndex = sortedBooks.findIndex(book => 
-    book.title === featuredBook.title && book.author === featuredBook.author
-  );
-
-  // Use either the sorted books or the shuffled books based on presence of featured book
-  const booksToUse = sortedFeaturedIndex !== -1 ? sortedBooks : allBooksShuffled;
-  const effectiveFeaturedIndex = sortedFeaturedIndex !== -1 ? sortedFeaturedIndex : featuredBookIndex;
-
-  for (let i = 0; i < displayCount; i++) {
-    const bookIndex = (effectiveFeaturedIndex - centerIndex + i + booksToUse.length) % booksToUse.length;
-    displayBooks.push({
-      book: booksToUse[bookIndex],
-      isFeatured: i === centerIndex
-    });
-  }
+// Prepare serializable client payload (avoid ImageMetadata)
+const clientBooks = orderedBooks.map(({ title, author, image, date, link, resolvedImageSrc }) => ({
+  title,
+  author,
+  image,
+  date,
+  link,
+  resolvedImageSrc,
+}));
+const ribbonData = {
+  allBooks: clientBooks,
+  featuredBookIndex: featuredIndex,
+  displayCount,
+};
 ---
 
 <WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-7xl ${classes?.container ?? ''}`} bg={bg}>
@@ -99,9 +95,14 @@ const hasBooks = allBooksShuffled.length > 0;
           {displayBooks.map(({ book, isFeatured }, index) => (
             <div 
               class={`book-cover-wrapper transition-all duration-300 cursor-pointer hover:scale-105 ${
-                isFeatured 
-                  ? 'scale-110 z-20' 
-                  : `scale-${Math.max(75, 95 - Math.abs(index - centerIndex) * 10)} opacity-${Math.max(70, 100 - Math.abs(index - centerIndex) * 15)} hover:opacity-100`
+                isFeatured
+                  ? 'scale-110 opacity-100 z-20'
+                  : (() => {
+                      const distance = Math.abs(index - centerIndex);
+                      if (distance === 1) return 'scale-100 opacity-90 z-10';
+                      if (distance === 2) return 'scale-90 opacity-75 z-10';
+                      return 'scale-75 opacity-60 z-10';
+                    })()
               }`}
               data-book-index={index}
               data-is-featured={isFeatured}
@@ -110,7 +111,7 @@ const hasBooks = allBooksShuffled.length > 0;
                 isFeatured ? 'ring-2 ring-primary/20' : 'shadow-md hover:shadow-xl'
               }`}>
                 <Image
-                  src={book.image}
+                  src={book.resolvedImage ?? book.image}
                   alt={`${book.title} by ${book.author}`}
                   width={isFeatured ? 200 : 140}
                   height={isFeatured ? 300 : 210}
@@ -142,23 +143,8 @@ const hasBooks = allBooksShuffled.length > 0;
   </div>
 </WidgetWrapper>
 
-<!-- Pass book data to JavaScript -->
-<script type="application/json" id="book-data" define:vars={{ allBooksShuffled, featuredBookIndex: featuredBookIndex === -1 ? 0 : featuredBookIndex, displayCount }}>
-  {
-    "allBooks": allBooksShuffled,
-    "featuredBookIndex": featuredBookIndex,
-    "displayCount": displayCount
-  }
-</script>
-
-<script define:vars={{ allBooksShuffled, featuredBookIndex: featuredBookIndex === -1 ? 0 : featuredBookIndex, displayCount }}>
-  // Set the book data on window for the main script to access
-  window.bookRibbonData = {
-    allBooks: allBooksShuffled,
-    featuredBookIndex: featuredBookIndex,
-    displayCount: displayCount
-  };
-</script>
+<!-- Pass ordered book data to JavaScript (no resorting on client) -->
+<script type="application/json" id="book-ribbon-data" set:html={JSON.stringify(ribbonData)}></script>
 
 <script>
   interface BookData {
@@ -172,11 +158,6 @@ const hasBooks = allBooksShuffled.length > 0;
 
   declare global {
     interface Window {
-      bookRibbonData?: {
-        allBooks: BookData[];
-        featuredBookIndex: number;
-        displayCount: number;
-      };
     }
   }
 
@@ -197,101 +178,47 @@ const hasBooks = allBooksShuffled.length > 0;
       this.ribbon = document.querySelector('.book-ribbon');
       this.bookElements = Array.from(document.querySelectorAll('.book-cover-wrapper')) as HTMLElement[];
       this.visibleElements = this.bookElements;
-      
+
       this.loadBookData();
       this.initializeEventListeners();
       this.initializeIntersectionObserver();
       this.initializeResizeListener();
-      
+
       // Initialize display count and positioning after data is loaded
       this.updateDisplayCountForScreenSize();
-      
-      // Ensure book positions are updated after a short delay
-      setTimeout(() => {
-        this.updateBookPositions();
-      }, 100);
-      
-      console.log('Initializing book ribbon with', this.allBooks.length, 'books');
-    }
 
-    // Helper method to center the featured book in the current display
-    centerFeaturedBook() {
-      // Find the current featured book's position
-      const currentFeaturedIndex = this.visibleElements.findIndex(el => 
-        el.dataset.isFeatured === 'true'
-      );
-      
-      if (currentFeaturedIndex !== -1) {
-        const targetCenter = this.centerIndex;
-        const offsetNeeded = targetCenter - currentFeaturedIndex;
-        this.currentOffset += offsetNeeded;
-        
-        console.log('Centering featured book:', {
-          currentFeaturedIndex,
-          targetCenter,
-          offsetNeeded,
-          newOffset: this.currentOffset
-        });
-      } else {
-        // Fallback: reset offset based on original featured book index and display count
-        const isMobile = this.currentDisplayCount === 5;
-        if (isMobile) {
-          // For mobile (5 books), center should be at index 2
-          this.currentOffset = this.featuredBookIndex - 2;
-        } else {
-          // For desktop (7 books), center should be at index 3  
-          this.currentOffset = this.featuredBookIndex - 3;
-        }
-        
-        console.log('Using fallback centering:', {
-          isMobile,
-          featuredBookIndex: this.featuredBookIndex,
-          centerIndex: this.centerIndex,
-          newOffset: this.currentOffset
-        });
-      }
+      // Ensure initial positions are applied immediately
+      this.updateBookPositions();
     }
 
     loadBookData() {
-      // Load book data from the window object set by the define:vars script
-      if (window.bookRibbonData) {
-        try {
-          const data = window.bookRibbonData;
-          
-          // Sort books by date (most recent first)
-          const sortedBooks = [...(data.allBooks || [])].sort((a, b) => {
-            if (!a.date) return 1;
-            if (!b.date) return -1;
-            return new Date(b.date).getTime() - new Date(a.date).getTime();
-          });
-          
-          this.allBooks = sortedBooks;
-          this.featuredBookIndex = data.featuredBookIndex || 0;
-          this.displayCount = data.displayCount || 7;
-          this.currentOffset = 0; // Start with featured book in center
-          
-          console.log('Loaded book data:', {
-            totalBooks: this.allBooks.length,
-            featuredBookIndex: this.featuredBookIndex,
-            featuredBook: this.allBooks[this.featuredBookIndex]?.title,
-            displayCount: this.displayCount
-          });
-        } catch (e) {
-          console.error('Failed to load book data:', e);
-          this.allBooks = [];
-        }
-      } else {
-        console.error('Book data not found on window object');
+      // Load book data from embedded JSON
+      try {
+        const dataEl = document.getElementById('book-ribbon-data');
+        const json = dataEl?.textContent || '{}';
+        const data = JSON.parse(json) as {
+          allBooks: BookData[];
+          featuredBookIndex: number;
+          displayCount: number;
+        };
+
+        this.allBooks = Array.isArray(data.allBooks) ? data.allBooks : [];
+        this.featuredBookIndex = typeof data.featuredBookIndex === 'number' ? data.featuredBookIndex : 0;
+        this.displayCount = typeof data.displayCount === 'number' ? data.displayCount : 7;
+        this.currentOffset = 0; // Start with featured book in center
+      } catch (e) {
+        // Silently fail if data is not present (e.g., on other pages)
+        this.allBooks = [];
       }
     }
 
     updateDisplayCountForScreenSize() {
       const isMobile = window.innerWidth < 768;
       const newDisplayCount = isMobile ? 5 : this.displayCount;
-      
+
       // Get all book elements first
       this.bookElements = Array.from(document.querySelectorAll('.book-cover-wrapper'));
-      
+
       // Update visibility of book elements based on screen size
       this.bookElements.forEach((el, index) => {
         if (index < newDisplayCount) {
@@ -301,7 +228,7 @@ const hasBooks = allBooksShuffled.length > 0;
           el.style.display = 'none';
         }
       });
-      
+
       // Update current display count and center index
       this.currentDisplayCount = newDisplayCount;
       this.centerIndex = Math.floor(newDisplayCount / 2);
@@ -309,23 +236,15 @@ const hasBooks = allBooksShuffled.length > 0;
       // Capture first N visible elements directly based on newDisplayCount
       this.visibleElements = this.bookElements.slice(0, newDisplayCount) as HTMLElement[];
 
-      // Apply a specific offset for mobile view to fix positioning
-      if (isMobile) {
-        // For mobile (5 books), we need to adjust the offset to -1 to align the featured book correctly
-        this.currentOffset = -1;
-      } else {
-        // For desktop (7 books), reset to 0 as the initial layout is correct
-        this.currentOffset = 0;
-      }
-      
-      console.log('Screen size update:', {
-        isMobile,
-        displayCount: newDisplayCount,
-        centerIndex: this.centerIndex,
-        currentOffset: this.currentOffset,
-        visibleElements: this.bookElements.length
-      });
-      
+      // Keep featured centered when the visible count changes.
+      // On mobile, a +1 offset compensates for DOM reuse from the 7-wide SSR layout
+      // so the featured book lands in the middle (index 2 of 5).
+      this.currentOffset = isMobile ? 1 : 0;
+      // Recalculate the element list for the new center positioning
+      this.visibleElements = this.bookElements.slice(0, newDisplayCount) as HTMLElement[];
+      // Immediately position books with the updated centerIndex/visibleElements
+      this.updateBookPositions();
+
       this.initializeBookClickListeners();
       if (this.allBooks.length > 0) {
         this.updateBookPositions();
@@ -344,23 +263,18 @@ const hasBooks = allBooksShuffled.length > 0;
     }
 
     initializeResizeListener() {
-      let resizeTimeout: NodeJS.Timeout;
+      let resizeTimeout: number | undefined;
       window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
+        if (resizeTimeout) window.clearTimeout(resizeTimeout);
+        resizeTimeout = window.setTimeout(() => {
           // Store current screen state to detect transitions
           const wasMobile = this.currentDisplayCount === 5;
           const isNowMobile = window.innerWidth < 768;
-          
+
           // Only update if there's an actual transition between mobile/desktop
           if (wasMobile !== isNowMobile) {
-            console.log('Screen transition detected:', { wasMobile, isNowMobile });
             this.updateDisplayCountForScreenSize();
-            
-            // Force reposition of books after screen size change
-            setTimeout(() => {
-              this.updateBookPositions();
-            }, 50);
+            this.updateBookPositions();
           }
         }, 250);
       });
@@ -369,7 +283,7 @@ const hasBooks = allBooksShuffled.length > 0;
     initializeEventListeners() {
       // Initialize book click listeners
       this.initializeBookClickListeners();
-      
+
       // Touch/swipe support
       this.initializeTouchEvents();
     }
@@ -392,7 +306,7 @@ const hasBooks = allBooksShuffled.length > 0;
 
       this.ribbon.addEventListener('touchend', (e) => {
         if (!isDragging) return;
-        
+
         const endX = e.changedTouches[0].clientX;
         const deltaX = startX - endX;
 
@@ -404,7 +318,7 @@ const hasBooks = allBooksShuffled.length > 0;
             this.navigateLeft();
           }
         }
-        
+
         isDragging = false;
       });
 
@@ -425,7 +339,7 @@ const hasBooks = allBooksShuffled.length > 0;
 
       document.addEventListener('mouseup', (e) => {
         if (!isMouseDragging) return;
-        
+
         const endX = e.clientX;
         const deltaX = mouseStartX - endX;
 
@@ -436,7 +350,7 @@ const hasBooks = allBooksShuffled.length > 0;
             this.navigateLeft();
           }
         }
-        
+
         isMouseDragging = false;
         this.ribbon!.style.cursor = 'grab';
       });
@@ -445,7 +359,7 @@ const hasBooks = allBooksShuffled.length > 0;
     slideToPosition(targetIndex: number) {
       const direction = targetIndex > this.centerIndex ? 1 : -1;
       const steps = Math.abs(targetIndex - this.centerIndex);
-      
+
       for (let i = 0; i < steps; i++) {
         setTimeout(() => {
           if (direction > 0) {
@@ -458,16 +372,12 @@ const hasBooks = allBooksShuffled.length > 0;
     }
 
     navigateLeft() {
-      console.log('Navigate left - Old offset:', this.currentOffset);
       this.currentOffset--;
-      console.log('Navigate left - New offset:', this.currentOffset);
       this.updateBookPositions();
     }
 
     navigateRight() {
-      console.log('Navigate right - Old offset:', this.currentOffset);
       this.currentOffset++;
-      console.log('Navigate right - New offset:', this.currentOffset);
       this.updateBookPositions();
     }
     
@@ -483,12 +393,7 @@ const hasBooks = allBooksShuffled.length > 0;
     }
 
     updateBookPositions() {
-      if (this.allBooks.length === 0) {
-        console.error('No books loaded for cycling');
-        return;
-      }
-
-      console.log('Updating positions - Current offset:', this.currentOffset, 'Featured book index:', this.featuredBookIndex);
+      if (this.allBooks.length === 0) return;
 
       // Work only with currently visible elements
       const elements = this.visibleElements.length > 0 ? this.visibleElements : this.bookElements;
@@ -499,30 +404,16 @@ const hasBooks = allBooksShuffled.length > 0;
         const positionOffset = index - this.centerIndex;
         const bookIndex = (baseIndex + positionOffset + this.allBooks.length * 100) % this.allBooks.length;
         const book = this.allBooks[bookIndex];
-        
-        console.log(`Position ${index}: Book index ${bookIndex}, Book: ${book?.title || 'undefined'}`);
-        
-        // Debug mobile positioning
-        const isMobile = this.currentDisplayCount === 5;
-        if (isMobile && index === this.centerIndex) {
-          console.log('Mobile center position:', {
-            centerIndex: this.centerIndex,
-            bookIndex,
-            bookTitle: book?.title,
-            offset: this.currentOffset
-          });
-        }
-        
+
         // Calculate visual properties based on distance from center
         const distanceFromCenter = Math.abs(index - this.centerIndex);
         const isFeatured = index === this.centerIndex;
-        
+
         // Update the book content (image and alt text) with preloading
         const img = bookEl.querySelector('img');
         if (img && book) {
           const newSrc = book.resolvedImageSrc || book.image;
-          console.log(`Updating image for position ${index} to: ${newSrc}`);
-          
+
           // Preload image to prevent flickering
           const tempImg = new Image();
           tempImg.onload = () => {
@@ -535,26 +426,26 @@ const hasBooks = allBooksShuffled.length > 0;
             console.error(`Failed to load image: ${newSrc}`);
             img.style.opacity = '';
           };
-          
+
           // Start loading and add visual feedback
           img.style.opacity = '0.7';
           tempImg.src = newSrc;
         } else {
           console.error(`Missing img element or book data for position ${index}`);
         }
-        
+
         // Remove existing transform classes
         bookEl.classList.remove(
           'scale-50', 'scale-75', 'scale-90', 'scale-100', 'scale-110', 'scale-125',
           'opacity-40', 'opacity-60', 'opacity-75', 'opacity-85', 'opacity-100',
           'z-10', 'z-20', 'z-30'
         );
-        
+
         // Apply new transform based on position
         if (isFeatured) {
           bookEl.classList.add('scale-110', 'opacity-100', 'z-20');
           bookEl.dataset.isFeatured = 'true';
-          
+
           // Add special styling for featured book
           const shadowDiv = bookEl.querySelector('.absolute.inset-0');
           if (shadowDiv) {
@@ -564,7 +455,7 @@ const hasBooks = allBooksShuffled.length > 0;
           let scale = 'scale-90';
           let opacity = 'opacity-85';
           let zIndex = 'z-10';
-          
+
           if (distanceFromCenter === 1) {
             scale = 'scale-100';
             opacity = 'opacity-90';
@@ -575,10 +466,10 @@ const hasBooks = allBooksShuffled.length > 0;
             scale = 'scale-75';
             opacity = 'opacity-60';
           }
-          
+
           bookEl.classList.add(scale, opacity, zIndex);
           bookEl.dataset.isFeatured = 'false';
-          
+
           // Hide shadow for non-featured books
           const shadowDiv = bookEl.querySelector('.absolute.inset-0');
           if (shadowDiv) {
@@ -586,7 +477,7 @@ const hasBooks = allBooksShuffled.length > 0;
           }
         }
       });
-      
+
       // Add a visual feedback that something is happening
       this.ribbon?.classList.add('transform-gpu');
       setTimeout(() => {
@@ -621,12 +512,22 @@ const hasBooks = allBooksShuffled.length > 0;
 
   // Initialize when DOM is ready
   document.addEventListener('DOMContentLoaded', () => {
-    new BookRibbon();
+    const container = document.querySelector('.book-ribbon-container') as HTMLElement | null;
+    const dataEl = document.getElementById('book-ribbon-data');
+    if (container && dataEl && container.dataset.ribbonInit !== 'true') {
+      container.dataset.ribbonInit = 'true';
+      new BookRibbon();
+    }
   });
 
   // Re-initialize after Astro page transitions
   document.addEventListener('astro:after-swap', () => {
-    new BookRibbon();
+    const container = document.querySelector('.book-ribbon-container') as HTMLElement | null;
+    const dataEl = document.getElementById('book-ribbon-data');
+    if (container && dataEl && container.dataset.ribbonInit !== 'true') {
+      container.dataset.ribbonInit = 'true';
+      new BookRibbon();
+    }
   });
 </script>
 
