@@ -1,0 +1,77 @@
+---
+const { embedUrl, title = 'YouTube video', class: className = '' } = Astro.props;
+
+const toPrivacyUrl = (url) => {
+  if (url.includes('youtube-nocookie.com/embed')) return url;
+  if (url.includes('youtube.com/embed')) return url.replace('youtube.com/embed', 'youtube-nocookie.com/embed');
+  if (url.includes('youtu.be/')) {
+    const id = (url.split('youtu.be/')[1] || '').split(/[?&]/)[0] || '';
+    return `https://www.youtube-nocookie.com/embed/${id}`;
+  }
+  return url;
+};
+
+const getYouTubeId = (url) => {
+  const embedMatch = url.match(/embed\/([a-zA-Z0-9_-]{6,})/);
+  if (embedMatch && embedMatch[1]) return embedMatch[1];
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]{6,})/);
+  if (shortMatch && shortMatch[1]) return shortMatch[1];
+  const vParam = url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+  if (vParam && vParam[1]) return vParam[1];
+  return '';
+};
+
+const privacyUrl = toPrivacyUrl(embedUrl);
+const videoId = getYouTubeId(privacyUrl);
+const posterUrl = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '';
+---
+
+<div class={`relative w-full h-full js-liteyt ${className}`} data-src={`${privacyUrl}?autoplay=1&rel=0`} data-title={title} role="button" aria-label={`Play video: ${title}`} tabindex="0">
+  <div class="absolute inset-0">
+    {posterUrl && (
+      <img src={posterUrl} alt={title} class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" />
+    )}
+  </div>
+  <div class="absolute inset-0 bg-black/30 transition-opacity"></div>
+  <div class="absolute inset-0 flex items-center justify-center">
+    <span class="inline-flex items-center justify-center rounded-full bg-white/90 dark:bg-black/70 shadow-lg w-16 h-16">
+      <svg viewBox="0 0 68 48" width="42" aria-hidden="true">
+        <path d="M66.52 7.74a8 8 0 0 0-5.64-5.66C56.73.67 34 .67 34 .67s-22.73 0-26.88 1.41a8 8 0 0 0-5.64 5.66A84 84 0 0 0 0 24a84 84 0 0 0 1.48 16.26 8 8 0 0 0 5.64 5.66C11.27 47.33 34 47.33 34 47.33s22.73 0 26.88-1.41a8 8 0 0 0 5.64-5.66A84 84 0 0 0 68 24a84 84 0 0 0-1.48-16.26z" fill="#f00"/>
+        <path d="M45 24 27 14v20" fill="#fff"/>
+      </svg>
+    </span>
+  </div>
+</div>
+
+<script>
+  const elements = document.querySelectorAll('.js-liteyt');
+  elements.forEach((el) => {
+    const activate = () => {
+      const src = el.getAttribute('data-src');
+      if (!src) return;
+      const title = el.getAttribute('data-title') || 'YouTube video';
+      const iframe = document.createElement('iframe');
+      iframe.setAttribute('src', src);
+      iframe.setAttribute('title', title);
+      iframe.setAttribute('loading', 'lazy');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.className = el.className;
+      el.replaceWith(iframe);
+    };
+
+    el.addEventListener('click', () => activate(), { passive: true });
+    el.addEventListener('keydown', (/** @type {KeyboardEvent} */ e) => {
+      const key = e && (e.key || e.code);
+      if (key === 'Enter' || key === ' ' || key === 'Space' || key === 'Spacebar') {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        activate();
+      }
+    });
+  });
+</script>
+
+

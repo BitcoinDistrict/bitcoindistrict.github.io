@@ -27,11 +27,11 @@ const hero = createHero({
   metadata={metadata} 
   hero={hero}
   scrollIndicator={SCROLL_INDICATOR_PRESETS.accent}
+  contentBackground={{ type: 'solid', opacityClass: 'opacity-90' }}
 >
   <!-- MeetupEvents Widget *********** -->
 
   <MeetupEvents
-    slot="hero-bottom"
     title="Upcoming Events"
     subtitle="Don't miss out on these upcoming Bitcoin District meetups and events"
   />

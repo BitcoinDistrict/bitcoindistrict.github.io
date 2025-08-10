@@ -32,6 +32,15 @@
  * 
  * 6. Disable scroll indicator:
  *    <HeroLayout metadata={metadata} hero={hero} showScrollIndicator={false} />
+ * 
+ * 7. Control background behind scrolling content (below hero):
+ *    - Default: solid theme-aware background
+ *    - Transparent: show hero image behind content as you scroll
+ *    - Adjustable opacity via Tailwind opacity utility class (e.g., 'opacity-90')
+ * 
+ *    Examples:
+ *    <HeroLayout metadata={metadata} hero={hero} contentBackground={{ type: 'transparent' }} />
+ *    <HeroLayout metadata={metadata} hero={hero} contentBackground={{ type: 'solid', opacityClass: 'opacity-90' }} />
  */
 import Layout from '~/layouts/Layout.astro';
 import Header from '~/components/widgets/Header.astro';
@@ -64,9 +73,21 @@ export interface Props {
     color?: 'light' | 'dark' | 'accent';
     size?: 'sm' | 'md' | 'lg';
   };
+  contentBackground?: {
+    /**
+     * 'solid' renders a theme-aware background behind the scrolling content.
+     * 'transparent' keeps the area transparent so the hero background remains visible.
+     */
+    type?: 'solid' | 'transparent';
+    /**
+     * Optional Tailwind opacity utility class for the solid background overlay, e.g. 'opacity-90'.
+     * Ignored when type is 'transparent'. Defaults to fully opaque.
+     */
+    opacityClass?: string;
+  };
 }
 
-const { metadata, hero, showScrollIndicator = true, scrollIndicator = {} } = Astro.props;
+const { metadata, hero, showScrollIndicator = true, scrollIndicator = {}, contentBackground } = Astro.props as Props;
 
 // Default hero configuration
 const defaultHero = {
@@ -76,6 +97,12 @@ const defaultHero = {
 };
 
 const heroConfig = { ...defaultHero, ...hero };
+
+// Background behind the scrolling content area (below the hero)
+const contentBgConfig = {
+  type: contentBackground?.type ?? 'solid',
+  opacityClass: contentBackground?.opacityClass ?? 'opacity-100',
+};
 ---
 
 <Layout metadata={metadata}>
@@ -122,8 +149,15 @@ const heroConfig = { ...defaultHero, ...hero };
       )}
     </div>
 
-    <!-- Main content area -->
-    <slot />
+    <!-- Main content area with optional theme-aware background overlay -->
+    <div class="relative">
+      {contentBgConfig.type === 'solid' && (
+        <div aria-hidden class={`absolute inset-0 bg-page ${contentBgConfig.opacityClass} z-0`}></div>
+      )}
+      <div class="relative z-10">
+        <slot />
+      </div>
+    </div>
   </main>
   
   <slot name="footer">
