@@ -9,6 +9,8 @@ export interface MeetupSource {
   description?: string;
   /** Path to logo image in assets directory */
   logo?: string;
+  /** Optional Tailwind class for header background color in UI (e.g., 'bg-red-800'). Defaults to 'bg-primary' */
+  headerBgClass?: string;
   /** Whether this source is currently active */
   enabled: boolean;
 }
@@ -24,6 +26,7 @@ export const meetupSources: MeetupSource[] = [
     url: "https://www.meetup.com/bitcoin-district/",
     description: "Bitcoin District community meetup group in DC metro area",
     logo: "~/assets/images/logos/bd.png",
+    headerBgClass: "bg-red-900",
     enabled: true,
   },
   {
@@ -32,6 +35,7 @@ export const meetupSources: MeetupSource[] = [
     url: "https://www.meetup.com/dc-bit-devs/",
     description: "Community for discussing and advancing Bitcoin and related protocols.",
     logo: "~/assets/images/logos/dcbitdevs.png",
+    headerBgClass: "bg-slate-800",
     enabled: true,
   },
   {
@@ -40,6 +44,7 @@ export const meetupSources: MeetupSource[] = [
     url: "https://www.meetup.com/shenandoah-bitcoin-club/",
     description: "Education and collaboration in and around Bitcoin, a new digital money based on the truth of mathematics.",
     logo: "~/assets/images/logos/shenandoah.png",
+    headerBgClass: "bg-emerald-900",
     enabled: true,
   },
   // Add more meetup groups here as needed
@@ -74,7 +79,8 @@ export interface EventsConfig {
 }
 
 export const eventsConfig: EventsConfig = {
-  maxEvents: 6,
+  // Set to 0 to disable global cap; individual widgets control limits via props
+  maxEvents: 0,
   includeManualEvents: true,
   includeMeetupEvents: true,
   defaultMaxMonthsAhead: 9,
