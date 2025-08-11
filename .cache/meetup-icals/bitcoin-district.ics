@@ -27,7 +27,7 @@ END:VTIMEZONE
 BEGIN:VEVENT
 UID:event_310131584@meetup.com
 SEQUENCE:1
-DTSTAMP:20250810T230016Z
+DTSTAMP:20250811T181818Z
 DTSTART;TZID=America/New_York:20250812T180000
 DTEND;TZID=America/New_York:20250812T200000
 SUMMARY:Self Custody Workshop
@@ -68,9 +68,37 @@ LAST-MODIFIED:20250723T193957Z
 CLASS:PUBLIC
 END:VEVENT
 BEGIN:VEVENT
+UID:event_310373451@meetup.com
+SEQUENCE:1
+DTSTAMP:20250811T181818Z
+DTSTART;TZID=America/New_York:20250821T090000
+DTEND;TZID=America/New_York:20250821T103000
+SUMMARY:Bitcoin Builders Breakfast
+DESCRIPTION:Bitcoin District\nJoin us for a networking and knowledge-shari
+ ng breakfast event tailored for entrepreneurs\, business owners\, and crea
+ tors interested in Bitcoin. Connect with like-minded innovators to explore
+  how Bitcoin can fuel business growth\, enhance financial sovereignty\, an
+ d safeguard wealth in an ever-changing economic landscape.\n\nGrab a coffe
+ e and breakfast sandwich from the counter (pay for yourself) and dive into
+  conversations with fellow Builders in Bitcoin.\n\nThis is a BITCOIN ONLY 
+ event. If you'd rather discuss other crypto projects or Web3\, there are p
+ lenty of other meetups in the DMV you can join.\n\n*This is a community ev
+ ent open to all bitcoiners\, particularly those who are already building o
+ n Bitcoin or are interested in the space. John from [Sovreign](https://sov
+ reign.io)\, a company who onboards businesses to Bitcoin\, will be the eve
+ nt host and will be giving away hard copies of their "The Business Case Fo
+ r Bitcoin" short book. All are welcome to bring their ideas and join the c
+ onversation!*
+URL;VALUE=URI:https://www.meetup.com/bitcoin-district/events/310373451/
+STATUS:CONFIRMED
+CREATED:20250805T162335Z
+LAST-MODIFIED:20250805T162335Z
+CLASS:PUBLIC
+END:VEVENT
+BEGIN:VEVENT
 UID:event_310309650@meetup.com
 SEQUENCE:1
-DTSTAMP:20250810T230016Z
+DTSTAMP:20250811T181818Z
 DTSTART;TZID=America/New_York:20250903T183000
 DTEND;TZID=America/New_York:20250903T203000
 SUMMARY:The Privatization of Money with Shimon Lazarov
@@ -99,7 +127,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:event_309950476@meetup.com
 SEQUENCE:1
-DTSTAMP:20250810T230016Z
+DTSTAMP:20250811T181818Z
 DTSTART;TZID=America/New_York:20250913T103000
 DTEND;TZID=America/New_York:20250913T123000
 SUMMARY:Coffee & Bitcoin - Falls Church
@@ -126,7 +154,7 @@ END:VEVENT
 BEGIN:VEVENT
 UID:event_310457850@meetup.com
 SEQUENCE:1
-DTSTAMP:20250810T230016Z
+DTSTAMP:20250811T181818Z
 DTSTART;TZID=America/New_York:20270501T103000
 DTEND;TZID=America/New_York:20270501T123000
 SUMMARY:Bitcoin Block 1\,000\,000 Party 🎉

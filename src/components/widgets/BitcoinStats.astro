@@ -141,14 +141,89 @@ const { class: className = '' } = Astro.props;
   </div>
 </div>
 
-<script>
+<script is:inline>
+  // Immediate paint from localStorage cache to avoid "Loading..." on SPA navigations
+  function paintFromLocalCache() {
+    try {
+      const get = (key) => {
+        const raw = localStorage.getItem(`bitcoin-stats-${key}`);
+        return raw ? JSON.parse(raw).data : null;
+      };
+      const price = get('price');
+      const dom = get('dominance');
+      const hashrate = get('hashrate');
+      const halving = get('halving');
+
+      if (price) {
+        const formatted = `$${Number(price.price).toLocaleString()}`;
+        const el = document.getElementById('bitcoin-price');
+        const elM = document.getElementById('bitcoin-price-mobile');
+        if (el) el.textContent = formatted;
+        if (elM) elM.textContent = formatted;
+        const pc = document.getElementById('price-change');
+        const pcM = document.getElementById('price-change-mobile');
+        if (pc) {
+          const span = pc.querySelector('.price-change-indicator');
+          if (span) {
+            const isPos = Number(price.change) >= 0;
+            span.textContent = `${isPos ? '+' : ''}${Number(price.change).toFixed(2)}% (24h)`;
+            span.className = `price-change-indicator ${isPos ? 'text-green-500' : 'text-red-500'}`;
+          }
+        }
+        if (pcM) {
+          const spanM = pcM.querySelector('.price-change-indicator-mobile');
+          if (spanM) {
+            const isPos = Number(price.change) >= 0;
+            spanM.textContent = `${isPos ? '+' : ''}${Number(price.change).toFixed(2)}%`;
+            spanM.className = `price-change-indicator-mobile ${isPos ? 'text-green-500' : 'text-red-500'}`;
+          }
+        }
+      }
+
+      if (dom) {
+        const formattedDom = `${Number(dom.dominance).toFixed(1)}%`;
+        const d = document.getElementById('bitcoin-dominance');
+        const dM = document.getElementById('bitcoin-dominance-mobile');
+        if (d) d.textContent = formattedDom;
+        if (dM) dM.textContent = formattedDom;
+      }
+
+      if (hashrate) {
+        const h = document.getElementById('bitcoin-hashrate');
+        const hM = document.getElementById('bitcoin-hashrate-mobile');
+        if (h) h.textContent = hashrate.hashrate;
+        if (hM) hM.textContent = hashrate.hashrate;
+      }
+
+      if (halving) {
+        const p = document.getElementById('halving-progress');
+        const pM = document.getElementById('halving-progress-mobile');
+        const bar = document.getElementById('halving-bar');
+        const barM = document.getElementById('halving-bar-mobile');
+        if (p) p.textContent = halving.progress;
+        if (pM) pM.textContent = halving.progress;
+        const w = `${Math.min(Number(halving.progressPercent) || 0, 100)}%`;
+        if (bar) bar.style.width = w;
+        if (barM) barM.style.width = w;
+      }
+    } catch (_) {
+      // ignore paint errors
+    }
+  }
+
+  // Paint at next frame to ensure DOM is ready after SPA swaps
+  try { requestAnimationFrame(paintFromLocalCache); } catch (_) { paintFromLocalCache(); }
   class BitcoinStatsWidget {
     CACHE_DURATION;
-    UPDATE_INTERVALS;
     isTabActive;
     updateTimer;
     retryAttempts;
     maxRetries;
+    visibilityHandler;
+    onlineHandler;
+    broadcastChannel;
+    inFlight;
+    instanceId;
     
     constructor() {
       // Cache configuration
@@ -159,26 +234,61 @@ const { class: className = '' } = Astro.props;
         dominance: 5 * 60 * 1000 // 5 minutes for dominance (moderate volatility)
       };
       
-      this.UPDATE_INTERVALS = {
-        active: 2 * 60 * 1000, // 2 minutes when tab is active
-        inactive: 10 * 60 * 1000 // 10 minutes when tab is inactive
-      };
-      
-      this.isTabActive = true;
+      this.isTabActive = !document.hidden;
       this.updateTimer = null;
       this.retryAttempts = new Map();
       this.maxRetries = 3;
+      this.inFlight = new Set();
+      this.instanceId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      
+      // BroadcastChannel for cross-tab/page dedupe + updates
+      try {
+        this.broadcastChannel = new BroadcastChannel('bitcoin-stats');
+        this.broadcastChannel.onmessage = (event) => {
+          const message = event?.data || {};
+          if (message?.type === 'cache-update' && message?.key) {
+            // Persist and update UI from broadcast data
+            this.setCachedData(message.key, message.data);
+            switch (message.key) {
+              case 'price':
+                this.updatePriceUI(message.data.price, message.data.change);
+                break;
+              case 'dominance':
+                this.updateDominanceUI(message.data.dominance);
+                break;
+              case 'hashrate':
+                this.updateHashrateUI(message.data.hashrate);
+                break;
+              case 'halving':
+                this.updateHalvingUI(message.data);
+                break;
+            }
+          }
+        };
+      } catch (_) {
+        // BroadcastChannel not available; safely ignore
+        this.broadcastChannel = null;
+      }
       
       this.setupVisibilityListener();
+      // Immediately paint from any existing cache
+      this.updateUIFromCache();
       this.init();
       this.startUpdating();
     }
 
     setupVisibilityListener() {
-      document.addEventListener('visibilitychange', () => {
+      this.visibilityHandler = () => {
         this.isTabActive = !document.hidden;
-        this.restartUpdateTimer();
-      });
+        this.restartUpdateTimer(true);
+      };
+      document.addEventListener('visibilitychange', this.visibilityHandler);
+      
+      this.onlineHandler = () => {
+        this.updateStats();
+        this.restartUpdateTimer(true);
+      };
+      window.addEventListener('online', this.onlineHandler);
     }
 
     async init() {
@@ -208,7 +318,13 @@ const { class: className = '' } = Astro.props;
       
       const now = Date.now();
       const cacheAge = now - cached.timestamp;
-      return cacheAge > this.CACHE_DURATION[dataType];
+      return cacheAge > this.getEffectiveCacheDuration(dataType);
+    }
+
+    getEffectiveCacheDuration(dataType) {
+      // Scale cache duration when tab is inactive to reduce network traffic
+      const multiplier = this.isTabActive ? 1 : 5; // inactive ≈ 5x longer TTL
+      return (this.CACHE_DURATION[dataType] || (2 * 60 * 1000)) * multiplier;
     }
 
     getCachedData(key) {
@@ -256,6 +372,8 @@ const { class: className = '' } = Astro.props;
 
     async updateBitcoinData() {
       const cacheKey = 'bitcoin-data';
+      if (this.inFlight.has(cacheKey)) return;
+      this.inFlight.add(cacheKey);
       try {
         // Consolidated API call for both price and dominance data
         const [priceResponse, globalResponse] = await Promise.all([
@@ -277,11 +395,17 @@ const { class: className = '' } = Astro.props;
         // Update UI
         this.updatePriceUI(price, change);
         this.updateDominanceUI(dominance);
+
+        // Broadcast to other tabs/pages
+        this.broadcastChannel?.postMessage({ type: 'cache-update', key: 'price', data: { price, change } });
+        this.broadcastChannel?.postMessage({ type: 'cache-update', key: 'dominance', data: { dominance } });
         
         // Reset retry counter on success
         this.retryAttempts.set(cacheKey, 0);
       } catch (error) {
         await this.handleRetry(cacheKey, error, () => this.updateBitcoinData());
+      } finally {
+        this.inFlight.delete(cacheKey);
       }
     }
 
@@ -340,6 +464,8 @@ const { class: className = '' } = Astro.props;
 
     async updateHashrate() {
       const cacheKey = 'hashrate';
+      if (this.inFlight.has(cacheKey)) return;
+      this.inFlight.add(cacheKey);
       try {
         // Using blockchain.info API for hashrate data
         const response = await this.fetchWithRetry('https://blockchain.info/q/hashrate');
@@ -354,11 +480,16 @@ const { class: className = '' } = Astro.props;
         
         // Update UI
         this.updateHashrateUI(hashrate);
+
+        // Broadcast to other tabs/pages
+        this.broadcastChannel?.postMessage({ type: 'cache-update', key: 'hashrate', data: { hashrate } });
         
         // Reset retry counter on success
         this.retryAttempts.set(cacheKey, 0);
       } catch (error) {
         await this.handleRetry(cacheKey, error, () => this.updateHashrate());
+      } finally {
+        this.inFlight.delete(cacheKey);
       }
     }
 
@@ -378,6 +509,8 @@ const { class: className = '' } = Astro.props;
 
     async updateHalvingProgress() {
       const cacheKey = 'halving';
+      if (this.inFlight.has(cacheKey)) return;
+      this.inFlight.add(cacheKey);
       try {
         // Get current block height from blockchain.info
         const response = await this.fetchWithRetry('https://blockchain.info/q/getblockcount');
@@ -413,11 +546,16 @@ const { class: className = '' } = Astro.props;
         
         // Update UI
         this.updateHalvingUI(halvingData);
+
+        // Broadcast to other tabs/pages
+        this.broadcastChannel?.postMessage({ type: 'cache-update', key: 'halving', data: halvingData });
         
         // Reset retry counter on success
         this.retryAttempts.set(cacheKey, 0);
       } catch (error) {
         await this.handleRetry(cacheKey, error, () => this.updateHalvingProgress());
+      } finally {
+        this.inFlight.delete(cacheKey);
       }
     }
 
@@ -532,42 +670,86 @@ const { class: className = '' } = Astro.props;
     }
 
     startUpdating() {
-      this.restartUpdateTimer();
+      this.restartUpdateTimer(true);
     }
 
-    restartUpdateTimer() {
+    computeNextUpdateDelay() {
+      // Determine the earliest next expiry among tracked data types
+      const types = ['price', 'hashrate', 'halving'];
+      const now = Date.now();
+      let nextDelay = 30 * 1000; // default minimum 30s
+      let foundAny = false;
+      for (const type of types) {
+        const cached = this.getCachedData(type);
+        const effective = this.getEffectiveCacheDuration(type);
+        if (!cached) {
+          nextDelay = 0;
+          foundAny = true;
+          break;
+        }
+        const age = now - cached.timestamp;
+        const untilExpiry = Math.max(effective - age, 0);
+        if (!foundAny || untilExpiry < nextDelay) {
+          nextDelay = untilExpiry;
+          foundAny = true;
+        }
+      }
+      // Put a sanity ceiling so timers don't drift too far
+      const ceiling = this.isTabActive ? 15 * 60 * 1000 : 60 * 60 * 1000; // 15m active, 60m inactive
+      return Math.min(Math.max(nextDelay, 15 * 1000), ceiling); // clamp to [15s, ceiling]
+    }
+
+    restartUpdateTimer(immediate = false) {
       // Clear existing timer
       if (this.updateTimer) {
-        clearInterval(this.updateTimer);
+        clearTimeout(this.updateTimer);
       }
-      
-      // Set interval based on tab visibility
-      const interval = this.isTabActive 
-        ? this.UPDATE_INTERVALS.active 
-        : this.UPDATE_INTERVALS.inactive;
-      
-      this.updateTimer = setInterval(() => {
+      if (immediate) {
+        // Fire and reschedule
         this.updateStats();
-      }, interval);
+      }
+      const delay = this.computeNextUpdateDelay();
+      this.updateTimer = setTimeout(() => {
+        this.updateStats();
+        // After running, schedule next
+        this.restartUpdateTimer(false);
+      }, delay);
     }
 
     // Cleanup method for when component is destroyed
     destroy() {
       if (this.updateTimer) {
-        clearInterval(this.updateTimer);
+        clearTimeout(this.updateTimer);
       }
-      document.removeEventListener('visibilitychange', this.setupVisibilityListener);
+      if (this.visibilityHandler) {
+        document.removeEventListener('visibilitychange', this.visibilityHandler);
+      }
+      if (this.onlineHandler) {
+        window.removeEventListener('online', this.onlineHandler);
+      }
+      if (this.broadcastChannel) {
+        try { this.broadcastChannel.close(); } catch (_) {}
+      }
     }
   }
 
-  // Singleton pattern to prevent multiple instances
-  let bitcoinStatsInstance;
+  // Singleton pattern to prevent multiple instances across SPA navigations
+  function getGlobalInstance() {
+    const globalRef = window;
+    if (!globalRef.__bitcoinStatsInstance) {
+      globalRef.__bitcoinStatsInstance = new BitcoinStatsWidget();
+    } else {
+      // Rebind to freshly mounted DOM on navigation
+      const instance = globalRef.__bitcoinStatsInstance;
+      instance.isTabActive = !document.hidden;
+      instance.updateUIFromCache();
+      instance.restartUpdateTimer(true);
+    }
+    return globalRef.__bitcoinStatsInstance;
+  }
 
   function initializeBitcoinStats() {
-    if (!bitcoinStatsInstance) {
-      bitcoinStatsInstance = new BitcoinStatsWidget();
-    }
-    return bitcoinStatsInstance;
+    return getGlobalInstance();
   }
 
   // Initialize the widget when the page loads
@@ -577,10 +759,21 @@ const { class: className = '' } = Astro.props;
     initializeBitcoinStats();
   }
 
-  // Clean up on page unload
+  // Handle Astro View Transitions lifecycle
+  document.addEventListener('astro:page-load', () => {
+    requestAnimationFrame(() => getGlobalInstance());
+  });
+  document.addEventListener('astro:after-swap', () => {
+    requestAnimationFrame(() => getGlobalInstance());
+  });
+  // Keep the singleton alive across SPA navigations; only destroy on full unload
+  // document.addEventListener('astro:before-swap', () => {});
+
+  // Clean up on full page unload
   window.addEventListener('beforeunload', () => {
-    if (bitcoinStatsInstance) {
-      bitcoinStatsInstance.destroy();
+    const globalRef = window;
+    if (globalRef.__bitcoinStatsInstance) {
+      globalRef.__bitcoinStatsInstance.destroy();
     }
   });
 </script>

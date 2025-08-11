@@ -52,11 +52,12 @@ import ScrollIndicator from '~/components/ui/ScrollIndicator.astro';
 import { headerData, footerData } from '~/navigation';
 
 import type { MetaData } from '~/types';
+import type { ImageMetadata } from 'astro';
 
 export interface Props {
   metadata?: MetaData;
   hero?: {
-    image?: string;
+    image?: string | ImageMetadata;
     alt?: string;
     opacity?: string;
     title?: string;
@@ -112,11 +113,9 @@ const contentBgConfig = {
       src={heroConfig.image}
       alt={heroConfig.alt}
       class={`object-cover w-full h-full ${heroConfig.opacity}`}
-      widths={[400, 768, 1024, 1920, 2560]}
+      layout="cover"
       sizes="100vw"
       loading="eager"
-      width={1920}
-      height={1080}
     />
   </div>
 

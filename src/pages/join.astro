@@ -1,38 +1,25 @@
 ---
-import Content from '~/components/widgets/Content.astro';
-import Features2 from '~/components/widgets/Features2.astro';
-import Hero from '~/components/widgets/Hero.astro';
 import NewsletterSubscribe from '~/components/widgets/NewsletterSubscribe.astro';
 import Testimonials from '~/components/widgets/Testimonials.astro';
-import Layout from '~/layouts/PageLayout.astro';
-import coffeetourImage from '~/assets/images/coffeetour.jpg';
-import { communityReasons } from '~/data/reasons';
+import HeroLayout from '~/layouts/HeroLayout.astro';
 import { testimonials } from '~/data/testimonials';
+import { HERO_IMAGES } from '~/utils/hero';
 
 const metadata = {
   title: 'Join Us',
 };
 ---
 
-<Layout metadata={metadata}>
-  <!-- Hero Widget ******************* -->
-
-  <Hero
-    title="Join the Bitcoin District Community"
-    subtitle="We're a group of people living & working in the DMV who are passionate about Bitcoin and freedom technology. We're here to help you learn, grow, and connect with others in the community."
-    image={{
-      src: coffeetourImage,
-      alt: 'Bitcoin District',
-    }}
-  />
-
-  <!-- Features2 Widget ************** -->
-
-  <Features2
-    title="Be part of a growing community"
-    columns={3}
-    items={communityReasons}
-  />
+<HeroLayout
+  metadata={metadata}
+  hero={{
+    image: HERO_IMAGES.default,
+    alt: 'Bitcoin District',
+    title: 'Join the Bitcoin District Community',
+    subtitle:
+      "We're a group of people living & working in the DMV who are passionate about Bitcoin and freedom technology. We're here to help you learn, grow, and connect with others in the community.",
+  }}
+>
 
   <!-- Testimonials Widget *********** -->
 
@@ -54,4 +41,4 @@ const metadata = {
       />
     </div>
   </section>
-</Layout>
+</HeroLayout>
