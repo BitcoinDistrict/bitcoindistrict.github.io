@@ -26,7 +26,7 @@ export const meetupSources: MeetupSource[] = [
     url: "https://www.meetup.com/bitcoin-district/",
     description: "Bitcoin District community meetup group in DC metro area",
     logo: "~/assets/images/logos/bd.png",
-    headerBgClass: "bg-red-900",
+    //headerBgClass: "bg-red-900",
     enabled: true,
   },
   {
@@ -35,7 +35,7 @@ export const meetupSources: MeetupSource[] = [
     url: "https://www.meetup.com/dc-bit-devs/",
     description: "Community for discussing and advancing Bitcoin and related protocols.",
     logo: "~/assets/images/logos/dcbitdevs.png",
-    headerBgClass: "bg-slate-800",
+    //headerBgClass: "bg-slate-800",
     enabled: true,
   },
   {
@@ -44,7 +44,7 @@ export const meetupSources: MeetupSource[] = [
     url: "https://www.meetup.com/shenandoah-bitcoin-club/",
     description: "Education and collaboration in and around Bitcoin, a new digital money based on the truth of mathematics.",
     logo: "~/assets/images/logos/shenandoah.png",
-    headerBgClass: "bg-emerald-900",
+    //headerBgClass: "bg-emerald-900",
     enabled: true,
   },
   {
@@ -53,7 +53,7 @@ export const meetupSources: MeetupSource[] = [
     url: "https://www.meetup.com/southern-maryland-bitcoiners/",
     description: "A group of Bitcoiners in Southern Maryland.",
     logo: "~/assets/images/logos/somd.png",
-    headerBgClass: "bg-yellow-900",
+    //headerBgClass: "bg-yellow-900",
     enabled: true,
   },
   // Add more meetup groups here as needed
