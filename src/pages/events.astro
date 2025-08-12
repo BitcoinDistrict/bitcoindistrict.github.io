@@ -1,8 +1,9 @@
 ---
 import MeetupEvents from '~/components/widgets/MeetupEvents.astro';
-import ImageStripGallery from '~/components/widgets/ImageStripGallery.astro';
+import Image from 'astro/components/Image.astro';
 import HeroLayout from '~/layouts/HeroLayout.astro';
 import { createHero, HERO_IMAGES, SCROLL_INDICATOR_PRESETS } from '~/utils/hero';
+import featureImage from '~/assets/images/dc_map_square.jpg';
 
 const metadata = {
   title: 'Events',
@@ -13,7 +14,7 @@ const hero = createHero({
   image: HERO_IMAGES.events, // This is hero-lincoln.jpg
   alt: 'Events in Bitcoin District',
   opacity: 'opacity-15 dark:opacity-30',
-  title: 'Events in the District',
+  title: 'Events in the DMV',
   subtitle: 'Washington D.C. is a hub for Bitcoiners, organizations and companies building on Bitcoin. This events page aims to be a central location for all Bitcoiners to find events in the DC, Maryland & Virginia (DMV) area.',
   actions: [{
     text: 'Subscribe to our Calendar',

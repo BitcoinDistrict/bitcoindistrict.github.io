@@ -23,6 +23,8 @@ export interface Props {
   showCallToAction?: boolean;
   /** Maximum months ahead to display in UI (no effect on ICS). Default 9. */
   maxMonthsAhead?: number;
+  /** Whether to show the meetup filter tabs above the grid. Default true. */
+  showFilterTabs?: boolean;
 }
 
 const {
@@ -36,6 +38,7 @@ const {
   maxEvents,
   showCallToAction = true,
   maxMonthsAhead = eventsConfig.defaultMaxMonthsAhead,
+  showFilterTabs = true,
 } = Astro.props;
 
 // Fetch events at build time and limit if maxEvents is specified
@@ -72,15 +75,62 @@ const getMeetupSource = (eventSource: string) => {
 // Weekday helper (ET)
 const getWeekdayName = (date: Date) =>
   new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'America/New_York' }).format(date);
+
+// Compute which meetup sources actually have upcoming events
+const activeMeetupSources = meetupSources.filter((source) =>
+  source.enabled && events.some((e) => e.source === source.name)
+);
+
+// Determine if there are any manual events (for the Other tab)
+const hasManualEvents = events.some((e) => !getMeetupSource(e.source));
 ---
 
 <WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-6xl mx-auto ${classes?.container ?? ''}`} bg={bg}>
   <Headline title={title} subtitle={subtitle} tagline={tagline} classes={classes?.headline} />
   
+  {/* Filter Tabs */}
+  {events.length > 0 && showFilterTabs && (
+    <div class="mb-4 md:mb-6">
+      <div class="flex flex-wrap items-center gap-2 md:gap-3" data-meetup-filter>
+        {/* All tab (default active) */}
+        <button
+          type="button"
+          class="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm md:text-base border transition-colors bg-primary text-white border-primary"
+          data-filter="all"
+          aria-pressed="true"
+        >
+          All
+        </button>
+        {/* One tab per enabled meetup source */}
+        {activeMeetupSources.map((s) => (
+          <button
+            type="button"
+            class="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm md:text-base border border-gray-300 dark:border-gray-700 transition-colors bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
+            data-filter={s.name}
+            aria-pressed="false"
+          >
+            {s.name}
+          </button>
+        ))}
+        {/* Other (manual events) */}
+        {hasManualEvents && (
+          <button
+            type="button"
+            class="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm md:text-base border border-gray-300 dark:border-gray-700 transition-colors bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700"
+            data-filter="other"
+            aria-pressed="false"
+          >
+            Other
+          </button>
+        )}
+      </div>
+    </div>
+  )}
+  
   {events.length > 0 ? (
     <div class="grid gap-4 md:gap-5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4" data-meetup-events>
       {events.map((event) => (
-        <article class="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-slate-900 flex flex-col aspect-square">
+        <article class="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-slate-900 flex flex-col aspect-square" data-source={event.source} data-type={getMeetupSource(event.source) ? 'meetup' : 'manual'}>
           {/* Card Header with Date and Conditional Meetup Icon */}
           {(() => {
             const meetupSource = getMeetupSource(event.source);
@@ -248,6 +298,58 @@ const getWeekdayName = (date: Date) =>
     const MAX_LINES_DESKTOP = 2;
     const MIN_FONT_PX = 12;
 
+      // Filtering logic
+      function setupFilter() {
+        const containerEl = document.querySelector('[data-meetup-events]') as Element | null;
+        const filterBar = document.querySelector('[data-meetup-filter]') as Element | null;
+        if (!containerEl || !filterBar) return;
+
+        const buttons = Array.from(filterBar.querySelectorAll('button')) as HTMLButtonElement[];
+
+        function setActive(button: HTMLButtonElement) {
+          buttons.forEach((btn) => {
+            const isActive = btn === button;
+            btn.setAttribute('aria-pressed', String(isActive));
+            if (isActive) {
+              btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-gray-50', 'dark:hover:bg-slate-700', 'border-gray-300', 'dark:border-gray-700');
+              btn.classList.add('bg-primary', 'text-white', 'border-primary');
+            } else {
+              btn.classList.add('bg-white', 'dark:bg-slate-800', 'text-gray-700', 'dark:text-gray-200', 'hover:bg-gray-50', 'dark:hover:bg-slate-700', 'border-gray-300', 'dark:border-gray-700');
+              btn.classList.remove('bg-primary', 'text-white', 'border-primary');
+            }
+          });
+        }
+
+        function applyFilter(containerNode: Element, value: string) {
+          const cards = Array.from(containerNode.querySelectorAll('article[data-source]')) as HTMLElement[];
+          cards.forEach((card: HTMLElement) => {
+            const source = card.getAttribute('data-source') || '';
+            const type = card.getAttribute('data-type') || '';
+            let show = true;
+            if (value === 'all') {
+              show = true;
+            } else if (value === 'other') {
+              show = type === 'manual';
+            } else {
+              show = source === value;
+            }
+            card.style.display = show ? '' : 'none';
+          });
+        }
+
+        filterBar.addEventListener('click', (e) => {
+          const target = e.target as Element | null;
+          if (!target) return;
+          const button = target.closest('button[data-filter]') as HTMLButtonElement | null;
+          if (!button) return;
+          const value = button.getAttribute('data-filter') || 'all';
+          setActive(button);
+          applyFilter(containerEl, value);
+          // Refit titles in case wrapping changes the flow
+          scheduleFit();
+        });
+      }
+
     function getMaxLines() {
       return window.matchMedia('(min-width: 768px)').matches ? MAX_LINES_DESKTOP : MAX_LINES_MOBILE;
     }
@@ -291,9 +393,13 @@ const getWeekdayName = (date: Date) =>
 
     // Initial
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', scheduleFit, { once: true });
+      document.addEventListener('DOMContentLoaded', () => {
+        scheduleFit();
+        setupFilter();
+      }, { once: true });
     } else {
       scheduleFit();
+      setupFilter();
     }
 
     // Refit on resize and orientation change
