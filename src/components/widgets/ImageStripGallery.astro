@@ -1,0 +1,152 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { galleries } from '~/data/gallery';
+
+interface Props {
+  galleryKey: keyof typeof galleries;
+  maxImages?: number;
+  animationDurationMs?: number;
+  animate?: boolean;
+  randomize?: boolean;
+  heightClass?: string;
+  ariaLabel?: string;
+}
+
+const {
+  galleryKey,
+  maxImages = 12,
+  animationDurationMs = 60000,
+  animate = false,
+  randomize = true,
+  heightClass = 'h-28 sm:h-32 md:h-36 lg:h-40',
+  ariaLabel = 'Photo gallery'
+} = Astro.props as Props;
+
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/images/gallery/**/*.{jpg,jpeg,png,webp,avif}',
+  { eager: true }
+);
+
+type ResolvedImage = { meta: ImageMetadata; srcPath: string };
+
+const fileNameFromPath = (p: string) => p.split('/').pop() ?? p;
+
+const desiredNames = (galleries[galleryKey]?.images ?? []) as string[];
+
+let resolved: ResolvedImage[] = [];
+
+if (desiredNames.length > 0) {
+  const moduleEntries = Object.entries(modules);
+  for (const desiredName of desiredNames) {
+    const match = moduleEntries.find(([path]) => fileNameFromPath(path) === desiredName);
+    if (match) {
+      const [srcPath, mod] = match;
+      resolved.push({ meta: mod.default, srcPath });
+    }
+  }
+} else {
+  resolved = Object.entries(modules).map(([srcPath, mod]) => ({ meta: mod.default, srcPath }));
+}
+
+// Randomize order if requested
+if (randomize) {
+  resolved = [...resolved].sort(() => Math.random() - 0.5);
+}
+
+// Limit number of images
+resolved = resolved.slice(0, maxImages);
+
+// Choose images to display (duplicate only when animating for seamless loop)
+const displayImages = animate ? [...resolved, ...resolved] : resolved;
+
+// Pixel height used to generate optimized assets; the container height is controlled via Tailwind classes
+const targetRenderHeight = 220;
+---
+
+{resolved.length > 0 && (
+  <section role="region" aria-label={ariaLabel} class="relative w-full">
+    <div
+      class={`w-full ${heightClass} overflow-x-auto overflow-y-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]`}
+      data-drag-scroll
+      tabindex="0"
+      aria-label={ariaLabel}
+    >
+      <div
+        class={`flex items-center h-full gap-4 ${animate ? 'animate-scroll-x will-change-transform' : ''}`}
+        style={`--scroll-duration:${animationDurationMs}ms`}
+      >
+        {displayImages.map(({ meta }, idx) => (
+          <div class="relative flex-none h-full rounded-xl overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-black/5 dark:bg-white/5">
+            <Image
+              src={meta}
+              alt={`Gallery image ${idx + 1}`}
+              height={targetRenderHeight}
+              loading="lazy"
+              decoding="async"
+              class="h-full w-auto object-contain"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .animate-scroll-x {
+    animation-name: aw-gallery-scroll-x;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-duration: var(--scroll-duration, 60000ms);
+  }
+
+  @keyframes aw-gallery-scroll-x {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .animate-scroll-x:hover { animation-play-state: paused; }
+  }
+</style>
+
+<script is:inline>
+  const containers = document.querySelectorAll('[data-drag-scroll]');
+  containers.forEach((el) => {
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+
+    const onPointerDown = (e) => {
+      isDown = true;
+      const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+      startX = pageX - el.offsetLeft;
+      scrollLeft = el.scrollLeft;
+    };
+
+    const onPointerLeaveOrUp = () => {
+      isDown = false;
+    };
+
+    const onPointerMove = (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+      const x = pageX - el.offsetLeft;
+      const walk = (x - startX);
+      el.scrollLeft = scrollLeft - walk;
+    };
+
+    el.addEventListener('mousedown', onPointerDown, { passive: true });
+    el.addEventListener('mouseleave', onPointerLeaveOrUp, { passive: true });
+    el.addEventListener('mouseup', onPointerLeaveOrUp, { passive: true });
+    el.addEventListener('mousemove', onPointerMove, { passive: false });
+
+    el.addEventListener('touchstart', onPointerDown, { passive: true });
+    el.addEventListener('touchend', onPointerLeaveOrUp, { passive: true });
+    el.addEventListener('touchmove', onPointerMove, { passive: false });
+  });
+</script>
+
+

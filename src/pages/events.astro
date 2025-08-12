@@ -1,5 +1,6 @@
 ---
 import MeetupEvents from '~/components/widgets/MeetupEvents.astro';
+import ImageStripGallery from '~/components/widgets/ImageStripGallery.astro';
 import HeroLayout from '~/layouts/HeroLayout.astro';
 import { createHero, HERO_IMAGES, SCROLL_INDICATOR_PRESETS } from '~/utils/hero';
 
@@ -29,6 +30,7 @@ const hero = createHero({
   scrollIndicator={SCROLL_INDICATOR_PRESETS.accent}
   contentBackground={{ type: 'solid', opacityClass: 'opacity-90' }}
 >
+  <ImageStripGallery slot="hero-bottom" galleryKey="eventsHero" maxImages={6} animationDurationMs={60000} heightClass="h-28 sm:h-32 md:h-36 lg:h-40" ariaLabel="Event photos" />
   <!-- MeetupEvents Widget *********** -->
 
   <MeetupEvents
