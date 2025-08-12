@@ -160,28 +160,25 @@ const hasManualEvents = events.some((e) => !getMeetupSource(e.source));
           })()}
           
           {/* Event Content - Flex grow to push time to bottom */}
-          <div class="p-3 md:p-4 md:pr-16 space-y-2.5 md:space-y-3.5 flex-grow flex flex-col min-h-0">
+          <div class="p-3 md:p-4 md:pr-16 flex-grow flex flex-col justify-between min-h-0 gap-2.5 md:gap-3.5">
             {/* Title */}
             {event.url ? (
               <a
                 href={event.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-base md:text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto"
+                class="text-lg md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto"
               >
                 {event.title}
               </a>
             ) : (
-              <h3 class="text-base md:text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto">
+              <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto">
                 {event.title}
               </h3>
             )}
             
-            {/* Spacer to push button to bottom (desktop/tablet only) */}
-            <div class="hidden md:block md:flex-grow"></div>
-            
-            {/* Time - at bottom-left */}
-            <div class="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+            {/* Time - pinned to bottom */}
+            <div class="mt-0 text-xs md:text-sm text-gray-600 dark:text-gray-300">
               {formatEventTime(event.startDate, event.endDate)}
             </div>
           </div>
@@ -294,15 +291,21 @@ const hasManualEvents = events.some((e) => !getMeetupSource(e.source));
   // Fit event titles to avoid clipping within square cards by reducing font-size
   (function () {
     const ROOT_SELECTOR = '[data-meetup-events] .js-event-title';
-    const MAX_LINES_MOBILE = 2;
-    const MAX_LINES_DESKTOP = 2;
-    const MIN_FONT_PX = 12;
+    const MAX_LINES_MOBILE = 3; // allow an extra line on mobile and increase title size
+    const MAX_LINES_DESKTOP = 4; // allow more lines on desktop per request
+    const MIN_FONT_PX = 14; // don't shrink too small
+    const MAX_SHRINK_PX_MOBILE = 2; // cap shrink amount for long titles
+    const MAX_SHRINK_PX_DESKTOP = 3;
 
       // Filtering logic
       function setupFilter() {
         const containerEl = document.querySelector('[data-meetup-events]') as Element | null;
         const filterBar = document.querySelector('[data-meetup-filter]') as Element | null;
         if (!containerEl || !filterBar) return;
+
+        // Prevent duplicate initialization (e.g., after HMR or repeated inits)
+        if (filterBar.getAttribute('data-initialized') === 'true') return;
+        filterBar.setAttribute('data-initialized', 'true');
 
         const buttons = Array.from(filterBar.querySelectorAll('button')) as HTMLButtonElement[];
 
@@ -372,8 +375,12 @@ const hasManualEvents = events.some((e) => !getMeetupSource(e.source));
       const display = style.display;
       if (display === 'none') return;
 
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+      const maxShrink = isDesktop ? MAX_SHRINK_PX_DESKTOP : MAX_SHRINK_PX_MOBILE;
+      const allowedMin = Math.max(MIN_FONT_PX, fontSize - maxShrink);
+
       let guard = 0;
-      while (el.scrollHeight > maxHeight && fontSize > MIN_FONT_PX && guard < 24) {
+      while (el.scrollHeight > maxHeight && fontSize > allowedMin && guard < 24) {
         fontSize -= 1;
         el.style.fontSize = fontSize + 'px';
         guard++;
@@ -391,16 +398,22 @@ const hasManualEvents = events.some((e) => !getMeetupSource(e.source));
       rafId = requestAnimationFrame(fitAll);
     }
 
-    // Initial
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        scheduleFit();
-        setupFilter();
-      }, { once: true });
-    } else {
+    // Init function used across initial load and Astro client-side swaps
+    function init() {
       scheduleFit();
       setupFilter();
     }
+
+    // Initial
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init, { once: true });
+    } else {
+      init();
+    }
+
+    // Re-initialize after Astro client-side navigations/HMR swaps
+    document.addEventListener('astro:page-load', init);
+    document.addEventListener('astro:after-swap', init);
 
     // Refit on resize and orientation change
     window.addEventListener('resize', scheduleFit);
