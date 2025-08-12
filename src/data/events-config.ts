@@ -47,6 +47,15 @@ export const meetupSources: MeetupSource[] = [
     headerBgClass: "bg-emerald-900",
     enabled: true,
   },
+  {
+    name: "Southern Maryland Bitcoiners",
+    icalUrl: "https://www.meetup.com/southern-maryland-bitcoiners/events/ical/",
+    url: "https://www.meetup.com/southern-maryland-bitcoiners/",
+    description: "A group of Bitcoiners in Southern Maryland.",
+    logo: "~/assets/images/logos/somd.png",
+    headerBgClass: "bg-yellow-900",
+    enabled: true,
+  },
   // Add more meetup groups here as needed
   // {
   //   name: "DC Bitcoin Developers",
