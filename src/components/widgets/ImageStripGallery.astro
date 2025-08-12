@@ -11,6 +11,13 @@ interface Props {
   randomize?: boolean;
   heightClass?: string;
   ariaLabel?: string;
+  /**
+   * When true, on small screens the gallery will expand to fill the remaining
+   * space in the hero section below the title/subtitle/actions, making it more
+   * prominent. On larger screens, the component falls back to the provided
+   * height classes.
+   */
+  mobileEmphasis?: boolean;
 }
 
 const {
@@ -19,8 +26,10 @@ const {
   animationDurationMs = 60000,
   animate = false,
   randomize = true,
-  heightClass = 'h-28 sm:h-32 md:h-36 lg:h-40',
-  ariaLabel = 'Photo gallery'
+  // On small viewports we prefer a flexible height; fixed heights start at sm+
+  heightClass = 'sm:h-32 md:h-36 lg:h-40',
+  ariaLabel = 'Photo gallery',
+  mobileEmphasis = true,
 } = Astro.props as Props;
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
@@ -60,14 +69,18 @@ resolved = resolved.slice(0, maxImages);
 // Choose images to display (duplicate only when animating for seamless loop)
 const displayImages = animate ? [...resolved, ...resolved] : resolved;
 
-// Pixel height used to generate optimized assets; the container height is controlled via Tailwind classes
-const targetRenderHeight = 220;
+// Pixel height used to generate optimized assets; bumped for taller mobile rendering
+const targetRenderHeight = 360;
 ---
 
 {resolved.length > 0 && (
-  <section role="region" aria-label={ariaLabel} class="relative w-full">
+  <section
+    role="region"
+    aria-label={ariaLabel}
+    class={`relative w-full ${mobileEmphasis ? 'flex-1 sm:flex-none' : ''}`}
+  >
     <div
-      class={`w-full ${heightClass} overflow-x-auto overflow-y-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]`}
+      class={`w-full ${heightClass} ${mobileEmphasis ? 'h-full min-h-[40vh] min-h-[40dvh] sm:min-h-0' : ''} overflow-x-auto overflow-y-hidden [touch-action:pan-y] [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]`}
       data-drag-scroll
       tabindex="0"
       aria-label={ariaLabel}
@@ -131,7 +144,6 @@ const targetRenderHeight = 220;
 
     const onPointerMove = (e) => {
       if (!isDown) return;
-      e.preventDefault();
       const pageX = e.touches ? e.touches[0].pageX : e.pageX;
       const x = pageX - el.offsetLeft;
       const walk = (x - startX);
@@ -141,11 +153,11 @@ const targetRenderHeight = 220;
     el.addEventListener('mousedown', onPointerDown, { passive: true });
     el.addEventListener('mouseleave', onPointerLeaveOrUp, { passive: true });
     el.addEventListener('mouseup', onPointerLeaveOrUp, { passive: true });
-    el.addEventListener('mousemove', onPointerMove, { passive: false });
+    el.addEventListener('mousemove', onPointerMove, { passive: true });
 
     el.addEventListener('touchstart', onPointerDown, { passive: true });
     el.addEventListener('touchend', onPointerLeaveOrUp, { passive: true });
-    el.addEventListener('touchmove', onPointerMove, { passive: false });
+    el.addEventListener('touchmove', onPointerMove, { passive: true });
   });
 </script>
 
