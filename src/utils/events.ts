@@ -98,14 +98,15 @@ class ICalParser {
   }
 
   private extractUrl(description: string): string {
-    // Look for URL in the description or return empty string
-    const urlMatch = description.match(/URL;VALUE=URI:(https?:\/\/[^\s]+)/);
-    return urlMatch ? urlMatch[1] : '';
+    // Fallback: find first URL-like string in the description
+    const urlMatch = description.match(/https?:\/\/\S+/);
+    return urlMatch ? urlMatch[0] : '';
   }
 
   parse(icalData: string, sourceName: string): MeetupEvent[] {
     const events: MeetupEvent[] = [];
-    const lines = icalData.split('\n').map(line => line.trim());
+    // Preserve leading spaces for folded lines per RFC 5545; only strip trailing CRs
+    const lines = icalData.split(/\r?\n/).map(line => line.replace(/\r$/, ''));
     
     let currentEvent: Partial<MeetupEvent> = {};
     let inEvent = false;
@@ -158,7 +159,9 @@ class ICalParser {
         const dateStr = fullLine.split(':')[1];
         currentEvent.endDate = this.parseDateTime(dateStr, tzidMatch?.[1]);
       } else if (fullLine.startsWith('URL;VALUE=URI:')) {
-        currentEvent.url = fullLine.substring(14);
+        currentEvent.url = fullLine.substring(14).trim();
+      } else if (fullLine.startsWith('URL:')) {
+        currentEvent.url = fullLine.substring(4).trim();
       } else if (fullLine.startsWith('LOCATION:')) {
         currentEvent.location = this.unescapeText(fullLine.substring(9));
       }
