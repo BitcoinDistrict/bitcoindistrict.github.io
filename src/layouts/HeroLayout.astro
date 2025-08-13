@@ -133,7 +133,8 @@ const contentBgConfig = {
         content={heroConfig.content}
         actions={heroConfig.actions}
       >
-        <!-- No per-hero background; using global fixed image above -->
+        <!-- Forward page-provided content to render directly under the subtitle -->
+        <slot name="content" slot="content" />
       </Hero>
 
       <!-- Additional content slot for widgets like BitcoinStats -->

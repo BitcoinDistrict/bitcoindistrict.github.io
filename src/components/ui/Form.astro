@@ -10,28 +10,66 @@ const submitUrl = getSubmitUrl();
 const getEntryId = (fieldName: string) => {
   return googleContactForm.entryIds[fieldName as keyof typeof googleContactForm.entryIds] || fieldName;
 };
+
+// Derive sensible autocomplete defaults based on field name/type
+const deriveAutocompleteToken = (fieldName: string, inputType: string): string => {
+  const normalized = (fieldName || '').toLowerCase().trim();
+
+  if (inputType === 'email' || normalized === 'email') return 'email';
+
+  if (
+    inputType === 'tel' ||
+    normalized === 'phone' ||
+    normalized === 'phone number' ||
+    normalized === 'telephone' ||
+    normalized === 'tel' ||
+    normalized === 'mobile'
+  ) {
+    return 'tel';
+  }
+
+  if (normalized === 'name' || normalized === 'full name' || normalized === 'fullname') return 'name';
+  if (normalized === 'first name' || normalized === 'firstname' || normalized === 'given-name') return 'given-name';
+  if (normalized === 'last name' || normalized === 'lastname' || normalized === 'family-name') return 'family-name';
+  if (normalized === 'organization' || normalized === 'organisation' || normalized === 'company') return 'organization';
+
+  return 'on';
+};
+
+// Convert a field name like "first_name" or "phone number" to a human-friendly placeholder
+const humanizeFieldName = (fieldName: string): string => {
+  const cleaned = (fieldName || '').replace(/[._-]+/g, ' ').trim();
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+};
 ---
 
 <form id="contact-form" method="POST" action={submitUrl} target="hidden_iframe">
   {
     inputs &&
       inputs.map(
-        ({ type = 'text', name, label = '', autocomplete = 'on', placeholder = '' }) =>
+        ({ type = 'text', name, label = '', autocomplete, placeholder = '' }) =>
           name && (
-            <div class="mb-6">
-              {label && (
-                <label for={name} class="block text-sm font-medium">
-                  {label}
-                </label>
-              )}
-              <input
-                type={type}
-                name={getEntryId(name)}
-                id={name}
-                autocomplete={autocomplete}
-                placeholder={placeholder}
-                class="py-3 px-4 block w-full text-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900"
-              />
+            <div class="mb-6 sm:mb-5">
+              {(() => {
+                const effectiveAutocomplete = autocomplete ?? deriveAutocompleteToken(name, type);
+                const effectivePlaceholder = placeholder || label || humanizeFieldName(name);
+                const accessibleLabel = label || humanizeFieldName(name);
+                return (
+                  <input
+                    type={type}
+                    name={getEntryId(name)}
+                    id={name}
+                    autocomplete={effectiveAutocomplete}
+                    placeholder={effectivePlaceholder}
+                    aria-label={accessibleLabel}
+                    class="py-3 px-4 block w-full text-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800"
+                  />
+                );
+              })()}
             </div>
           )
       )
@@ -39,16 +77,15 @@ const getEntryId = (fieldName: string) => {
 
   {
     textarea && (
-      <div>
-        <label for="textarea" class="block text-sm font-medium">
-          {textarea.label}
-        </label>
+      <div class="mb-6 sm:mb-5">
         <textarea
           id="textarea"
           name={getEntryId(textarea.name ? textarea.name : 'message')}
           rows={textarea.rows ? textarea.rows : 4}
-          placeholder={textarea.placeholder}
-          class="py-3 px-4 block w-full text-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900"
+          placeholder={textarea.placeholder || textarea.label || 'Message'}
+          aria-label={textarea.label || 'Message'}
+          autocomplete="off"
+          class="py-3 px-4 block w-full text-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800"
         />
       </div>
     )
@@ -87,7 +124,7 @@ const getEntryId = (fieldName: string) => {
   {
     description && (
       <div class="mt-3 text-center">
-        <p class="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400" set:html={description} />
       </div>
     )
   }
