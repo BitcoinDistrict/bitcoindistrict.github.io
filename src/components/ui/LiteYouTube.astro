@@ -8,6 +8,10 @@ const toPrivacyUrl = (url) => {
     const id = (url.split('youtu.be/')[1] || '').split(/[?&]/)[0] || '';
     return `https://www.youtube-nocookie.com/embed/${id}`;
   }
+  if (url.includes('youtube.com/watch')) {
+    const match = url.match(/[?&]v=([a-zA-Z0-9_-]{6,})/);
+    if (match && match[1]) return `https://www.youtube-nocookie.com/embed/${match[1]}`;
+  }
   return url;
 };
 
@@ -22,11 +26,12 @@ const getYouTubeId = (url) => {
 };
 
 const privacyUrl = toPrivacyUrl(embedUrl);
+const autoplaySrc = `${privacyUrl}${privacyUrl.includes('?') ? '&' : '?'}autoplay=1&rel=0`;
 const videoId = getYouTubeId(privacyUrl);
 const posterUrl = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '';
 ---
 
-<div class={`relative w-full h-full js-liteyt ${className}`} data-src={`${privacyUrl}?autoplay=1&rel=0`} data-title={title} role="button" aria-label={`Play video: ${title}`} tabindex="0">
+<div class={`relative w-full h-full js-liteyt ${className}`} data-src={autoplaySrc} data-title={title} role="button" aria-label={`Play video: ${title}`} tabindex="0">
   <div class="absolute inset-0">
     {posterUrl && (
       <img src={posterUrl} alt={title} class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" />
@@ -64,13 +69,15 @@ const posterUrl = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : 
     };
 
     el.addEventListener('click', () => activate(), { passive: true });
-    el.addEventListener('keydown', (/** @type {KeyboardEvent} */ e) => {
-      const key = e && (e.key || e.code);
+    /** @type {(e: KeyboardEvent) => void} */
+    const onKeyDown = (e) => {
+      const key = e.key || e.code;
       if (key === 'Enter' || key === ' ' || key === 'Space' || key === 'Spacebar') {
         if (typeof e.preventDefault === 'function') e.preventDefault();
         activate();
       }
-    });
+    };
+    el.addEventListener('keydown', onKeyDown);
   });
 </script>
 

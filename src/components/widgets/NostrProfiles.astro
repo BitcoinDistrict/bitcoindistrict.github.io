@@ -207,6 +207,7 @@ const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', desc
           img.loading = 'lazy';
           img.decoding = 'async';
           img.fetchPriority = 'low';
+          try { img.referrerPolicy = 'no-referrer'; } catch {}
           img.width = 128;
           img.height = 128;
           img.className = 'w-full h-full object-cover';
@@ -226,6 +227,20 @@ const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', desc
         container.appendChild(a);
       });
     }
+
+    // In case of image load failures, fallback to initials
+    document.addEventListener('error', (e) => {
+      const target = e.target;
+      if (target && (target instanceof HTMLImageElement) && target.closest('#nostr-bubbles')) {
+        const a = target.parentElement;
+        if (!a) return;
+        const name = a.getAttribute('aria-label') || '';
+        const div = document.createElement('div');
+        div.className = `w-full h-full flex items-center justify-center ${initialColor(name)} text-sm font-medium`;
+        div.textContent = (name || '?').slice(0, 2).toUpperCase();
+        a.replaceChild(div, target);
+      }
+    }, true);
 
     function hashNames(names) {
       // deterministic hash for cache key
@@ -278,15 +293,45 @@ const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', desc
         const prebuilt = await tryLoadPrebuilt();
         if (prebuilt) {
           renderBubbles(prebuilt);
+          // also refresh in idle to keep data up-to-date if sources change
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(async () => {
+              try {
+                const names = await loadNames();
+                const authors = names.map(n => n.hex);
+                const metaMap = await queryMetadata(authors);
+                const fresh = await buildList(names, metaMap);
+                if (!deepEqual(fresh, prebuilt)) {
+                  renderBubbles(fresh);
+                }
+              } catch {}
+            }, { timeout: 1000 });
+          }
           return;
         }
 
         // 2) Fallback to client-side list with localStorage cache
         const names = await loadNames();
         const key = 'nostrProfiles:v1:' + hashNames(names);
+        // wipe container in case we are re-entering the page and skeletons remained
+        const skelContainer = document.querySelector('#nostr-bubbles > .flex');
+        if (skelContainer) skelContainer.innerHTML = '';
         const cached = readCache(key);
         if (cached && Array.isArray(cached) && cached.length) {
+          // Render cached immediately
           renderBubbles(cached);
+          // Ensure images load even if they were previously in cache and not re-requested
+          try {
+            document.querySelectorAll('#nostr-bubbles img').forEach((img) => {
+              const i = /** @type {HTMLImageElement} */ (img);
+              // Force reload broken images
+              if (!i.complete || i.naturalWidth === 0) {
+                const src = i.src;
+                i.src = '';
+                i.src = src;
+              }
+            });
+          } catch {}
           if (window.requestIdleCallback) {
             window.requestIdleCallback(async () => {
               try {
@@ -326,18 +371,25 @@ const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', desc
     }
 
     // Defer heavy work until section is near viewport
-    const section = document.getElementById('nostr-bubbles')?.closest('section');
-    if ('IntersectionObserver' in window && section) {
-      const io = new IntersectionObserver((entries) => {
-        if (entries.some(e => e.isIntersecting)) {
-          io.disconnect();
-          init();
-        }
-      }, { rootMargin: '150px' });
-      io.observe(section);
-    } else {
-      init();
-    }
+    // Initialize immediately for reliability across navigations
+    init();
+    // Also run after a microtask to ensure DOM is fully settled
+    setTimeout(() => init(), 0);
+
+    // Ensure re-initialization when navigating back via bfcache
+    window.addEventListener('pageshow', (ev) => {
+      // Handle bfcache restores
+      let persisted = false;
+      try { persisted = 'persisted' in ev && ev.persisted === true; } catch {}
+      if (persisted) init();
+    });
+
+    // Handle Astro client-side navigations
+    const scheduleInit = () => { setTimeout(() => init(), 0); };
+    document.addEventListener('astro:page-load', scheduleInit);
+    document.addEventListener('astro:after-swap', scheduleInit);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') scheduleInit(); });
+    window.addEventListener('focus', scheduleInit);
   </script>
 </section>
 
