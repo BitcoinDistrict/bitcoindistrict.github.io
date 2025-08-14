@@ -38,6 +38,16 @@ const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', desc
   </div>
 
   <script type="module">
+    async function tryLoadPrebuilt() {
+      try {
+        const res = await fetch('/nostr/profiles.json', { cache: 'no-cache' });
+        if (!res.ok) return null;
+        const list = await res.json();
+        if (Array.isArray(list) && list.length) return list;
+      } catch {}
+      return null;
+    }
+
     // Minimal bech32 implementation (BIP-0173) for NIP-19 npub encoding
     // Adapted for small size and clarity
     const BECH32_CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
@@ -264,12 +274,19 @@ const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', desc
 
     async function init() {
       try {
+        // 1) Prefer prebuilt list from build-time generator
+        const prebuilt = await tryLoadPrebuilt();
+        if (prebuilt) {
+          renderBubbles(prebuilt);
+          return;
+        }
+
+        // 2) Fallback to client-side list with localStorage cache
         const names = await loadNames();
         const key = 'nostrProfiles:v1:' + hashNames(names);
         const cached = readCache(key);
         if (cached && Array.isArray(cached) && cached.length) {
           renderBubbles(cached);
-          // refresh in background
           if (window.requestIdleCallback) {
             window.requestIdleCallback(async () => {
               try {
@@ -298,7 +315,6 @@ const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', desc
           return;
         }
 
-        // No cache: fetch metadata now
         const authors = names.map(n => n.hex);
         const metaMap = await queryMetadata(authors);
         const list = await buildList(names, metaMap);

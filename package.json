@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "prebuild": "node scripts/generate-nostr-profiles.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -19,7 +20,8 @@
     "fix": "npm run fix:eslint && npm run fix:prettier",
     "fix:eslint": "eslint --fix .",
     "fix:prettier": "prettier -w .",
-    "generate-ics": "node scripts/generate-ics-simple.mjs"
+    "generate-ics": "node scripts/generate-ics-simple.mjs",
+    "generate-nostr-profiles": "node scripts/generate-nostr-profiles.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.11",
@@ -34,7 +36,8 @@
     "leaflet": "^1.9.4",
     "limax": "4.1.0",
     "lodash.merge": "^4.6.2",
-    "unpic": "^4.1.2"
+    "unpic": "^4.1.2",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
@@ -60,7 +63,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
     "reading-time": "^1.5.0",
-    "sharp": "0.34.1",
+    "sharp": "^0.34.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",

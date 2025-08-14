@@ -1,0 +1,42 @@
+[
+  {
+    "name": "hey",
+    "hex": "de2d9f416ea6c60097dfdb78f03469c095cc8d6d811532844c4ce0de2cd1bb2c",
+    "npub": "npub1mcke7stw5mrqp97lmdu0qdrfcz2uertdsy2n9pzvfnsdutx3hvkq7d5mnw",
+    "display": "Bitcoin District",
+    "picture": "/nostr/profiles/de2d9f416ea6c60097dfdb78f03469c095cc8d6d811532844c4ce0de2cd1bb2c.webp",
+    "pictureOriginal": "https://m.primal.net/MXXq.png"
+  },
+  {
+    "name": "trey",
+    "hex": "a762b5bb70506089e8af2b11f27ffae8d75191638ec6bd52f0c454280c393a86",
+    "npub": "npub15a3ttwms2psgn6909vglyll6art4rytr3mrt65hsc32zsrpe82rq25uhm5",
+    "display": "Trey",
+    "picture": "/nostr/profiles/a762b5bb70506089e8af2b11f27ffae8d75191638ec6bd52f0c454280c393a86.webp",
+    "pictureOriginal": "https://blossom.primal.net/54c6c7c4d3140d31715f65933dc0499cc89fa784d990c8d8800df7a1d1c22f98.jpg"
+  },
+  {
+    "name": "gary",
+    "hex": "d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d",
+    "npub": "npub160t5zfxalddaccdc7xx30sentwa5lrr3rq4rtm38x99ynf8t0vwsvzyjc9",
+    "display": "CPOBV - average_gary",
+    "picture": "/nostr/profiles/d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d.webp",
+    "pictureOriginal": "https://blossom.primal.net/e2310f9048e8ebb2e1f75eeb87ee4e2798eea43f5e9ab5ccfb1917e1b5ef8bce.jpg"
+  },
+  {
+    "name": "tkay",
+    "hex": "9cb3545c36940d9a2ef86d50d5c7a8fab90310cc898c4344bcfc4c822ff47bca",
+    "npub": "npub1nje4ghpkjsxe5thcd4gdt3agl2usxyxv3xxyx39ul3xgytl5009q87l02j",
+    "display": "TKay",
+    "picture": "/nostr/profiles/9cb3545c36940d9a2ef86d50d5c7a8fab90310cc898c4344bcfc4c822ff47bca.webp",
+    "pictureOriginal": "https://pfp.nostr.build/ea0e7924c8c297af6ddb48ab9a3f4e51d16f6faba5d4196db3b7cea6e96c50e9.png"
+  },
+  {
+    "name": "david",
+    "hex": "42576a819d1b69472fbc9fefd356e2c127afb1bc25847753ec692c06a8ead90a",
+    "npub": "npub1gftk4qvard55wtaunlhax4hzcyn6lvduykz8w5lvdykqd282my9qdm0hhg",
+    "display": "David Tarr",
+    "picture": "/nostr/profiles/42576a819d1b69472fbc9fefd356e2c127afb1bc25847753ec692c06a8ead90a.webp",
+    "pictureOriginal": "https://m.primal.net/IehB.jpg"
+  }
+]
