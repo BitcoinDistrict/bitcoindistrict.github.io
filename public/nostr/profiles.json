@@ -38,5 +38,13 @@
     "display": "David Tarr",
     "picture": "/nostr/profiles/42576a819d1b69472fbc9fefd356e2c127afb1bc25847753ec692c06a8ead90a.webp",
     "pictureOriginal": "https://m.primal.net/IehB.jpg"
+  },
+  {
+    "name": "LZP",
+    "hex": "3f1de51da0f9d5248a96ed1c533b7a2b98d9f80aebc81b214ab507f6c7a170a4",
+    "npub": "npub18uw728dql82jfz5ka5w9xwm69wvdn7q2a0ypkg22k5rld3apwzjqqhnyjz",
+    "display": "Layer Zero Propaganda",
+    "picture": "/nostr/profiles/3f1de51da0f9d5248a96ed1c533b7a2b98d9f80aebc81b214ab507f6c7a170a4.webp",
+    "pictureOriginal": "https://blossom.primal.net/cf18c56af5f4e5c97654c0fea6115ec50cbbf327365173782d03e188b0bdddfa.png"
   }
 ]
