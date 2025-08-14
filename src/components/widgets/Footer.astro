@@ -3,6 +3,7 @@ import { Icon } from 'astro-icon/components';
 import { SITE } from 'astrowind:config';
 import { getHomePermalink, getAsset } from '~/utils/permalinks';
 import NewsletterSubscribe from '~/components/widgets/NewsletterSubscribe.astro';
+import NostrIcon from '~/components/icons/NostrIcon.astro';
 
 interface Link {
   text?: string;
@@ -133,7 +134,7 @@ const { socialLinks = [], secondaryLinks = [], links = [], footNote = '', theme 
                   aria-label={ariaLabel}
                   href={href}
                 >
-                  {icon && <Icon name={icon} class="w-5 h-5" />}
+                  {icon === 'nostr' ? <NostrIcon class="w-5 h-5" /> : icon && <Icon name={icon} class="w-5 h-5" />}
                   <Fragment set:html={text} />
                 </a>
               </li>

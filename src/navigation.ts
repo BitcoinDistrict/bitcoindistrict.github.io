@@ -62,7 +62,7 @@ export const footerData = {
   },
   socialLinks: [
     { ariaLabel: 'X', icon: 'tabler:brand-x', href: 'https://x.com/BTCDistrict' },
-    { ariaLabel: 'Nostr', icon: 'tabler:feather', href: 'https://primal.net/p/npub1mcke7stw5mrqp97lmdu0qdrfcz2uertdsy2n9pzvfnsdutx3hvkq7d5mnw' },
+    { ariaLabel: 'Nostr', icon: 'nostr', href: 'https://primal.net/p/npub1mcke7stw5mrqp97lmdu0qdrfcz2uertdsy2n9pzvfnsdutx3hvkq7d5mnw' },
     //{ ariaLabel: 'Instagram', icon: 'tabler:brand-instagram', href: '#' },
     //{ ariaLabel: 'RSS', icon: 'tabler:rss', href: getAsset('/rss.xml') },
     { ariaLabel: 'Github', icon: 'tabler:brand-github', href: 'https://github.com/BitcoinDistrict' },
