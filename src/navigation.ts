@@ -15,15 +15,15 @@ export const headerData = {
       href: getPermalink('/about'),
     },
     {
+      text: 'News',
+      href: getPermalink('https://news.bitcoindistrict.org'),
+    },
+    {
       text: 'Resources',
       links: [
         { text: 'Learn', href: getPermalink('/learn') },
         { text: 'Nostr', href: getPermalink('/nostr') },
       ],
-    },
-    {
-      text: 'News',
-      href: getPermalink('https://news.bitcoindistrict.org'),
     },
   ],
   actions: [{ text: 'Blog', href: '/blog', target: '_self' }],
