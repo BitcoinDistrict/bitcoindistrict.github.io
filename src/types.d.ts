@@ -91,6 +91,7 @@ export interface MetaDataTwitter {
 export interface Image {
   src: string;
   alt?: string;
+  href?: string;
 }
 
 export interface Video {
@@ -261,6 +262,8 @@ export interface Testimonials extends Omit<Headline, 'classes'>, Widget {
 export interface Brands extends Omit<Headline, 'classes'>, Widget {
   icons?: Array<string>;
   images?: Array<Image>;
+  /** Tailwind class string to control max-height of brand images (e.g., 'max-h-16 md:max-h-20'). */
+  imageMaxHeightClass?: string;
 }
 
 export interface Features extends Omit<Headline, 'classes'>, Widget {
@@ -298,6 +301,7 @@ export interface Content extends Omit<Headline, 'classes'>, Widget {
   isReversed?: boolean;
   isAfterContent?: boolean;
   callToAction?: CallToAction;
+  imageAlign?: 'left' | 'center' | 'right';
 }
 
 export interface Contact extends Omit<Headline, 'classes'>, Form, Widget {}

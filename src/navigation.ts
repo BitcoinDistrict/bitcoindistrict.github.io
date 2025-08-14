@@ -23,6 +23,7 @@ export const headerData = {
       links: [
         { text: 'Learn', href: getPermalink('/learn') },
         { text: 'Nostr', href: getPermalink('/nostr') },
+        { text: 'Thanks', href: getPermalink('/thanks') },
       ],
     },
   ],

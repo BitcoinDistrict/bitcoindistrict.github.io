@@ -16,23 +16,47 @@ const {
   classes = {},
   bg = await Astro.slots.render('bg'),
 } = Astro.props;
+const maxHeightClass =
+  (classes?.imageMaxHeight as string) || '!max-h-[100px] sm:!max-h-[120px] md:!max-h-[140px] lg:!max-h-[150px]';
 ---
 
 <WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-6xl mx-auto ${classes?.container ?? ''}`} bg={bg}>
   <Headline title={title} subtitle={subtitle} tagline={tagline} />
 
-  <div class="flex flex-wrap justify-center gap-x-6 sm:gap-x-12 lg:gap-x-24">
-    {icons && icons.map((icon) => <Icon name={icon} class="py-3 lg:py-5 w-12 h-auto mx-auto sm:mx-0 text-gray-500" />)}
-    {
-      images &&
-        images.map(
-          (image) =>
-            image.src && (
-              <div class="flex justify-center col-span-1 my-2 lg:my-4 py-1 px-3 rounded-md dark:bg-gray-200">
-                <Image src={image.src} alt={image.alt || ''} class="max-h-12" width={120} height={48} layout="fixed" />
-              </div>
-            )
-        )
-    }
+  <div class="grid grid-rows-2 grid-flow-col auto-cols-max justify-center items-center gap-x-8 gap-y-6">
+    {icons &&
+      icons.map((icon) => (
+        <Icon name={icon} class="h-10 w-10 md:h-12 md:w-12 text-gray-500" />
+      ))}
+
+    {images &&
+      images.map(
+        (image) =>
+          image.src && (
+            <div class="flex items-center justify-center">
+              {image.href ? (
+                <a href={image.href} target="_blank" rel="noopener noreferrer" class="inline-flex">
+                  <Image
+                    src={image.src}
+                    alt={image.alt || ''}
+                    width={200}
+                    height={200}
+                    layout="contained"
+                    class:list={[maxHeightClass, 'h-auto w-auto object-contain']}
+                  />
+                </a>
+              ) : (
+                <Image
+                  src={image.src}
+                  alt={image.alt || ''}
+                  width={200}
+                  height={200}
+                  layout="contained"
+                  class:list={[maxHeightClass, 'h-auto w-auto object-contain']}
+                />
+              )}
+            </div>
+          )
+      )}
   </div>
 </WidgetWrapper>

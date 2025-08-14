@@ -86,9 +86,11 @@ export interface Props {
      */
     opacityClass?: string;
   };
+  /** Optional Tailwind class controlling the min-height of the hero section. Defaults to full screen. */
+  heroMinHeightClass?: string;
 }
 
-const { metadata, hero, showScrollIndicator = true, scrollIndicator = {}, contentBackground } = Astro.props as Props;
+const { metadata, hero, showScrollIndicator = true, scrollIndicator = {}, contentBackground, heroMinHeightClass = 'min-h-screen' } = Astro.props as Props;
 
 // Default hero configuration
 const defaultHero = {
@@ -125,7 +127,7 @@ const contentBgConfig = {
   
   <main>
     <!-- Hero Section (background provided globally above) -->
-    <div class="min-h-screen flex flex-col justify-start pt-4 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-18 relative">
+    <div class={`${heroMinHeightClass} flex flex-col justify-start pt-4 sm:pt-14 md:pt-16 lg:pt-18 xl:pt-18 relative`}>
       <Hero
         tagline={heroConfig.tagline}
         title={heroConfig.title}

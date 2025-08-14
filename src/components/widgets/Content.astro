@@ -17,12 +17,17 @@ const {
   image = await Astro.slots.render('image'),
   isReversed = false,
   isAfterContent = false,
+  imageAlign = 'center',
 
   id,
   isDark = false,
   classes = {},
   bg = await Astro.slots.render('bg'),
 } = Astro.props;
+const imageAlignClass = imageAlign === 'right' ? 'md:ml-auto md:mr-0 mx-auto' : imageAlign === 'left' ? 'md:mr-auto md:ml-0 mx-auto' : 'mx-auto';
+const contentContainerClass = classes?.contentContainer ? String(classes.contentContainer) : 'p-4 md:px-8';
+const columnsClass = classes?.columns ? String(classes.columns) : 'md:gap-20 lg:gap-24';
+const imageWrapperClass = classes?.imageWrapper ? String(classes.imageWrapper) : '';
 ---
 
 <WidgetWrapper
@@ -41,8 +46,8 @@ const {
       subtitle: 'max-w-3xl mx-auto sm:text-center text-xl text-muted dark:text-slate-400',
     }}
   />
-  <div class="mx-auto max-w-7xl p-4 md:px-8">
-    <div class={`md:flex ${isReversed ? 'md:flex-row-reverse' : ''} md:gap-16`}>
+  <div class={`mx-auto max-w-7xl ${contentContainerClass}`}>
+    <div class={`md:flex ${isReversed ? 'md:flex-row-reverse' : ''} ${columnsClass}`}>
       <div class="md:basis-1/2 self-center">
         {content && <div class="mb-12 text-lg dark:text-slate-400" set:html={content} />}
 
@@ -68,15 +73,15 @@ const {
           }}
         />
       </div>
-      <div aria-hidden="true" class="mt-10 md:mt-0 md:basis-1/2">
+      <div aria-hidden="true" class="mt-10 md:mt-0 md:basis-1/2 md:flex md:justify-end">
         {
           image && (
-            <div class="relative m-auto max-w-4xl">
+            <div class={`relative ${imageAlignClass} max-w-4xl ${imageWrapperClass}`}>
               {typeof image === 'string' ? (
                 <Fragment set:html={image} />
               ) : (
                 <Image
-                  class="mx-auto w-full rounded-lg bg-gray-500 shadow-lg"
+                  class="w-full rounded-lg bg-gray-500 shadow-lg"
                   width={500}
                   height={500}
                   widths={[400, 768]}
