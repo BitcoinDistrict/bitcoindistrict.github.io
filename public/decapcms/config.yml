@@ -1,6 +1,8 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: BitcoinDistrict/bitcoindistrict.github.io  # Replace with your actual GitHub repo
   branch: main
+  base_url: https://bitcoindistrict.org  # Optional: your site URL for OAuth redirect
 
 media_folder: 'src/assets/images'
 public_folder: '/_astro'

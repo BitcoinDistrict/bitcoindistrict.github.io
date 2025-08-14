@@ -15,8 +15,11 @@ export const headerData = {
       href: getPermalink('/about'),
     },
     {
-      text: 'Learn',
-      href: getPermalink('/learn'),
+      text: 'Resources',
+      links: [
+        { text: 'Learn', href: getPermalink('/learn') },
+        { text: 'Nostr', href: getPermalink('/nostr') },
+      ],
     },
     {
       text: 'News',

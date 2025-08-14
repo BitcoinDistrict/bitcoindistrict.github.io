@@ -1,0 +1,328 @@
+---
+/**
+ * NostrProfiles - Displays NIP-05 verified profiles from /.well-known/nostr.json
+ * - Reads list of names -> hex pubkeys from public/.well-known/nostr.json
+ * - Converts hex pubkeys to npub (NIP-19) for Primal links
+ * - Fetches kind:0 metadata from a relay to get profile images and display names
+ * - Renders a responsive full-width bubble cloud with hover effects
+ */
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+}
+
+const { title = 'Community on Nostr', subtitle = 'NIP-05 verified members', description } = Astro.props as Props;
+---
+
+<section class="w-full py-12 sm:py-16 md:py-20">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="text-center mb-8 sm:mb-10">
+      <p class="text-sm text-muted">{subtitle}</p>
+      <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">{title}</h2>
+      {description && (
+        <p class="mt-4 text-muted max-w-2xl mx-auto" set:html={description} />
+      )}
+    </div>
+  </div>
+
+  <!-- Bubble cloud -->
+  <div id="nostr-bubbles" class="max-w-7xl mx-auto px-2 sm:px-4">
+    <div class="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+      <!-- Loading skeletons (uniform size) -->
+      {Array.from({ length: 16 }).map(() => (
+        <div class="rounded-full bg-muted/40 animate-pulse w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"></div>
+      ))}
+    </div>
+  </div>
+
+  <script type="module">
+    // Minimal bech32 implementation (BIP-0173) for NIP-19 npub encoding
+    // Adapted for small size and clarity
+    const BECH32_CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+    function bech32Polymod(values) {
+      let chk = 1;
+      const GENERATORS = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
+      for (let p = 0; p < values.length; ++p) {
+        const top = chk >>> 25;
+        chk = ((chk & 0x1ffffff) << 5) ^ values[p];
+        for (let i = 0; i < 5; ++i) {
+          if ((top >>> i) & 1) chk ^= GENERATORS[i];
+        }
+      }
+      return chk;
+    }
+    function bech32HrpExpand(hrp) {
+      const ret = [];
+      for (let i = 0; i < hrp.length; ++i) ret.push(hrp.charCodeAt(i) >>> 5);
+      ret.push(0);
+      for (let i = 0; i < hrp.length; ++i) ret.push(hrp.charCodeAt(i) & 31);
+      return ret;
+    }
+    function bech32CreateChecksum(hrp, data) {
+      const values = bech32HrpExpand(hrp).concat(data);
+      const polymod = bech32Polymod(values.concat([0, 0, 0, 0, 0, 0])) ^ 1;
+      const ret = [];
+      for (let p = 0; p < 6; ++p) ret.push((polymod >>> (5 * (5 - p))) & 31);
+      return ret;
+    }
+    function bech32Encode(hrp, data) {
+      const combined = data.concat(bech32CreateChecksum(hrp, data));
+      let ret = hrp + '1';
+      for (let p = 0; p < combined.length; ++p) ret += BECH32_CHARSET.charAt(combined[p]);
+      return ret;
+    }
+    function convertBits(data, from, to, pad = true) {
+      let acc = 0;
+      let bits = 0;
+      const ret = [];
+      const maxv = (1 << to) - 1;
+      const maxAcc = (1 << (from + to - 1)) - 1;
+      for (let p = 0; p < data.length; ++p) {
+        const value = data[p] & 0xff;
+        if (value < 0 || value >> from !== 0) return null;
+        acc = ((acc << from) | value) & maxAcc;
+        bits += from;
+        while (bits >= to) {
+          bits -= to;
+          ret.push((acc >>> bits) & maxv);
+        }
+      }
+      if (pad) {
+        if (bits) ret.push((acc << (to - bits)) & maxv);
+      } else if (bits >= from || ((acc << (to - bits)) & maxv)) {
+        return null;
+      }
+      return ret;
+    }
+    function hexToBytes(hex) {
+      if (hex.startsWith('0x')) hex = hex.slice(2);
+      if (hex.length % 2 !== 0) throw new Error('Invalid hex length');
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < bytes.length; i++) {
+        bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+      }
+      return bytes;
+    }
+    function hexToNpub(hex) {
+      const data5 = convertBits(hexToBytes(hex), 8, 5, true);
+      if (!data5) throw new Error('convertBits failed');
+      return bech32Encode('npub', data5);
+    }
+
+    async function loadNames() {
+      const res = await fetch('/.well-known/nostr.json');
+      if (!res.ok) throw new Error('Failed to load nostr.json');
+      const json = await res.json();
+      const entries = Object.entries(json?.names || {});
+      return entries.map(([name, hex]) => ({ name, hex }));
+    }
+
+    // Fetch metadata for all authors in one subscription
+    function queryMetadata(authors) {
+      const relays = [
+        'wss://relay.damus.io',
+        'wss://relay.primal.net'
+      ];
+      return new Promise((resolve) => {
+        const results = new Map();
+        let settled = false;
+        const timer = setTimeout(() => {
+          settled = true;
+          sockets.forEach(s => { try { s.close(); } catch {} });
+          resolve(results);
+        }, 3500);
+        const filter = { kinds: [0], authors };
+        const subId = 'bd_meta_' + Math.random().toString(36).slice(2, 10);
+        const sockets = relays.map(url => {
+          const ws = new WebSocket(url);
+          ws.onopen = () => {
+            ws.send(JSON.stringify(["REQ", subId, filter]));
+          };
+          ws.onmessage = (ev) => {
+            try {
+              const msg = JSON.parse(ev.data);
+              if (msg[0] === 'EVENT' && msg[1] === subId) {
+                const evt = msg[2];
+                if (evt?.kind === 0 && evt?.pubkey && evt?.content) {
+                  try {
+                    const content = JSON.parse(evt.content);
+                    results.set(evt.pubkey, {
+                      display_name: content.display_name || content.name || '',
+                      picture: content.picture || '',
+                      about: content.about || ''
+                    });
+                  } catch {}
+                }
+              } else if (msg[0] === 'EOSE' && msg[1] === subId) {
+                try { ws.close(); } catch {}
+                if (!settled && [...sockets].every(s => s.readyState === 3)) {
+                  settled = true;
+                  clearTimeout(timer);
+                  resolve(results);
+                }
+              }
+            } catch {}
+          };
+          ws.onerror = () => { try { ws.close(); } catch {} };
+          return ws;
+        });
+      });
+    }
+
+    function initialColor(name) {
+      const colors = ['bg-accent/20', 'bg-primary/20', 'bg-muted/40', 'bg-indigo-400/25', 'bg-emerald-400/25', 'bg-amber-400/25'];
+      let h = 0;
+      for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+      return colors[h % colors.length];
+    }
+
+    function renderBubbles(list) {
+      const container = document.querySelector('#nostr-bubbles > .flex');
+      if (!container) return;
+      container.innerHTML = '';
+      const sizeCls = 'w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32';
+      list.forEach((item) => {
+        const a = document.createElement('a');
+        a.href = `https://primal.net/p/${item.npub}`;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = `group relative rounded-full overflow-hidden ${sizeCls} ring-0 hover:ring-4 ring-accent transition-all duration-200`;
+
+        if (item.picture) {
+          const img = document.createElement('img');
+          img.src = item.picture;
+          img.alt = item.display || item.name;
+          img.loading = 'lazy';
+          img.decoding = 'async';
+          img.fetchPriority = 'low';
+          img.width = 128;
+          img.height = 128;
+          img.className = 'w-full h-full object-cover';
+          a.appendChild(img);
+        } else {
+          const div = document.createElement('div');
+          div.className = `w-full h-full flex items-center justify-center ${initialColor(item.name)} text-sm font-medium`;
+          div.textContent = (item.display || item.name || '?').slice(0, 2).toUpperCase();
+          a.appendChild(div);
+        }
+
+        const label = document.createElement('div');
+        label.className = 'pointer-events-none absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-2 text-[11px] sm:text-xs text-white';
+        label.textContent = item.display || item.name;
+        a.appendChild(label);
+
+        container.appendChild(a);
+      });
+    }
+
+    function hashNames(names) {
+      // deterministic hash for cache key
+      const s = JSON.stringify(names.map(n => [n.name, n.hex]).sort());
+      let h = 5381;
+      for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+      return (h >>> 0).toString(16);
+    }
+
+    const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+    function readCache(cacheKey) {
+      try {
+        const raw = localStorage.getItem(cacheKey);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (!obj || typeof obj !== 'object') return null;
+        if (Date.now() - (obj.timestamp || 0) > CACHE_TTL_MS) return null;
+        return obj.data || null;
+      } catch { return null; }
+    }
+    function writeCache(cacheKey, data) {
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data }));
+      } catch {}
+    }
+
+    function deepEqual(a, b) {
+      try { return JSON.stringify(a) === JSON.stringify(b); } catch { return false; }
+    }
+
+    async function buildList(names, metaMap) {
+      return names.map(n => {
+        let npub = '';
+        try { npub = hexToNpub(n.hex); } catch {}
+        const meta = metaMap.get(n.hex) || {};
+        return {
+          name: n.name,
+          hex: n.hex,
+          npub,
+          display: meta.display_name || n.name,
+          picture: meta.picture || ''
+        };
+      });
+    }
+
+    async function init() {
+      try {
+        const names = await loadNames();
+        const key = 'nostrProfiles:v1:' + hashNames(names);
+        const cached = readCache(key);
+        if (cached && Array.isArray(cached) && cached.length) {
+          renderBubbles(cached);
+          // refresh in background
+          if (window.requestIdleCallback) {
+            window.requestIdleCallback(async () => {
+              try {
+                const authors = names.map(n => n.hex);
+                const metaMap = await queryMetadata(authors);
+                const fresh = await buildList(names, metaMap);
+                if (!deepEqual(fresh, cached)) {
+                  writeCache(key, fresh);
+                  renderBubbles(fresh);
+                }
+              } catch {}
+            }, { timeout: 1000 });
+          } else {
+            setTimeout(async () => {
+              try {
+                const authors = names.map(n => n.hex);
+                const metaMap = await queryMetadata(authors);
+                const fresh = await buildList(names, metaMap);
+                if (!deepEqual(fresh, cached)) {
+                  writeCache(key, fresh);
+                  renderBubbles(fresh);
+                }
+              } catch {}
+            }, 100);
+          }
+          return;
+        }
+
+        // No cache: fetch metadata now
+        const authors = names.map(n => n.hex);
+        const metaMap = await queryMetadata(authors);
+        const list = await buildList(names, metaMap);
+        writeCache(key, list);
+        renderBubbles(list);
+      } catch (e) {
+        console.error('NostrProfiles failed', e);
+      }
+    }
+
+    // Defer heavy work until section is near viewport
+    const section = document.getElementById('nostr-bubbles')?.closest('section');
+    if ('IntersectionObserver' in window && section) {
+      const io = new IntersectionObserver((entries) => {
+        if (entries.some(e => e.isIntersecting)) {
+          io.disconnect();
+          init();
+        }
+      }, { rootMargin: '150px' });
+      io.observe(section);
+    } else {
+      init();
+    }
+  </script>
+</section>
+
+

@@ -1,0 +1,74 @@
+---
+import HeroLayout from '~/layouts/HeroLayout.astro';
+import NostrProfiles from '~/components/widgets/NostrProfiles.astro';
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
+import Headline from '~/components/ui/Headline.astro';
+import LiteYouTube from '~/components/ui/LiteYouTube.astro';
+import CallToAction from '~/components/widgets/CallToAction.astro';
+import type { CallToAction as CTA } from '~/types';
+import { createHero, HERO_IMAGES, HERO_OPACITY } from '~/utils/hero';
+
+const metadata = {
+  title: 'Nostr',
+};
+
+const hero = createHero({
+  image: HERO_IMAGES.nostr,
+  alt: 'Nostr Community',
+  opacity: HERO_OPACITY.lighter,
+  title: 'Our Community on Nostr',
+  subtitle: 'Nostr is an open, censorship‑resistant social protocol where you own your identity. Follow and connect with our NIP‑05 verified members.',
+});
+
+const nostrResourceActions: CTA[] = [
+  {
+    text: 'nostr.com',
+    href: 'https://nostr.com',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+    variant: 'secondary',
+    icon: 'tabler:external-link',
+  },
+  {
+    text: 'nostr.how',
+    href: 'https://nostr.how',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+    variant: 'secondary',
+    icon: 'tabler:external-link',
+  },
+  {
+    text: 'nostr.net',
+    href: 'https://nostr.net',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+    variant: 'secondary',
+    icon: 'tabler:external-link',
+  },
+];
+---
+
+<HeroLayout metadata={metadata} hero={hero} contentBackground={{ type: 'transparent' }}>
+  <div slot="hero-bottom" class="relative z-10 -mt-12 sm:-mt-16 pb-6">
+    <NostrProfiles
+        title="Our Nostriches"
+        description='Come to a meetup and ask how to get <a href="/blog/nostr-nip05" class="text-primary hover:text-secondary font-medium">nostr verified</a> with Bitcoin District.'
+    />
+  </div>
+  
+  <WidgetWrapper id="what-is-nostr">
+    <Headline title="What is Nostr?" />
+    <div class="mx-auto max-w-4xl">
+      <div class="w-full aspect-video mb-8">
+        <LiteYouTube embedUrl="https://www.youtube.com/watch?v=5W-jtbbh3eA" title="What is Nostr?" class="rounded-lg shadow-lg" />
+      </div>
+    </div>
+  </WidgetWrapper>
+
+  <CallToAction
+    id="learn-more-nostr"
+    title="Learn more from these resources"
+    actions={nostrResourceActions}
+  />
+</HeroLayout>
+
