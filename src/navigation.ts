@@ -44,6 +44,7 @@ export const footerData = {
     {
       title: 'Friends',
       links: [
+        { text: 'Bitcoin District Initiative', href: 'https://www.bitcoindistrictinitiative.org/' },
         { text: 'Bitcoin Policy Institute', href: 'https://www.btcpolicy.org/' },
         { text: 'Strategy Hub', href: 'https://strategy.com/hub' },
         { text: 'Bitcoin Academic Center', href: 'https://bitcoinacademic.center' },
