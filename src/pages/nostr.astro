@@ -5,6 +5,7 @@ import WidgetWrapper from '~/components/ui/WidgetWrapper.astro';
 import Headline from '~/components/ui/Headline.astro';
 import LiteYouTube from '~/components/ui/LiteYouTube.astro';
 import CallToAction from '~/components/widgets/CallToAction.astro';
+import Button from '~/components/ui/Button.astro';
 import type { CallToAction as CTA } from '~/types';
 import { createHero, HERO_IMAGES, HERO_OPACITY } from '~/utils/hero';
 
@@ -48,14 +49,65 @@ const nostrResourceActions: CTA[] = [
 ];
 ---
 
-<HeroLayout metadata={metadata} hero={hero} showScrollIndicator={false} contentBackground={{ type: 'transparent' }}>
+<HeroLayout metadata={metadata} hero={hero} showScrollIndicator={true} contentBackground={{ type: 'transparent' }}>
   <div slot="hero-bottom" class="relative z-10 -mt-12 sm:-mt-16 pb-6">
-    <NostrProfiles
-        title="Our Nostriches"
-        description='Come to a meetup and ask how to get <a href="/blog/nostr-nip05" class="text-primary hover:text-secondary font-medium">nostr verified</a> with Bitcoin District.'
-    />
+    <div class="px-4 sm:px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="relative overflow-hidden rounded-lg p-6 sm:p-8 shadow-xl ring-1 ring-white/10 bg-gradient-to-r from-primary/90 to-accent/90 text-white">
+          <div class="flex flex-col gap-4 sm:gap-5">
+            <div>
+              <p class="text-xs uppercase tracking-wider/loose opacity-90">Official Relay</p>
+              <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Bitcoin District Nostr Relay</h2>
+              <p class="mt-2 text-white/90 max-w-3xl">Connect to our community relay and help strengthen the local social graph.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="w-full">
+                  <div class="flex items-center gap-3 rounded-md bg-black/20 backdrop-blur-sm px-3 py-2.5 ring-1 ring-white/15">
+                    <code id="relay-url" class="block w-full overflow-x-auto whitespace-nowrap text-sm font-mono tracking-tight">wss://relay.bitcoindistrict.org</code>
+                  </div>
+                </div>
+              </div>
+              <div class="flex sm:shrink-0">
+                <Button type="button" variant="secondary" id="copy-relay" class="!bg-white !text-gray-900 hover:!bg-white/90">
+                  Copy connection
+                </Button>
+              </div>
+            </div>
+
+            <p class="text-sm text-white/90">
+              Posting is limited to members who are <a href="/blog/nostr-nip05" class="underline decoration-white/40 hover:decoration-white">Nostr verified</a> on our site. Others are welcome to connect and read.
+            </p>
+          </div>
+
+          <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl"></div>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      (function () {
+        const btn = document.getElementById('copy-relay');
+        if (!btn) return;
+        const full = 'wss://relay.bitcoindistrict.org';
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(full);
+            const original = btn.textContent || 'Copy connection';
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = original; }, 1200);
+          } catch {}
+        });
+      })();
+    </script>
   </div>
-  
+
+  <NostrProfiles
+      title="Our Nostriches"
+      description='Come to a meetup and ask how to get <a href="/blog/nostr-nip05" class="text-primary hover:text-secondary font-medium">nostr verified</a> with Bitcoin District.'
+  />
+
   <WidgetWrapper id="what-is-nostr">
     <Headline title="What is Nostr?" />
     <div class="mx-auto max-w-4xl">
