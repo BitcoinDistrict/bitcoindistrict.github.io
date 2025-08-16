@@ -86,8 +86,8 @@ function generateBasicICSContent() {
   icsContent += foldLine(`SUMMARY:Bitcoin District Events Calendar`) + `\r\n`;
   icsContent += foldLine(`DESCRIPTION:This calendar aggregates Bitcoin and cryptocurrency events from multiple sources in the DC metro area. Visit our website for the latest events.`) + `\r\n`;
   icsContent += foldLine(`URL:https://bitcoindistrict.org/events`) + `\r\n`;
-  icsContent += foldLine(`ORGANIZER;CN=Bitcoin District:mailto:events@bitcoindistrict.org`) + `\r\n`;
-  icsContent += foldLine(`CATEGORIES:Bitcoin,Cryptocurrency,Meetup`) + `\r\n`;
+  icsContent += foldLine(`ORGANIZER;CN=Bitcoin District:mailto:hey@bitcoindistrict.org`) + `\r\n`;
+  icsContent += foldLine(`CATEGORIES:Bitcoin,Freedom,Meetup`) + `\r\n`;
   icsContent += foldLine(`STATUS:CONFIRMED`) + `\r\n`;
   icsContent += foldLine(`TRANSP:OPAQUE`) + `\r\n`;
   icsContent += `END:VEVENT\r\n`;
