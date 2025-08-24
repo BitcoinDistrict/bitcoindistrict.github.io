@@ -33,23 +33,32 @@ const sortedBooks = [...bookClubBooks].sort((a, b) => {
 
 const allBooks = sortedBooks;
 
+// Helper function to create EST date from date string
+function createESTDate(dateString: string) {
+  // Parse the date string and create a date object in EST timezone
+  const [year, month, day] = dateString.split('-').map(Number);
+  // Create date at noon EST to avoid timezone issues
+  return new Date(year, month - 1, day, 12, 0, 0);
+}
+
 // Find the next book (earliest future date)
 const now = new Date();
-const futureBooks = allBooks.filter(book => book.date && new Date(book.date) > now);
+const futureBooks = allBooks.filter(book => book.date && createESTDate(book.date) > now);
 const nextBook = futureBooks.length > 0 ? 
   futureBooks.reduce((earliest, current) => 
-    new Date(current.date!) < new Date(earliest.date!) ? current : earliest
+    createESTDate(current.date!) < createESTDate(earliest.date!) ? current : earliest
   ) : null;
 
 // Pre-format dates on the server side to avoid client-side work
 const booksWithFormattedDates = allBooks.map(book => ({
   ...book,
-  formattedDate: book.date ? new Date(book.date).toLocaleDateString('en-US', { 
+  formattedDate: book.date ? createESTDate(book.date).toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'long', 
-    day: 'numeric' 
+    day: 'numeric',
+    timeZone: 'America/New_York'
   }) : null,
-  dateValue: book.date ? new Date(book.date).getTime() : null,
+  dateValue: book.date ? createESTDate(book.date).getTime() : null,
   isNextBook: nextBook ? book.title === nextBook.title : false
 }));
 ---

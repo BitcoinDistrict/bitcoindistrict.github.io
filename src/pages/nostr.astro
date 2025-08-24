@@ -53,31 +53,58 @@ const nostrResourceActions: CTA[] = [
   <div slot="hero-bottom" class="relative z-10 -mt-12 sm:-mt-16 pb-6">
     <div class="px-4 sm:px-6">
       <div class="max-w-6xl mx-auto">
-        <div class="relative overflow-hidden rounded-lg p-6 sm:p-8 shadow-xl ring-1 ring-white/10 bg-gradient-to-r from-primary/90 to-accent/90 text-white">
-          <div class="flex flex-col gap-4 sm:gap-5">
+        <div class="relative overflow-hidden rounded-lg p-6 sm:p-8 shadow-xl ring-1 bg-white ring-gray-200 text-gray-900 dark:bg-transparent dark:bg-gradient-to-r dark:from-primary/90 dark:to-accent/90 dark:text-white dark:ring-white/10">
+          <div class="flex flex-col gap-4 sm:gap-6">
             <div>
-              <p class="text-xs uppercase tracking-wider/loose opacity-90">Official Relay</p>
-              <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Bitcoin District Nostr Relay</h2>
-              <p class="mt-2 text-white/90 max-w-3xl">Connect to our community relay and help strengthen the local social graph.</p>
+              <p class="text-xs uppercase tracking-wider/loose opacity-90">Community Infrastructure</p>
+              <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Bitcoin District Nostr Services</h2>
+              <p class="mt-2 text-gray-600 dark:text-white/90 max-w-3xl">Connect to our community relay and media server to participate in the decentralized social network.</p>
             </div>
 
-            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-              <div class="flex-1 min-w-0">
-                <div class="w-full">
-                  <div class="flex items-center gap-3 rounded-md bg-black/20 backdrop-blur-sm px-3 py-2.5 ring-1 ring-white/15">
-                    <code id="relay-url" class="block w-full overflow-x-auto whitespace-nowrap text-sm font-mono tracking-tight">wss://relay.bitcoindistrict.org</code>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <!-- Nostr Relay -->
+              <div class="space-y-3">
+                <div>
+                  <h3 class="text-lg font-semibold">Nostr Relay</h3>
+                  <p class="text-sm text-gray-600 dark:text-white/80">Community relay for social interactions</p>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-3 rounded-md bg-gray-50 backdrop-blur-sm px-3 py-2.5 ring-1 ring-gray-200 dark:bg-black/20 dark:ring-white/15">
+                      <code id="relay-url" class="block w-full overflow-x-auto whitespace-nowrap text-sm font-mono tracking-tight">wss://relay.bitcoindistrict.org</code>
+                    </div>
+                  </div>
+                  <div class="flex sm:shrink-0">
+                    <Button type="button" variant="secondary" id="copy-relay" class="!bg-white !text-gray-900 hover:!bg-white/90 text-sm px-3 py-1.5">
+                      Copy
+                    </Button>
                   </div>
                 </div>
               </div>
-              <div class="flex sm:shrink-0">
-                <Button type="button" variant="secondary" id="copy-relay" class="!bg-white !text-gray-900 hover:!bg-white/90">
-                  Copy connection
-                </Button>
+
+              <!-- Blossom Media Server -->
+              <div class="space-y-3">
+                <div>
+                  <h3 class="text-lg font-semibold">Blossom Media Server</h3>
+                  <p class="text-sm text-gray-600 dark:text-white/80">Decentralized blob storage for images and files</p>
+                </div>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-3 rounded-md bg-gray-50 backdrop-blur-sm px-3 py-2.5 ring-1 ring-gray-200 dark:bg-black/20 dark:ring-white/15">
+                      <code id="blossom-url" class="block w-full overflow-x-auto whitespace-nowrap text-sm font-mono tracking-tight">https://cherry.bitcoindistrict.org</code>
+                    </div>
+                  </div>
+                  <div class="flex sm:shrink-0">
+                    <Button type="button" variant="secondary" id="copy-blossom" class="!bg-white !text-gray-900 hover:!bg-white/90 text-sm px-3 py-1.5">
+                      Copy
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <p class="text-sm text-white/90">
-              Posting is limited to members who are <a href="/blog/nostr-nip05" class="underline decoration-white/40 hover:decoration-white">Nostr verified</a> on our site. Others are welcome to connect and read.
+            <p class="text-sm text-gray-600 dark:text-white/90">
+              Posting may be restricted to members who are <a href="/blog/nostr-nip05" class="underline decoration-gray-400 hover:decoration-gray-700 dark:decoration-white/40 dark:hover:decoration-white">Nostr verified</a> on our site.
             </p>
           </div>
 
@@ -88,17 +115,33 @@ const nostrResourceActions: CTA[] = [
 
     <script is:inline>
       (function () {
-        const btn = document.getElementById('copy-relay');
-        if (!btn) return;
-        const full = 'wss://relay.bitcoindistrict.org';
-        btn.addEventListener('click', async () => {
-          try {
-            await navigator.clipboard.writeText(full);
-            const original = btn.textContent || 'Copy connection';
-            btn.textContent = 'Copied!';
-            setTimeout(() => { btn.textContent = original; }, 1200);
-          } catch {}
-        });
+        // Copy relay URL
+        const relayBtn = document.getElementById('copy-relay');
+        if (relayBtn) {
+          const relayUrl = 'wss://relay.bitcoindistrict.org';
+          relayBtn.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(relayUrl);
+              const original = relayBtn.textContent || 'Copy';
+              relayBtn.textContent = 'Copied!';
+              setTimeout(() => { relayBtn.textContent = original; }, 1200);
+            } catch {}
+          });
+        }
+
+        // Copy blossom URL
+        const blossomBtn = document.getElementById('copy-blossom');
+        if (blossomBtn) {
+          const blossomUrl = 'https://cherry.bitcoindistrict.org';
+          blossomBtn.addEventListener('click', async () => {
+            try {
+              await navigator.clipboard.writeText(blossomUrl);
+              const original = blossomBtn.textContent || 'Copy';
+              blossomBtn.textContent = 'Copied!';
+              setTimeout(() => { blossomBtn.textContent = original; }, 1200);
+            } catch {}
+          });
+        }
       })();
     </script>
   </div>
