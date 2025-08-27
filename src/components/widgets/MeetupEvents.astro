@@ -25,6 +25,12 @@ export interface Props {
   maxMonthsAhead?: number;
   /** Whether to show the meetup filter tabs above the grid. Default true. */
   showFilterTabs?: boolean;
+  /** Enable special highlighting for events whose title matches given keywords */
+  highlightEnabled?: boolean;
+  /** List of case-insensitive keywords to match in event titles */
+  highlightKeywords?: string[];
+  /** Tailwind classes applied to highlighted cards */
+  highlightCardClass?: string;
 }
 
 const {
@@ -39,6 +45,9 @@ const {
   showCallToAction = true,
   maxMonthsAhead = eventsConfig.defaultMaxMonthsAhead,
   showFilterTabs = true,
+  highlightEnabled = eventsConfig.highlight?.enabled ?? true,
+  highlightKeywords = eventsConfig.highlight?.keywords ?? ['conference'],
+  highlightCardClass = eventsConfig.highlight?.cardClass ?? 'ring-2 ring-amber-400 dark:ring-amber-300 ring-offset-2 ring-offset-white dark:ring-offset-slate-900',
 } = Astro.props;
 
 // Fetch events at build time and limit if maxEvents is specified
@@ -83,6 +92,14 @@ const activeMeetupSources = meetupSources.filter((source) =>
 
 // Determine if there are any manual events (for the Other tab)
 const hasManualEvents = events.some((e) => !getMeetupSource(e.source));
+
+// Highlight helper
+const shouldHighlight = (title: string): boolean => {
+  if (!highlightEnabled) return false;
+  if (!title) return false;
+  const normalized = title.toLowerCase();
+  return (highlightKeywords || []).some((kw) => normalized.includes(String(kw || '').toLowerCase()));
+};
 ---
 
 <WidgetWrapper id={id} isDark={isDark} containerClass={`max-w-6xl mx-auto ${classes?.container ?? ''}`} bg={bg}>
@@ -130,7 +147,7 @@ const hasManualEvents = events.some((e) => !getMeetupSource(e.source));
   {events.length > 0 ? (
     <div class="grid gap-4 md:gap-5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4" data-meetup-events>
       {events.map((event) => (
-        <article class="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-slate-900 flex flex-col aspect-square" data-source={event.source} data-type={getMeetupSource(event.source) ? 'meetup' : 'manual'}>
+        <article class={`group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-gray-700 dark:bg-slate-900 flex flex-col aspect-square ${shouldHighlight(event.title) ? highlightCardClass : ''}`} data-source={event.source} data-type={getMeetupSource(event.source) ? 'meetup' : 'manual'}>
           {/* Card Header with Date and Conditional Meetup Icon */}
           {(() => {
             const meetupSource = getMeetupSource(event.source);

@@ -85,6 +85,15 @@ export interface EventsConfig {
   includeMeetupEvents: boolean;
   /** Default months-ahead window for UI display (widgets may override) */
   defaultMaxMonthsAhead: number;
+  /** Global defaults for highlighting events by title keywords */
+  highlight?: {
+    /** Whether highlighting is enabled globally by default */
+    enabled: boolean;
+    /** Keywords matched case-insensitively against event titles */
+    keywords: string[];
+    /** Tailwind classes applied to highlighted cards (outer article) */
+    cardClass: string;
+  };
 }
 
 export const eventsConfig: EventsConfig = {
@@ -93,4 +102,10 @@ export const eventsConfig: EventsConfig = {
   includeManualEvents: true,
   includeMeetupEvents: true,
   defaultMaxMonthsAhead: 9,
+  highlight: {
+    enabled: true,
+    keywords: ['conference'],
+    // Stronger light-mode ring for visibility; softer in dark mode
+    cardClass: 'ring-2 ring-amber-900 dark:ring-amber-300 ring-offset-2 ring-offset-white dark:ring-offset-slate-900',
+  },
 };
