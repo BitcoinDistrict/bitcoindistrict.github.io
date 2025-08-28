@@ -1,0 +1,32 @@
+---
+import HeroLayout from '~/layouts/HeroLayout.astro';
+import { HERO_IMAGES } from '~/utils/hero';
+import BTCMapWidget from '~/components/widgets/BTCMapWidget.astro';
+
+const metadata = {
+  title: 'Merchants',
+};
+const hero = {
+  image: HERO_IMAGES.map || HERO_IMAGES.default,
+  opacity: 'opacity-10',
+  title: 'Bitcoin Merchants in DC',
+  subtitle:
+    "Explore shops, cafés, and services across the District that accept Bitcoin (on-chain & Lightning). This page uses live data from BTC Map. If something’s missing or outdated, please update it on BTC Map to help the community.",
+};
+
+---
+
+<HeroLayout metadata={metadata} hero={hero} showScrollIndicator={false}>
+  <div slot="content">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="prose prose-slate dark:prose-invert max-w-none mb-6">
+        <p>
+          Data courtesy of <a href="https://btcmap.org" target="_blank" rel="noopener noreferrer">BTCMap.org</a>. 
+          Update or add merchants there to help keep this list fresh.
+        </p>
+      </div>
+      <BTCMapWidget lat={38.898440071478795} lng={-77.03426861762752} zoom={11} />
+    </div>
+  </div>
+
+</HeroLayout>

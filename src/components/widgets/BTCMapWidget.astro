@@ -1,0 +1,62 @@
+---
+interface Props {
+  lat?: number;
+  lng?: number;
+  zoom?: number;
+  heightClass?: string;
+  showHeader?: boolean;
+  title?: string;
+  class?: string;
+}
+
+const {
+  lat = 38.9072,
+  lng = -77.0369,
+  zoom = 13,
+  heightClass = 'h-[65vh] sm:h-[70vh]',
+  showHeader = false,
+  title = 'Bitcoin-accepting merchants in Washington, DC',
+  class: className = '',
+} = Astro.props as Props;
+
+// Use hash-based coordinates to ensure centering works across app routing schemes
+const embedUrl = `https://btcmap.org/map#${zoom}/${lat}/${lng}`;
+const fullMapUrl = `https://btcmap.org/map#${zoom}/${lat}/${lng}`;
+---
+<section class={`w-full ${className}`} aria-label="BTCMap merchants map">
+  {showHeader && (
+    <div class="mb-4 sm:mb-6">
+      <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+        {title}
+      </h2>
+    </div>
+  )}
+
+  <div class="relative w-full overflow-hidden rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 bg-white dark:bg-slate-900">
+    <iframe
+      class={`w-full ${heightClass} border-0`}
+      src={embedUrl}
+      loading="lazy"
+      allow="geolocation"
+      allowfullscreen
+      referrerpolicy="no-referrer-when-downgrade"
+      title="BTCMap embedded map"
+    />
+  </div>
+
+  <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">
+    If the map doesn’t load, open it directly on
+    {' '}
+    <a href={fullMapUrl} class="underline hover:no-underline text-primary-600 dark:text-primary-400" target="_blank" rel="noopener noreferrer">BTCMap.org</a>.
+  </p>
+
+  <noscript>
+    <p class="mt-3 text-sm text-gray-600 dark:text-gray-300">
+      JavaScript is disabled. View the map on
+      {' '}
+      <a href={fullMapUrl} class="underline hover:no-underline text-primary-600 dark:text-primary-400" target="_blank" rel="noopener noreferrer">BTCMap.org</a>.
+    </p>
+  </noscript>
+</section>
+
+

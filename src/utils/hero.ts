@@ -43,6 +43,7 @@ export const HERO_IMAGES = {
   learn: '~/assets/images/hero-whitehouse.jpg',
   blog: '~/assets/images/hero-basin.jpg',
   nostr: '~/assets/images/hero-nostr.jpg',
+  map: '~/assets/images/hero-map.jpg',
   // Add more preset hero images here as needed
 } as const;
 
