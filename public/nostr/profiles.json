@@ -21,7 +21,7 @@
     "npub": "npub15a3ttwms2psgn6909vglyll6art4rytr3mrt65hsc32zsrpe82rq25uhm5",
     "display": "Trey",
     "picture": "/nostr/profiles/a762b5bb70506089e8af2b11f27ffae8d75191638ec6bd52f0c454280c393a86.webp",
-    "pictureOriginal": "https://blossom.primal.net/d9eb8d6587a0024597c22820cc47f2226adf16a13bb0efc53e6534f6759c82a1.jpg"
+    "pictureOriginal": "https://blossom.primal.net/54c6c7c4d3140d31715f65933dc0499cc89fa784d990c8d8800df7a1d1c22f98.jpg"
   },
   {
     "name": "gary",
@@ -35,7 +35,7 @@
     "name": "tkay",
     "hex": "9cb3545c36940d9a2ef86d50d5c7a8fab90310cc898c4344bcfc4c822ff47bca",
     "npub": "npub1nje4ghpkjsxe5thcd4gdt3agl2usxyxv3xxyx39ul3xgytl5009q87l02j",
-    "display": "TKay",
+    "display": "TKay of House Circassian",
     "picture": "/nostr/profiles/9cb3545c36940d9a2ef86d50d5c7a8fab90310cc898c4344bcfc4c822ff47bca.webp",
     "pictureOriginal": "https://pfp.nostr.build/ea0e7924c8c297af6ddb48ab9a3f4e51d16f6faba5d4196db3b7cea6e96c50e9.png"
   },
@@ -72,11 +72,27 @@
     "pictureOriginal": "https://nostr.build/i/nostr.build_22b55084464e2dc7cc305549199aa9f17ebe20ff54aeb6bff788907b35e24ef6.jpg"
   },
   {
-    "name": "test",
+    "name": "notemaster",
     "hex": "ffbadbad2bacd2b32deecb459111030cf11e2bfd9bda12505c2154b23754e909",
     "npub": "npub1l7adhtft4nftxt0wedzezygrpnc3u2lan0dpy5zuy92tyd65ayysce85wl",
-    "display": "Ben Franklinator",
+    "display": "Notemaster General",
     "picture": "/nostr/profiles/ffbadbad2bacd2b32deecb459111030cf11e2bfd9bda12505c2154b23754e909.webp",
-    "pictureOriginal": "https://image.nostr.build/e561985fcb82a2d2f8c3815862388a242bcfe0a595611b3d9f37eb7139707345.jpg"
+    "pictureOriginal": "https://image.nostr.build/2c322f42c13e9c7b6865618af147e3eb926c0f3632a84bd65226e2f78def3a52.jpg"
+  },
+  {
+    "name": "eggs",
+    "hex": "7d3cb1b53c777914f2f3fce49f67833d6a9099d36515ee8802b677ee8106d2d6",
+    "npub": "npub1057trdfuwau3fuhnlnjf7eur844fpxwnv527azqzkem7aqgx6ttqwx322s",
+    "display": "Eggsahash",
+    "picture": "/nostr/profiles/7d3cb1b53c777914f2f3fce49f67833d6a9099d36515ee8802b677ee8106d2d6.webp",
+    "pictureOriginal": "https://blossom.primal.net/be0888a5a064c8cf3a2786362c92373aec8fdf7054ebcbc98fb1e8d98881f023.jpg"
+  },
+  {
+    "name": "mauricio",
+    "hex": "7dd6058ed7c0970cfcf988add550b308eb0520c7da7b2d7b5766f8562df8f5c8",
+    "npub": "npub10htqtrkhcztsel8e3zka259npr4s2gx8mfaj676hvmu9vt0c7hyqu0smgf",
+    "display": "Mauricio ",
+    "picture": "/nostr/profiles/7dd6058ed7c0970cfcf988add550b308eb0520c7da7b2d7b5766f8562df8f5c8.webp",
+    "pictureOriginal": "https://blossom.primal.net/c6039319fde73a6e94972751cc628696dbed43d369e4577146e5ee5271d00524.jpg"
   }
 ]
