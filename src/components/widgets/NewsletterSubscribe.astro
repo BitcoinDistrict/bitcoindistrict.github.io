@@ -30,7 +30,7 @@ const isCompact = variant === 'compact';
     </div>
   )}
 
-  <form data-newsletter-form class="newsletter-form">
+  <form data-newsletter-form class="newsletter-form" novalidate>
     <input type="hidden" name="label" value={label} />
     
     <div class={`flex flex-col ${isCompact ? 'sm:flex-row' : ''} gap-3`}>
@@ -104,14 +104,29 @@ const isCompact = variant === 'compact';
       </div>
     </div>
   </form>
+  
+  <noscript>
+    <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+      <p class="text-sm text-yellow-800">
+        JavaScript is required for newsletter subscription. Please enable JavaScript or visit 
+        <a href="https://news.bitcoindistrict.org" class="underline hover:text-yellow-900" target="_blank" rel="noopener">
+          news.bitcoindistrict.org
+        </a> directly to subscribe.
+      </p>
+    </div>
+  </noscript>
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    console.log('Newsletter subscription script loaded');
     const forms = document.querySelectorAll<HTMLFormElement>('[data-newsletter-form]');
+    console.log('Found newsletter forms:', forms.length);
     
-    forms.forEach(form => {
+    forms.forEach((form, index) => {
+      console.log(`Setting up form ${index}`);
       form.addEventListener('submit', async function(e) {
+        console.log('Form submitted, preventing default');
         e.preventDefault();
         
         const formData = new FormData(form);
@@ -119,7 +134,12 @@ const isCompact = variant === 'compact';
         const name = formData.get('name') as string;
         const label = formData.get('label') as string;
         
-        if (!email) return;
+        console.log('Form data:', { email, name, label });
+        
+        if (!email) {
+          console.error('No email provided');
+          return;
+        }
         
         // Update UI state
         const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
@@ -129,8 +149,18 @@ const isCompact = variant === 'compact';
         const errorMessage = form.querySelector('.error-message');
         const errorText = errorMessage?.querySelector('.error-text');
         
+        console.log('Form elements found:', {
+          submitBtn: !!submitBtn,
+          submitText: !!submitText,
+          loadingText: !!loadingText,
+          successMessage: !!successMessage,
+          errorMessage: !!errorMessage,
+          errorText: !!errorText
+        });
+        
         if (!submitBtn || !submitText || !loadingText || !successMessage || !errorMessage || !errorText) {
           console.error('Required form elements not found');
+          alert('Form setup error. Please refresh the page and try again.');
           return;
         }
         
@@ -142,10 +172,13 @@ const isCompact = variant === 'compact';
         loadingText.classList.remove('hidden');
         
         try {
+          console.log('Starting subscription process...');
+          
           // For static hosting, we'll call Ghost directly
           const ghostUrl = 'https://news.bitcoindistrict.org';
           
           // First, get an integrity token
+          console.log('Fetching integrity token...');
           const integrityResponse = await fetch(`${ghostUrl}/members/api/integrity-token/`, {
             method: 'GET',
             headers: {
@@ -154,11 +187,14 @@ const isCompact = variant === 'compact';
             }
           });
 
+          console.log('Integrity response status:', integrityResponse.status);
+          
           if (!integrityResponse.ok) {
-            throw new Error('Failed to connect to newsletter service');
+            throw new Error(`Failed to get integrity token: ${integrityResponse.status}`);
           }
 
           const integrityToken = await integrityResponse.text();
+          console.log('Got integrity token:', integrityToken.substring(0, 20) + '...');
 
           // Prepare the subscription data
           const subscriptionData = {
@@ -169,38 +205,65 @@ const isCompact = variant === 'compact';
             ...(label && label.trim() ? { labels: [label.trim()] } : {})
           };
 
+          console.log('Sending subscription request with data:', {
+            ...subscriptionData,
+            integrityToken: integrityToken.substring(0, 20) + '...'
+          });
+
           // Send magic link to user (requires email confirmation)
           const response = await fetch(`${ghostUrl}/members/api/send-magic-link/`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
             },
             body: JSON.stringify(subscriptionData)
           });
           
-          if (response.ok) {
+          console.log('Subscription response status:', response.status);
+          
+          if (response.ok || response.status === 201) {
+            console.log('Subscription successful!');
             successMessage.classList.remove('hidden');
             form.reset();
+            
+            // Scroll to success message for better UX
+            successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else {
+            console.log('Subscription failed with status:', response.status);
             // Try to get error details from Ghost
             let errorMsg = 'Failed to subscribe to newsletter';
             try {
               const result = await response.json();
+              console.log('Error response:', result);
               if (result.errors && result.errors[0] && result.errors[0].message) {
                 errorMsg = result.errors[0].message;
               }
             } catch (e) {
+              console.error('Failed to parse error response:', e);
               // If we can't parse the error, use the default message
             }
             errorText.textContent = errorMsg;
             errorMessage.classList.remove('hidden');
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         } catch (error) {
           console.error('Newsletter subscription error:', error);
-          errorText.textContent = 'Network error. Please check your connection and try again.';
+          let errorMsg = 'Network error. Please check your connection and try again.';
+          
+          // Provide more specific error messages
+          if (error instanceof TypeError && error.message.includes('fetch')) {
+            errorMsg = 'Unable to connect to the newsletter service. Please try again later.';
+          } else if (error instanceof Error) {
+            errorMsg = error.message;
+          }
+          
+          errorText.textContent = errorMsg;
           errorMessage.classList.remove('hidden');
+          errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } finally {
           // Reset button state
+          console.log('Resetting button state');
           submitBtn.disabled = false;
           submitText.classList.remove('hidden');
           loadingText.classList.add('hidden');
