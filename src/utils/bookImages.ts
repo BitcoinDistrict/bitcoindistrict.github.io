@@ -3,6 +3,7 @@ import abundance from '~/assets/images/books/abundance.jpg';
 import bitcoinage from '~/assets/images/books/bitcoinage.jpg';
 import blocksizewar from '~/assets/images/books/blocksizewar.jpg';
 import bigprint from '~/assets/images/books/bigprint.jpg';
+import boom from '~/assets/images/books/boom.jpg';
 import bushido from '~/assets/images/books/bushido.jpg';
 import chasingseeds from '~/assets/images/books/chasingseeds.jpg';
 import deficitmyth from '~/assets/images/books/deficitmyth.jpg';
@@ -39,6 +40,7 @@ export const bookImageMap: Record<string, any> = {
   '~/assets/images/books/bitcoinage.jpg': bitcoinage,
   '~/assets/images/books/blocksizewar.jpg': blocksizewar,
   '~/assets/images/books/bigprint.jpg': bigprint,
+  '~/assets/images/books/boom.jpg': boom,
   '~/assets/images/books/bushido.jpg': bushido,
   '~/assets/images/books/chasingseeds.jpg': chasingseeds,
   '~/assets/images/books/deficitmyth.jpg': deficitmyth,

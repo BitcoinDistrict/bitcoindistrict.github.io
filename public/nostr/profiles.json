@@ -5,7 +5,7 @@
     "npub": "npub1mcke7stw5mrqp97lmdu0qdrfcz2uertdsy2n9pzvfnsdutx3hvkq7d5mnw",
     "display": "Bitcoin District",
     "picture": "/nostr/profiles/de2d9f416ea6c60097dfdb78f03469c095cc8d6d811532844c4ce0de2cd1bb2c.webp",
-    "pictureOriginal": "https://m.primal.net/KLGc.png"
+    "pictureOriginal": "https://m.primal.net/MXXq.png"
   },
   {
     "name": "dcbitdevs",
@@ -53,7 +53,7 @@
     "npub": "npub18uw728dql82jfz5ka5w9xwm69wvdn7q2a0ypkg22k5rld3apwzjqqhnyjz",
     "display": "Layer Zero Propaganda",
     "picture": "/nostr/profiles/3f1de51da0f9d5248a96ed1c533b7a2b98d9f80aebc81b214ab507f6c7a170a4.webp",
-    "pictureOriginal": "https://blossom.primal.net/7704cc8d08748324ee1dea94400eab06ec06db767f3c81585f5c8d0d0c9a4184.jpg"
+    "pictureOriginal": "https://blossom.primal.net/cf18c56af5f4e5c97654c0fea6115ec50cbbf327365173782d03e188b0bdddfa.png"
   },
   {
     "name": "boatingaccident",
@@ -94,5 +94,13 @@
     "display": "Mauricio ",
     "picture": "/nostr/profiles/7dd6058ed7c0970cfcf988add550b308eb0520c7da7b2d7b5766f8562df8f5c8.webp",
     "pictureOriginal": "https://blossom.primal.net/c6039319fde73a6e94972751cc628696dbed43d369e4577146e5ee5271d00524.jpg"
+  },
+  {
+    "name": "testington",
+    "hex": "0897c6bca7af170d6b8ee21e366ff01a76352ddd98ffb0b9877c9778bd4c886c",
+    "npub": "npub1pztud0984uts66uwug0rvmlsrfmr2twanrlmpwv80jth302v3pkqa4sgys",
+    "display": "Testington",
+    "picture": "/nostr/profiles/0897c6bca7af170d6b8ee21e366ff01a76352ddd98ffb0b9877c9778bd4c886c.webp",
+    "pictureOriginal": "https://cherry.bitcoindistrict.org/d7243b3497e62427a2ccdbb638f6e9eb9c0341ea990fef6dd505512a117e858c.webp"
   }
 ]

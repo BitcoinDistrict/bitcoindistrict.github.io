@@ -237,5 +237,12 @@ export const bookClubBooks: BookClubBook[] = [
     link: "https://a.co/d/ddAKOHY",
     date: "2025-09-03",
     image: "~/assets/images/books/privatizatinofmoney.jpg"
-  }
+  },
+  {
+    title: "Boom: Bubbles and the End of Stagnation",
+    author: "Byrne Hobart and Tobias Huber",
+    link: "https://a.co/d/eTHZvuy",
+    date: null,
+    image: "~/assets/images/books/boom.jpg"
+  },
 ];
