@@ -34,7 +34,7 @@ export const headerData = {
 export const footerData = {
   links: [
     {
-      title: 'Meetups',
+      title: 'Meetups 🤝',
       links: [
         { text: 'Bitcoin District', href: 'https://www.meetup.com/bitcoin-district/' },
         { text: 'DC BitDevs', href: 'https://www.meetup.com/dc-bit-devs/' },
@@ -43,7 +43,7 @@ export const footerData = {
       ],
     },
     {
-      title: 'Friends',
+      title: 'Friends 🤗',
       links: [
         { text: 'Bitcoin District Initiative', href: 'https://www.bitcoindistrictinitiative.org/' },
         { text: 'Bitcoin Policy Institute', href: 'https://www.btcpolicy.org/' },
