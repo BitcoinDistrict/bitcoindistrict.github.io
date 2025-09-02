@@ -110,9 +110,8 @@ function hashNames(names) {
 
 async function queryMetadata(authors) {
   const relays = [
-    'wss://relay.primal.net',
-    'wss://relay.damus.io',
-    'wss://nostr.wine'
+    'wss://relay.bitcoindistrict.org',
+    'wss://relay.primal.net'
   ];
   const results = new Map();
   const subId = 'bd_meta_' + Math.random().toString(36).slice(2, 10);
