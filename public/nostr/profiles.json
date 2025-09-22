@@ -35,7 +35,7 @@
     "name": "tkay",
     "hex": "9cb3545c36940d9a2ef86d50d5c7a8fab90310cc898c4344bcfc4c822ff47bca",
     "npub": "npub1nje4ghpkjsxe5thcd4gdt3agl2usxyxv3xxyx39ul3xgytl5009q87l02j",
-    "display": "TKay of House Circassian",
+    "display": "TKay",
     "picture": "/nostr/profiles/9cb3545c36940d9a2ef86d50d5c7a8fab90310cc898c4344bcfc4c822ff47bca.webp",
     "pictureOriginal": "https://pfp.nostr.build/ea0e7924c8c297af6ddb48ab9a3f4e51d16f6faba5d4196db3b7cea6e96c50e9.png"
   },
@@ -59,7 +59,7 @@
     "name": "boatingaccident",
     "hex": "90cca4db5ad5a9359d88ed8a6710df461d73a7e51b02e633016aefc05b130ac6",
     "npub": "npub1jrx2fk666k5nt8vgak9xwyxlgcwh8fl9rvpwvvcpdthuqkcnptrqdfhtaq",
-    "display": "Paul ✝️",
+    "display": "Paul",
     "picture": "/nostr/profiles/90cca4db5ad5a9359d88ed8a6710df461d73a7e51b02e633016aefc05b130ac6.webp",
     "pictureOriginal": "https://cherry.bitcoindistrict.org/15dae9f3a9547db62eaeadd544e258cf7bb42e9c36deba964245c579b5040b88.jpeg"
   },
@@ -102,5 +102,13 @@
     "display": "Testington",
     "picture": "/nostr/profiles/0897c6bca7af170d6b8ee21e366ff01a76352ddd98ffb0b9877c9778bd4c886c.webp",
     "pictureOriginal": "https://cherry.bitcoindistrict.org/d7243b3497e62427a2ccdbb638f6e9eb9c0341ea990fef6dd505512a117e858c.webp"
+  },
+  {
+    "name": "brrr",
+    "hex": "cf17edc05f702a2937efd831e9085ac86db73a24b01de9c22450e0a65d8e8439",
+    "npub": "npub1eut7mszlwq4zjdl0mqc7jzz6epkmww3ykqw7ns3y2rs2vhvwssusq4tugm",
+    "display": "National Debt Notes",
+    "picture": "/nostr/profiles/cf17edc05f702a2937efd831e9085ac86db73a24b01de9c22450e0a65d8e8439.webp",
+    "pictureOriginal": "https://blossom.primal.net/7659086f9d6ed911fe39cc9724dbb3d8135380ceedad5cede7eac7c80396aa76.gif"
   }
 ]
