@@ -39,6 +39,19 @@ export const manualEvents: ManualEvent[] = [
     icon: "~/assets/images/logos/gw.png", // GW logo for the conference
     enabled: true, // Set to true when you want this event to show
   },
+
+  {
+    id: "planbworkshop-2025",
+    title: "Plan₿ Bitcoin Revolutionaries Workshop",
+    description: "Discover Bitcoin’s rise at BTC in DC with GWU & Plan ₿—workshops, courses, and a chance to shape the future.",
+    startDate: new Date("2025-09-29T09:00:00-04:00"), // April 15, 2025 9:00 AM ET
+    endDate: new Date("2025-09-29T16:00:00-04:00"),   // April 15, 2025 5:00 PM ET
+    url: "https://planb.network/en/events/3f12cbf9-73b7-46b7-87ea-6162e68cfd78",
+    location: "University Student Center, 800 21st St NW, Washington, DC 20052",
+    source: "George Washington University",
+    icon: "~/assets/images/logos/gw.png", // GW logo for the conference
+    enabled: true, // Set to true when you want this event to show
+  },
   
   // Add more manual events here
   // {
