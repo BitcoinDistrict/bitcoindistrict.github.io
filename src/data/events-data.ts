@@ -47,7 +47,7 @@ export const manualEvents: ManualEvent[] = [
     startDate: new Date("2025-09-29T09:00:00-04:00"), // April 15, 2025 9:00 AM ET
     endDate: new Date("2025-09-29T16:00:00-04:00"),   // April 15, 2025 5:00 PM ET
     url: "https://planb.network/en/events/3f12cbf9-73b7-46b7-87ea-6162e68cfd78",
-    location: "University Student Center, 800 21st St NW, Washington, DC 20052",
+    location: "Eckles Memorial Library Room 222, 2100 Foxhall Rd NW, Washington, DC 20007",
     source: "George Washington University",
     icon: "~/assets/images/logos/gw.png", // GW logo for the conference
     enabled: true, // Set to true when you want this event to show
