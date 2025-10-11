@@ -178,21 +178,28 @@ const shouldHighlight = (title: string): boolean => {
           
           {/* Event Content - Flex grow to push time to bottom */}
           <div class="p-3 md:p-4 md:pr-16 flex-grow flex flex-col justify-between min-h-0 gap-2.5 md:gap-3.5">
-            {/* Title */}
-            {event.url ? (
-              <a
-                href={event.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-lg md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto"
-              >
-                {event.title}
-              </a>
-            ) : (
-              <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto">
-                {event.title}
-              </h3>
-            )}
+            <div>
+              {/* Title */}
+              {event.url ? (
+                <a
+                  href={event.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-lg md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto"
+                >
+                  {event.title}
+                </a>
+              ) : (
+                <h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors leading-snug js-event-title [text-wrap:balance] break-words hyphens-auto">
+                  {event.title}
+                </h3>
+              )}
+              
+              {/* Meetup Group Name */}
+              <div class="text-xs italic text-gray-500 dark:text-gray-400 mt-1">
+                {event.source}
+              </div>
+            </div>
             
             {/* Time - pinned to bottom */}
             <div class="mt-0 text-xs md:text-sm text-gray-600 dark:text-gray-300">
