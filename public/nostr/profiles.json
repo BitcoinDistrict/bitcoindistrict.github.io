@@ -4,7 +4,7 @@
     "hex": "de2d9f416ea6c60097dfdb78f03469c095cc8d6d811532844c4ce0de2cd1bb2c",
     "npub": "npub1mcke7stw5mrqp97lmdu0qdrfcz2uertdsy2n9pzvfnsdutx3hvkq7d5mnw",
     "display": "Bitcoin District",
-    "picture": "",
+    "picture": "/nostr/profiles/de2d9f416ea6c60097dfdb78f03469c095cc8d6d811532844c4ce0de2cd1bb2c.webp",
     "pictureOriginal": "https://m.primal.net/MXXq.png"
   },
   {
@@ -70,6 +70,14 @@
     "display": "𝔼𝕣𝕪𝕟 𝔹𝕣𝕒𝕔𝕔𝕠",
     "picture": "/nostr/profiles/ca86d55ab426d52de1732413d69b9b1b063a7980968b8b69635a89a562af1bec.webp",
     "pictureOriginal": "https://nostr.build/i/nostr.build_22b55084464e2dc7cc305549199aa9f17ebe20ff54aeb6bff788907b35e24ef6.jpg"
+  },
+  {
+    "name": "wrensnest",
+    "hex": "70f3361893ba117949eb8c99feb903d8c77dcc6f91995de89a32fd5e5001d9cf",
+    "npub": "npub1wrenvxynhgghjj0t3jvlawgrmrrhmnr0jxv4m6y6xt74u5qpm88sut9776",
+    "display": "Wren's Nest Handmade Art",
+    "picture": "/nostr/profiles/70f3361893ba117949eb8c99feb903d8c77dcc6f91995de89a32fd5e5001d9cf.webp",
+    "pictureOriginal": "https://cherry.bitcoindistrict.org/0aa74c650425014d7cb6c44be9ff4f744d7c48d9ec36afca70b858f944abff60.webp"
   },
   {
     "name": "notemaster",
