@@ -4,6 +4,7 @@ import Brands from '~/components/widgets/Brands.astro';
 import Content from '~/components/widgets/Content.astro';
 import Image from '~/components/common/Image.astro';
 import { createHero, HERO_IMAGES, HERO_OPACITY } from '~/utils/hero';
+import { supporters } from '~/data/thanks';
 
 const metadata = {
   title: 'Thanks to our friends and supporters',
@@ -17,9 +18,13 @@ const hero = createHero({
   subtitle: 'Bitcoin District is a community, not a business with a budget. We are grateful for the support of our community volunteers, friends and supporters.',
 });
 
-const supporters = [
-  { src: '~/assets/images/brands/compasscoffee.png', alt: 'Compass Coffee', href: 'https://www.compasscoffee.com' },
-];
+// Sort supporters by rank (ascending) and map to format expected by Brands component
+const sortedSupporters = [...supporters].sort((a, b) => a.rank - b.rank);
+const brandImages = sortedSupporters.map(supporter => ({
+  src: supporter.logo.src,
+  alt: supporter.logo.alt,
+  href: supporter.href,
+}));
 
 ---
 
@@ -29,37 +34,35 @@ const supporters = [
     <Brands
       title="Friends & Supporters"
       subtitle="A few of the companies and friends who have supported the Bitcoin District community"
-      images={supporters}
+      images={brandImages}
       classes={{ imageMaxHeight: '!max-h-[100px] sm:!max-h-[120px] md:!max-h-[140px] lg:!max-h-[150px]' }}
     />
   </div>
 
-  <Content
-    title="Compass Coffee"
-    subtitle="Washington DC's favorite roaster — and a steadfast supporter of Bitcoiners in the District"
-    content={`
-      <p>Compass Coffee has been a steadfast supporter of the DMV Bitcoin community — opening their doors for countless meetups, providing a home for BitDevs, and showing up time and again for our events. Their commitment goes beyond great coffee; they’ve brewed a culture of connection and collaboration.</p> <p>They even crafted a special single-origin <strong>Bitcoin Blend</strong> — a vibrant, caramelly roast honoring El Salvador’s leadership and the global Bitcoin movement.</p>
-    `}
-    callToAction={{
-      text: 'Check out the Bitcoin Blend',
-      href: 'https://www.compasscoffee.com/products/bitcoin-blend',
-      icon: 'tabler:external-link',
-    }}
-    imageAlign="right"
-  >
-    <Fragment slot="image">
-      <a href="https://www.compasscoffee.com/products/bitcoin-blend" target="_blank" rel="noopener noreferrer" class="inline-flex">
-        <Image
-          src="~/assets/images/brands/compasscoffee.png"
-          alt="Compass Coffee"
-          width={400}
-          height={400}
-          class="mx-auto w-full max-w-sm rounded-full bg-white p-6 shadow-lg dark:bg-slate-800"
-          layout="responsive"
-        />
-      </a>
-    </Fragment>
-  </Content>
+  {sortedSupporters.map((supporter, index) => 
+    supporter.detailedSection && (
+      <Content
+        title={supporter.detailedSection.title}
+        subtitle={supporter.detailedSection.subtitle}
+        content={supporter.detailedSection.content}
+        callToAction={supporter.detailedSection.callToAction}
+        imageAlign="center"
+      >
+        <Fragment slot="image">
+          <a href={supporter.href} target="_blank" rel="noopener noreferrer" class="hidden md:inline-flex">
+            <Image
+              src={supporter.logo.src}
+              alt={supporter.logo.alt}
+              width={400}
+              height={400}
+              class="mx-auto max-w-[200px] md:max-w-[250px] lg:max-w-[300px] object-contain shadow"
+              layout="contained"
+            />
+          </a>
+        </Fragment>
+      </Content>
+    )
+  )}
   
 </HeroLayout>
 
