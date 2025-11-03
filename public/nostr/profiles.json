@@ -27,7 +27,7 @@
     "name": "gary",
     "hex": "d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d",
     "npub": "npub160t5zfxalddaccdc7xx30sentwa5lrr3rq4rtm38x99ynf8t0vwsvzyjc9",
-    "display": "CPOBV - average_gary",
+    "display": "Pioneer Hash",
     "picture": "/nostr/profiles/d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d.webp",
     "pictureOriginal": "https://image.nostr.build/8cca96671d7ee60dbfbb8f19049ae635ca21a57603539c7375bd1ffea63e37fd.jpg"
   },
@@ -118,5 +118,13 @@
     "display": "National Debt Notes",
     "picture": "/nostr/profiles/cf17edc05f702a2937efd831e9085ac86db73a24b01de9c22450e0a65d8e8439.webp",
     "pictureOriginal": "https://blossom.primal.net/7659086f9d6ed911fe39cc9724dbb3d8135380ceedad5cede7eac7c80396aa76.gif"
+  },
+  {
+    "name": "bdi",
+    "hex": "87789f8ef4ae61e94cbf1f929b3e00ccea3f08e4d0d9d9cc979ddbefa8e2ccb2",
+    "npub": "npub1sauflrh54es7jn9lr7ffk0sqen4r7z8y6rvannyhnhd7l28zejeq4lssr8",
+    "display": "Bitcoin District Initiative",
+    "picture": "/nostr/profiles/87789f8ef4ae61e94cbf1f929b3e00ccea3f08e4d0d9d9cc979ddbefa8e2ccb2.webp",
+    "pictureOriginal": "https://blossom.primal.net/6eca4d0e1a1f62b3b9674e7468db8be9514f2a9cc6ea79c78ef40d9db605c8f9.png"
   }
 ]
