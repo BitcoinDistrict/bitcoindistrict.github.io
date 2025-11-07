@@ -245,4 +245,11 @@ export const bookClubBooks: BookClubBook[] = [
     date: null,
     image: "~/assets/images/books/boom.jpg"
   },
+  {
+    title: "What Has Government Done to Our Money?",
+    author: "Murray Rothbard",
+    link: "https://cdn.mises.org/What%20Has%20Government%20Done%20to%20Our%20Money_3.pdf",
+    date: "2025-12-09",
+    image: "~/assets/images/books/govmoney.jpg"
+  },
 ];

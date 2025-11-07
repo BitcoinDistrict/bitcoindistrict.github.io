@@ -47,9 +47,8 @@ export const footerData = {
       links: [
         { text: 'Bitcoin District Initiative', href: 'https://www.bitcoindistrictinitiative.org/' },
         { text: 'Bitcoin Policy Institute', href: 'https://www.btcpolicy.org/' },
-        { text: 'Strategy Hub', href: 'https://strategy.com/hub' },
-        { text: 'Bitcoin Academic Center', href: 'https://bitcoinacademic.center' },
         { text: 'PubKey DC', href: 'https://pubkey.bar/' },
+        { text: 'Strategy Hub', href: 'https://strategy.com/hub' }
       ],
     },
   ],
