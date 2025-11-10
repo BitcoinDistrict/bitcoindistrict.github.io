@@ -5,6 +5,8 @@ dist/
 # cache
 .cache/
 
+.other
+
 # dependencies
 node_modules/
 

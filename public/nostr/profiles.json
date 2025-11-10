@@ -126,5 +126,13 @@
     "display": "Bitcoin District Initiative",
     "picture": "/nostr/profiles/87789f8ef4ae61e94cbf1f929b3e00ccea3f08e4d0d9d9cc979ddbefa8e2ccb2.webp",
     "pictureOriginal": "https://blossom.primal.net/6eca4d0e1a1f62b3b9674e7468db8be9514f2a9cc6ea79c78ef40d9db605c8f9.png"
+  },
+  {
+    "name": "btcaccepted",
+    "hex": "ab3d7eec2613e3e47bd52005d6e7b8956c3797317dfccc75944249c4dc9f7a1b",
+    "npub": "npub14v7hampxz037g774yqzadeacj4kr09e30h7vcav5gfyufhyl0gdslxmmya",
+    "display": "DMV Bitcoin Notifier",
+    "picture": "/nostr/profiles/ab3d7eec2613e3e47bd52005d6e7b8956c3797317dfccc75944249c4dc9f7a1b.webp",
+    "pictureOriginal": "https://blossom.primal.net/da8c941f6164c37b43c872738939be2e9bd5475b37a6330510329310b0696e3e.gif"
   }
 ]
