@@ -27,7 +27,7 @@
     "name": "gary",
     "hex": "d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d",
     "npub": "npub160t5zfxalddaccdc7xx30sentwa5lrr3rq4rtm38x99ynf8t0vwsvzyjc9",
-    "display": "PioneerHash",
+    "display": "AverageGary",
     "picture": "/nostr/profiles/d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d.webp",
     "pictureOriginal": "https://image.nostr.build/8cca96671d7ee60dbfbb8f19049ae635ca21a57603539c7375bd1ffea63e37fd.jpg"
   },
@@ -77,7 +77,7 @@
     "npub": "npub1wrenvxynhgghjj0t3jvlawgrmrrhmnr0jxv4m6y6xt74u5qpm88sut9776",
     "display": "Wren's Nest Handmade Art",
     "picture": "/nostr/profiles/70f3361893ba117949eb8c99feb903d8c77dcc6f91995de89a32fd5e5001d9cf.webp",
-    "pictureOriginal": "https://cherry.bitcoindistrict.org/0aa74c650425014d7cb6c44be9ff4f744d7c48d9ec36afca70b858f944abff60.webp"
+    "pictureOriginal": "https://npub1wrenvxynhgghjj0t3jvlawgrmrrhmnr0jxv4m6y6xt74u5qpm88sut9776.blossom.band/bf08cda4fe46121ed63dfd470a181d92f6ccc433a24b026307ddbe5c5d44cd3e.png"
   },
   {
     "name": "notemaster",
@@ -128,7 +128,7 @@
     "pictureOriginal": "https://blossom.primal.net/6eca4d0e1a1f62b3b9674e7468db8be9514f2a9cc6ea79c78ef40d9db605c8f9.png"
   },
   {
-    "name": "btcaccepted",
+    "name": "dmvbtcnotifier",
     "hex": "ab3d7eec2613e3e47bd52005d6e7b8956c3797317dfccc75944249c4dc9f7a1b",
     "npub": "npub14v7hampxz037g774yqzadeacj4kr09e30h7vcav5gfyufhyl0gdslxmmya",
     "display": "DMV Bitcoin Notifier",

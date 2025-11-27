@@ -41,28 +41,6 @@ export const supporters: Supporter[] = [
     },
   },
   {
-    rank: 20,
-    name: 'George Washington University',
-    logo: {
-      src: '~/assets/images/brands/gwu.png',
-      alt: 'George Washington University Logo',
-    },
-    href: 'https://www.gwu.edu',
-    detailedSection: {
-      title: 'George Washington University',
-      subtitle: 'Washington\'s hub for ideas — and a welcoming home for Bitcoin conversation.',
-      content: `
-      <p>The George Washington University has been a generous supporter of the local Bitcoin community — hosting book talks, BitDevs sessions, and academic discussions that bring together students, builders, and thinkers from across the District.</p>
-      <p>Through the <strong>Bitcoin Academic Center</strong> and a spirit of open inquiry, GWU is helping to foster dialogue around Bitcoin's role in technology, economics, and freedom — making space for innovation right in the heart of DC.</p>
-    `,
-      callToAction: {
-        text: 'Learn More About the Bitcoin Academic Center',
-        href: 'https://bitcoinacademic.center',
-        icon: 'tabler:external-link',
-      },
-    },
-  },
-  {
     rank: 10,
     name: 'Bitcoin Policy Institute',
     logo: {
