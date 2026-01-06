@@ -11,9 +11,9 @@
     "name": "dcbitdevs",
     "hex": "d16c7d237241d25263a3138a0e1b1d7720b39a614cffbea269b60c8626b2e5bf",
     "npub": "npub169k86gmjg8f9ycarzw9quxcawust8xnpfnlmagnfkcxgvf4jukls2j02zu",
-    "display": "DC BitDevs",
-    "picture": "/nostr/profiles/d16c7d237241d25263a3138a0e1b1d7720b39a614cffbea269b60c8626b2e5bf.webp",
-    "pictureOriginal": "https://m.primal.net/NBLW.jpg"
+    "display": "dcbitdevs",
+    "picture": "",
+    "pictureOriginal": ""
   },
   {
     "name": "trey",
@@ -27,9 +27,9 @@
     "name": "gary",
     "hex": "d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d",
     "npub": "npub160t5zfxalddaccdc7xx30sentwa5lrr3rq4rtm38x99ynf8t0vwsvzyjc9",
-    "display": "DudeChicken",
+    "display": "average_bitcoiner",
     "picture": "/nostr/profiles/d3d74124ddfb5bdc61b8f18d17c3335bbb4f8c71182a35ee27314a49a4eb7b1d.webp",
-    "pictureOriginal": "https://blossom.primal.net/752a3ffc2ebd6fea199f4b6e9ba9711a5e44d81f4188c53a13a3c4efb7410085.jpg"
+    "pictureOriginal": "https://blossom.primal.net/144e150d9558b4b947e3248944cbaac0850bb81e876c75f76043b1b69b4c36ed.jpg"
   },
   {
     "name": "tkay",
@@ -37,23 +37,23 @@
     "npub": "npub1nje4ghpkjsxe5thcd4gdt3agl2usxyxv3xxyx39ul3xgytl5009q87l02j",
     "display": "TKay",
     "picture": "/nostr/profiles/9cb3545c36940d9a2ef86d50d5c7a8fab90310cc898c4344bcfc4c822ff47bca.webp",
-    "pictureOriginal": "https://media.nostrarabia.com/b6626d364057eab005f3513ea879d3c1bc27fdee0fe829832f8f79851aa12ce3.webp"
+    "pictureOriginal": "https://i.nostr.build/ZH7RsCKQqiPxPjic.jpg"
   },
   {
     "name": "david",
     "hex": "42576a819d1b69472fbc9fefd356e2c127afb1bc25847753ec692c06a8ead90a",
     "npub": "npub1gftk4qvard55wtaunlhax4hzcyn6lvduykz8w5lvdykqd282my9qdm0hhg",
-    "display": "David Tarr",
-    "picture": "/nostr/profiles/42576a819d1b69472fbc9fefd356e2c127afb1bc25847753ec692c06a8ead90a.webp",
-    "pictureOriginal": "https://m.primal.net/IehB.jpg"
+    "display": "david",
+    "picture": "",
+    "pictureOriginal": ""
   },
   {
     "name": "LZP",
     "hex": "3f1de51da0f9d5248a96ed1c533b7a2b98d9f80aebc81b214ab507f6c7a170a4",
     "npub": "npub18uw728dql82jfz5ka5w9xwm69wvdn7q2a0ypkg22k5rld3apwzjqqhnyjz",
-    "display": "Layer Zero Propaganda",
-    "picture": "/nostr/profiles/3f1de51da0f9d5248a96ed1c533b7a2b98d9f80aebc81b214ab507f6c7a170a4.webp",
-    "pictureOriginal": "https://blossom.primal.net/cf18c56af5f4e5c97654c0fea6115ec50cbbf327365173782d03e188b0bdddfa.png"
+    "display": "LZP",
+    "picture": "",
+    "pictureOriginal": ""
   },
   {
     "name": "boatingaccident",
@@ -91,9 +91,9 @@
     "name": "eggs",
     "hex": "7d3cb1b53c777914f2f3fce49f67833d6a9099d36515ee8802b677ee8106d2d6",
     "npub": "npub1057trdfuwau3fuhnlnjf7eur844fpxwnv527azqzkem7aqgx6ttqwx322s",
-    "display": "Eggsahash",
-    "picture": "/nostr/profiles/7d3cb1b53c777914f2f3fce49f67833d6a9099d36515ee8802b677ee8106d2d6.webp",
-    "pictureOriginal": "https://blossom.primal.net/be0888a5a064c8cf3a2786362c92373aec8fdf7054ebcbc98fb1e8d98881f023.jpg"
+    "display": "eggs",
+    "picture": "",
+    "pictureOriginal": ""
   },
   {
     "name": "mauricio",
@@ -107,25 +107,25 @@
     "name": "testington",
     "hex": "0897c6bca7af170d6b8ee21e366ff01a76352ddd98ffb0b9877c9778bd4c886c",
     "npub": "npub1pztud0984uts66uwug0rvmlsrfmr2twanrlmpwv80jth302v3pkqa4sgys",
-    "display": "Testington",
-    "picture": "/nostr/profiles/0897c6bca7af170d6b8ee21e366ff01a76352ddd98ffb0b9877c9778bd4c886c.webp",
-    "pictureOriginal": "https://cherry.bitcoindistrict.org/d7243b3497e62427a2ccdbb638f6e9eb9c0341ea990fef6dd505512a117e858c.webp"
+    "display": "testington",
+    "picture": "",
+    "pictureOriginal": ""
   },
   {
     "name": "brrr",
     "hex": "cf17edc05f702a2937efd831e9085ac86db73a24b01de9c22450e0a65d8e8439",
     "npub": "npub1eut7mszlwq4zjdl0mqc7jzz6epkmww3ykqw7ns3y2rs2vhvwssusq4tugm",
-    "display": "National Debt Notes",
-    "picture": "/nostr/profiles/cf17edc05f702a2937efd831e9085ac86db73a24b01de9c22450e0a65d8e8439.webp",
-    "pictureOriginal": "https://blossom.primal.net/7659086f9d6ed911fe39cc9724dbb3d8135380ceedad5cede7eac7c80396aa76.gif"
+    "display": "brrr",
+    "picture": "",
+    "pictureOriginal": ""
   },
   {
     "name": "bdi",
     "hex": "87789f8ef4ae61e94cbf1f929b3e00ccea3f08e4d0d9d9cc979ddbefa8e2ccb2",
     "npub": "npub1sauflrh54es7jn9lr7ffk0sqen4r7z8y6rvannyhnhd7l28zejeq4lssr8",
-    "display": "Bitcoin District Initiative",
-    "picture": "/nostr/profiles/87789f8ef4ae61e94cbf1f929b3e00ccea3f08e4d0d9d9cc979ddbefa8e2ccb2.webp",
-    "pictureOriginal": "https://blossom.primal.net/6eca4d0e1a1f62b3b9674e7468db8be9514f2a9cc6ea79c78ef40d9db605c8f9.png"
+    "display": "bdi",
+    "picture": "",
+    "pictureOriginal": ""
   },
   {
     "name": "dmvbtcnotifier",
