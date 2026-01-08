@@ -1,10 +1,11 @@
 ---
 import type { Form as Props } from '~/types';
 import Button from '~/components/ui/Button.astro';
-import { getSubmitUrl } from '~/data/contactus';
+import { getSubmitUrl, getRecaptchaSiteKey } from '~/data/contactus';
 
 const { inputs, textarea, disclaimer, button = 'Contact us', description = '' } = Astro.props;
 const submitUrl = getSubmitUrl();
+const recaptchaSiteKey = getRecaptchaSiteKey();
 
 // Derive sensible autocomplete defaults based on field name/type
 const deriveAutocompleteToken = (fieldName: string, inputType: string): string => {
@@ -127,10 +128,14 @@ const humanizeFieldName = (fieldName: string): string => {
   }
 </form>
 
-<script>
+{recaptchaSiteKey && (
+  <script src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}></script>
+)}
+
+<script define:vars={{ recaptchaSiteKey }}>
   function handleFormSuccess() {
-    const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
-    const form = document.getElementById('contact-form') as HTMLFormElement;
+    const submitButton = document.getElementById('submit-button');
+    const form = document.getElementById('contact-form');
     
     if (submitButton) {
       submitButton.textContent = 'Thanks for your message!';
@@ -144,8 +149,8 @@ const humanizeFieldName = (fieldName: string): string => {
     }
   }
 
-  function handleFormError(errorMessage: string) {
-    const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
+  function handleFormError(errorMessage) {
+    const submitButton = document.getElementById('submit-button');
     if (submitButton) {
       submitButton.textContent = 'Error - Please try again';
       submitButton.style.backgroundColor = '#ef4444'; // Red color
@@ -164,12 +169,13 @@ const humanizeFieldName = (fieldName: string): string => {
   }
 
   // Handle form submission
-  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const form = document.getElementById('contact-form');
+  
   if (form) {
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
-      const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
+      const submitButton = document.getElementById('submit-button');
       if (submitButton) {
         submitButton.textContent = 'Sending...';
         submitButton.disabled = true;
@@ -177,6 +183,25 @@ const humanizeFieldName = (fieldName: string): string => {
       
       try {
         const formData = new FormData(form);
+        
+        // Execute reCAPTCHA v3 if site key is configured
+        if (recaptchaSiteKey && typeof window.grecaptcha !== 'undefined') {
+          try {
+            const recaptchaToken = await new Promise((resolve, reject) => {
+              window.grecaptcha.ready(() => {
+                window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+                  .then(resolve)
+                  .catch(reject);
+              });
+            });
+            
+            // Add reCAPTCHA token to form data
+            formData.append('_g-recaptcha-response', recaptchaToken);
+          } catch (recaptchaError) {
+            console.warn('reCAPTCHA error:', recaptchaError);
+            // Continue with form submission even if reCAPTCHA fails
+          }
+        }
         
         const response = await fetch(form.action, {
           method: 'POST',

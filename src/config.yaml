@@ -68,5 +68,9 @@ analytics:
     googleAnalytics:
       id: null # or "G-XXXXXXXXXX"
 
+forms:
+  recaptcha:
+    siteKey: 6LeYQkQsAAAAACpyqv7_QnKsR1rmmNcjehAm2dIt # Your reCAPTCHA v3 site key (public, safe to expose)
+
 ui:
   theme: 'dark' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"
