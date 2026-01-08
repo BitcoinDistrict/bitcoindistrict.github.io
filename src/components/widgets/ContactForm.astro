@@ -1,15 +1,10 @@
 ---
 import type { Form as Props } from '~/types';
 import Button from '~/components/ui/Button.astro';
-import { getSubmitUrl, googleContactForm } from '~/data/contactus';
+import { getSubmitUrl } from '~/data/contactus';
 
 const { inputs, textarea, disclaimer, button = 'Contact us', description = '' } = Astro.props;
 const submitUrl = getSubmitUrl();
-
-// Map form field names to Google Forms entry IDs
-const getEntryId = (fieldName: string) => {
-  return googleContactForm.entryIds[fieldName as keyof typeof googleContactForm.entryIds] || fieldName;
-};
 
 // Derive sensible autocomplete defaults based on field name/type
 const deriveAutocompleteToken = (fieldName: string, inputType: string): string => {
@@ -47,7 +42,7 @@ const humanizeFieldName = (fieldName: string): string => {
 };
 ---
 
-<form id="contact-form" method="POST" action={submitUrl} target="hidden_iframe">
+<form id="contact-form" method="POST" action={submitUrl}>
   {
     inputs &&
       inputs.map(
@@ -61,12 +56,13 @@ const humanizeFieldName = (fieldName: string): string => {
                 return (
                   <input
                     type={type}
-                    name={getEntryId(name)}
+                    name={name}
                     id={name}
                     autocomplete={effectiveAutocomplete}
                     placeholder={effectivePlaceholder}
                     aria-label={accessibleLabel}
                     class="py-3 px-4 block w-full text-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800"
+                    required={type === 'email' || name === 'email'}
                   />
                 );
               })()}
@@ -80,11 +76,12 @@ const humanizeFieldName = (fieldName: string): string => {
       <div class="mb-6 sm:mb-5">
         <textarea
           id="textarea"
-          name={getEntryId(textarea.name ? textarea.name : 'message')}
+          name={textarea.name ? textarea.name : 'message'}
           rows={textarea.rows ? textarea.rows : 4}
           placeholder={textarea.placeholder || textarea.label || 'Message'}
           aria-label={textarea.label || 'Message'}
           autocomplete="off"
+          required
           class="py-3 px-4 block w-full text-md rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800"
         />
       </div>
@@ -130,35 +127,75 @@ const humanizeFieldName = (fieldName: string): string => {
   }
 </form>
 
-<!-- Hidden iframe for Google Forms submission -->
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
 <script>
   function handleFormSuccess() {
     const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
+    const form = document.getElementById('contact-form') as HTMLFormElement;
+    
     if (submitButton) {
       submitButton.textContent = 'Thanks for your message!';
       submitButton.style.backgroundColor = '#10b981'; // Green color
       submitButton.style.borderColor = '#10b981';
       submitButton.disabled = true;
     }
+    
+    if (form) {
+      form.reset();
+    }
+  }
+
+  function handleFormError(errorMessage: string) {
+    const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
+    if (submitButton) {
+      submitButton.textContent = 'Error - Please try again';
+      submitButton.style.backgroundColor = '#ef4444'; // Red color
+      submitButton.style.borderColor = '#ef4444';
+      submitButton.disabled = false;
+      
+      // Reset button text after 3 seconds
+      setTimeout(() => {
+        submitButton.textContent = 'Contact us';
+        submitButton.style.backgroundColor = '';
+        submitButton.style.borderColor = '';
+      }, 3000);
+    }
+    
+    console.error('Form submission error:', errorMessage);
   }
 
   // Handle form submission
   const form = document.getElementById('contact-form') as HTMLFormElement;
   if (form) {
-    form.addEventListener('submit', function(e) {
-      // Show immediate feedback
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
       const submitButton = document.getElementById('submit-button') as HTMLButtonElement;
       if (submitButton) {
         submitButton.textContent = 'Sending...';
         submitButton.disabled = true;
       }
       
-      // Trigger success state after a short delay to simulate form processing
-      setTimeout(() => {
-        handleFormSuccess();
-      }, 2000);
+      try {
+        const formData = new FormData(form);
+        
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          handleFormSuccess();
+        } else {
+          const data = await response.json();
+          handleFormError(data.error || 'Failed to send message. Please try again.');
+        }
+      } catch (error) {
+        handleFormError('Network error. Please check your connection and try again.');
+      }
     });
   }
 </script>
+
