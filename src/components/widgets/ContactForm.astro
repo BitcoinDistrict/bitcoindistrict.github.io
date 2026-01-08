@@ -185,21 +185,48 @@ const humanizeFieldName = (fieldName: string): string => {
         const formData = new FormData(form);
         
         // Execute reCAPTCHA v3 if site key is configured
-        if (recaptchaSiteKey && typeof window.grecaptcha !== 'undefined') {
+        // Following https://developers.google.com/recaptcha/docs/v3
+        if (recaptchaSiteKey) {
           try {
+            // grecaptcha.ready() handles race conditions and ensures library is loaded
             const recaptchaToken = await new Promise((resolve, reject) => {
-              window.grecaptcha.ready(() => {
+              // Check if grecaptcha exists (script may still be loading)
+              if (typeof window.grecaptcha === 'undefined') {
+                // If script hasn't loaded, wait for it with a timeout
+                const timeout = setTimeout(() => {
+                  reject(new Error('reCAPTCHA script timeout'));
+                }, 3000);
+                
+                // Poll for grecaptcha to be available
+                const checkGrecaptcha = setInterval(() => {
+                  if (typeof window.grecaptcha !== 'undefined') {
+                    clearInterval(checkGrecaptcha);
+                    clearTimeout(timeout);
+                    window.grecaptcha.ready(function() {
+                      window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+                        .then(resolve)
+                        .catch(reject);
+                    });
+                  }
+                }, 50);
+                
+                return;
+              }
+              
+              // Script is loaded, use grecaptcha.ready() as per docs
+              window.grecaptcha.ready(function() {
                 window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
                   .then(resolve)
                   .catch(reject);
               });
             });
             
-            // Add reCAPTCHA token to form data
+            // Add reCAPTCHA token to form data (Formspree expects this field name)
             formData.append('_g-recaptcha-response', recaptchaToken);
           } catch (recaptchaError) {
             console.warn('reCAPTCHA error:', recaptchaError);
             // Continue with form submission even if reCAPTCHA fails
+            // This allows the form to work if reCAPTCHA is temporarily unavailable
           }
         }
         
