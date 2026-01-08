@@ -11,6 +11,7 @@ export type Config = {
   };
   ui?: unknown;
   analytics?: unknown;
+  forms?: FormsConfig;
 };
 
 export interface SiteConfig {
@@ -80,6 +81,12 @@ export interface AnalyticsConfig {
 
 export interface UIConfig {
   theme: string;
+}
+
+export interface FormsConfig {
+  recaptcha?: {
+    siteKey?: string;
+  };
 }
 
 const DEFAULT_SITE_NAME = 'Website';
@@ -193,6 +200,16 @@ const getAnalytics = (config: Config) => {
   return merge({}, _default, config?.analytics ?? {}) as AnalyticsConfig;
 };
 
+const getForms = (config: Config) => {
+  const _default = {
+    recaptcha: {
+      siteKey: undefined,
+    },
+  };
+
+  return merge({}, _default, config?.forms ?? {}) as FormsConfig;
+};
+
 export default (config: Config) => ({
   SITE: getSite(config),
   I18N: getI18N(config),
@@ -200,4 +217,5 @@ export default (config: Config) => ({
   APP_BLOG: getAppBlog(config),
   UI: getUI(config),
   ANALYTICS: getAnalytics(config),
+  FORMS: getForms(config),
 });
