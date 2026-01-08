@@ -70,7 +70,7 @@ analytics:
 
 forms:
   recaptcha:
-    siteKey: 6LeEEUQsAAAAAE94WfZTplZVsHgqW5TG6LSV9Ce0 # Your reCAPTCHA Enterprise site key (public, safe to expose)
+    siteKey: 6LcpDEQsAAAAABtAl7eX1aZ1ZTtGSSf1b0DA0yFc # Your reCAPTCHA v3 site key for Formspree (public, safe to expose). Formspree only supports regular v3, not Enterprise.
 
 ui:
   theme: 'dark' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"

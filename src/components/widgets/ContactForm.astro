@@ -126,10 +126,15 @@ const humanizeFieldName = (fieldName: string): string => {
       </div>
     )
   }
+  
+  <!-- Hidden input for reCAPTCHA token (Formspree expects this field name) -->
+  {recaptchaSiteKey && (
+    <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
+  )}
 </form>
 
 {recaptchaSiteKey && (
-  <script src={`https://www.google.com/recaptcha/enterprise.js?render=${recaptchaSiteKey}`}></script>
+  <script src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}></script>
 )}
 
 <script define:vars={{ recaptchaSiteKey }}>
@@ -182,66 +187,83 @@ const humanizeFieldName = (fieldName: string): string => {
       }
       
       try {
-        const formData = new FormData(form);
-        
-        // Execute reCAPTCHA Enterprise if site key is configured
-        // Using reCAPTCHA Enterprise API: grecaptcha.enterprise.ready() and grecaptcha.enterprise.execute()
+        // Execute reCAPTCHA v3 if site key is configured
+        // Formspree only supports regular reCAPTCHA v3, not Enterprise
+        // Using regular v3 API: grecaptcha.ready() and grecaptcha.execute()
         if (recaptchaSiteKey) {
-          try {
-            // grecaptcha.enterprise.ready() handles race conditions and ensures library is loaded
-            const recaptchaToken = await new Promise((resolve, reject) => {
-              // Check if grecaptcha.enterprise exists (script may still be loading or blocked)
-              if (typeof window.grecaptcha === 'undefined' || typeof window.grecaptcha.enterprise === 'undefined') {
-                // Poll for grecaptcha.enterprise to be available
-                const checkGrecaptcha = setInterval(() => {
-                  if (typeof window.grecaptcha !== 'undefined' && typeof window.grecaptcha.enterprise !== 'undefined') {
-                    clearInterval(checkGrecaptcha);
-                    clearTimeout(timeout);
-                    window.grecaptcha.enterprise.ready(function() {
-                      window.grecaptcha.enterprise.execute(recaptchaSiteKey, { action: 'submit' })
-                        .then(resolve)
-                        .catch(reject);
-                    });
-                  }
-                }, 50);
-                
-                // If script hasn't loaded after 3 seconds, it's likely blocked
-                const timeout = setTimeout(() => {
+          console.log('reCAPTCHA v3: Starting verification', {
+            siteKey: recaptchaSiteKey,
+            grecaptchaExists: typeof window.grecaptcha !== 'undefined'
+          });
+          
+          // grecaptcha.ready() handles race conditions and ensures library is loaded
+          await new Promise((resolve, reject) => {
+            // Check if grecaptcha exists (script may still be loading or blocked)
+            if (typeof window.grecaptcha === 'undefined') {
+              // Poll for grecaptcha to be available
+              const checkGrecaptcha = setInterval(() => {
+                if (typeof window.grecaptcha !== 'undefined') {
                   clearInterval(checkGrecaptcha);
-                  reject(new Error('reCAPTCHA Enterprise script failed to load. The reCAPTCHA script may be blocked by an ad blocker. Please disable ad blockers for this site and try again.'));
-                }, 3000);
-                
-                return;
-              }
+                  clearTimeout(timeout);
+                  window.grecaptcha.ready(function() {
+                    window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+                      .then(function(token) {
+                        // Set token in hidden input field (Formspree expects this)
+                        const tokenInput = document.getElementById('g-recaptcha-response');
+                        if (tokenInput) {
+                          tokenInput.value = token;
+                          console.log('reCAPTCHA v3: Token set in hidden input', token.substring(0, 20) + '...');
+                          resolve(token);
+                        } else {
+                          reject(new Error('reCAPTCHA token input field not found'));
+                        }
+                      })
+                      .catch(reject);
+                  });
+                }
+              }, 50);
               
-              // Script is loaded, use grecaptcha.enterprise.ready() as per Enterprise docs
-              window.grecaptcha.enterprise.ready(function() {
-                window.grecaptcha.enterprise.execute(recaptchaSiteKey, { action: 'submit' })
-                  .then(resolve)
-                  .catch(reject);
-              });
-            });
+              // If script hasn't loaded after 3 seconds, it's likely blocked
+              const timeout = setTimeout(() => {
+                clearInterval(checkGrecaptcha);
+                reject(new Error('reCAPTCHA script failed to load. The reCAPTCHA script may be blocked by an ad blocker. Please disable ad blockers for this site and try again.'));
+              }, 3000);
+              
+              return;
+            }
             
-            // Add reCAPTCHA token to form data (Formspree expects this field name)
-            formData.append('_g-recaptcha-response', recaptchaToken);
-          } catch (recaptchaError) {
-            console.error('reCAPTCHA Enterprise error:', recaptchaError);
-            // Log detailed error for debugging
-            console.error('reCAPTCHA Enterprise details:', {
-              error: recaptchaError,
-              siteKey: recaptchaSiteKey,
-              grecaptchaAvailable: typeof window.grecaptcha !== 'undefined',
-              enterpriseAvailable: typeof window.grecaptcha !== 'undefined' && typeof window.grecaptcha.enterprise !== 'undefined',
-              errorMessage: recaptchaError.message
+            // Script is loaded, use grecaptcha.ready() as per v3 docs
+            window.grecaptcha.ready(function() {
+              window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+                .then(function(token) {
+                  // Set token in hidden input field (Formspree expects this)
+                  const tokenInput = document.getElementById('g-recaptcha-response');
+                  if (tokenInput) {
+                    tokenInput.value = token;
+                    console.log('reCAPTCHA v3: Token set in hidden input', token.substring(0, 20) + '...');
+                    resolve(token);
+                  } else {
+                    reject(new Error('reCAPTCHA token input field not found'));
+                  }
+                })
+                .catch(reject);
             });
-            
-            // If reCAPTCHA fails, show user-friendly error message
-            const errorMsg = recaptchaError.message || 'reCAPTCHA verification failed';
-            handleFormError('reCAPTCHA verification failed. Please check your browser console for details or contact support.');
-            return; // Stop form submission if reCAPTCHA is required
-          }
+          });
         }
         
+        // Create FormData from form (will include the hidden input with token)
+        const formData = new FormData(form);
+        
+        // Debug: Log form data to verify token is included
+        console.log('Form data keys:', Array.from(formData.keys()));
+        const recaptchaValue = formData.get('g-recaptcha-response');
+        if (recaptchaValue) {
+          console.log('reCAPTCHA token in form data:', recaptchaValue.substring(0, 20) + '...');
+        } else {
+          console.warn('WARNING: reCAPTCHA token not found in form data!');
+        }
+        
+        console.log('Form submission: Sending to', form.action);
         const response = await fetch(form.action, {
           method: 'POST',
           body: formData,
@@ -250,14 +272,29 @@ const humanizeFieldName = (fieldName: string): string => {
           }
         });
         
+        console.log('Form submission: Response status', response.status);
+        
         if (response.ok) {
+          console.log('Form submission: Success');
           handleFormSuccess();
         } else {
           const data = await response.json();
+          console.error('Form submission: Error response', data);
           handleFormError(data.error || 'Failed to send message. Please try again.');
         }
       } catch (error) {
-        handleFormError('Network error. Please check your connection and try again.');
+        if (error.message && error.message.includes('reCAPTCHA')) {
+          console.error('reCAPTCHA Enterprise error:', error);
+          handleFormError('reCAPTCHA verification failed. Please check your browser console for details or contact support.');
+        } else {
+          console.error('Form submission error:', error);
+          handleFormError('Network error. Please check your connection and try again.');
+        }
+        // Re-enable submit button on error
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Contact us';
+        }
       }
     });
   }
