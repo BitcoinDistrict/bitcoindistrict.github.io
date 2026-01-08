@@ -129,7 +129,7 @@ const humanizeFieldName = (fieldName: string): string => {
 </form>
 
 {recaptchaSiteKey && (
-  <script src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}></script>
+  <script src={`https://www.google.com/recaptcha/enterprise.js?render=${recaptchaSiteKey}`}></script>
 )}
 
 <script define:vars={{ recaptchaSiteKey }}>
@@ -184,21 +184,21 @@ const humanizeFieldName = (fieldName: string): string => {
       try {
         const formData = new FormData(form);
         
-        // Execute reCAPTCHA v3 if site key is configured
-        // Following https://developers.google.com/recaptcha/docs/v3
+        // Execute reCAPTCHA Enterprise if site key is configured
+        // Using reCAPTCHA Enterprise API: grecaptcha.enterprise.ready() and grecaptcha.enterprise.execute()
         if (recaptchaSiteKey) {
           try {
-            // grecaptcha.ready() handles race conditions and ensures library is loaded
+            // grecaptcha.enterprise.ready() handles race conditions and ensures library is loaded
             const recaptchaToken = await new Promise((resolve, reject) => {
-              // Check if grecaptcha exists (script may still be loading or blocked)
-              if (typeof window.grecaptcha === 'undefined') {
-                // Poll for grecaptcha to be available
+              // Check if grecaptcha.enterprise exists (script may still be loading or blocked)
+              if (typeof window.grecaptcha === 'undefined' || typeof window.grecaptcha.enterprise === 'undefined') {
+                // Poll for grecaptcha.enterprise to be available
                 const checkGrecaptcha = setInterval(() => {
-                  if (typeof window.grecaptcha !== 'undefined') {
+                  if (typeof window.grecaptcha !== 'undefined' && typeof window.grecaptcha.enterprise !== 'undefined') {
                     clearInterval(checkGrecaptcha);
                     clearTimeout(timeout);
-                    window.grecaptcha.ready(function() {
-                      window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+                    window.grecaptcha.enterprise.ready(function() {
+                      window.grecaptcha.enterprise.execute(recaptchaSiteKey, { action: 'submit' })
                         .then(resolve)
                         .catch(reject);
                     });
@@ -208,15 +208,15 @@ const humanizeFieldName = (fieldName: string): string => {
                 // If script hasn't loaded after 3 seconds, it's likely blocked
                 const timeout = setTimeout(() => {
                   clearInterval(checkGrecaptcha);
-                  reject(new Error('reCAPTCHA script failed to load. The reCAPTCHA script may be blocked by an ad blocker. Please disable ad blockers for this site and try again.'));
+                  reject(new Error('reCAPTCHA Enterprise script failed to load. The reCAPTCHA script may be blocked by an ad blocker. Please disable ad blockers for this site and try again.'));
                 }, 3000);
                 
                 return;
               }
               
-              // Script is loaded, use grecaptcha.ready() as per docs
-              window.grecaptcha.ready(function() {
-                window.grecaptcha.execute(recaptchaSiteKey, { action: 'submit' })
+              // Script is loaded, use grecaptcha.enterprise.ready() as per Enterprise docs
+              window.grecaptcha.enterprise.ready(function() {
+                window.grecaptcha.enterprise.execute(recaptchaSiteKey, { action: 'submit' })
                   .then(resolve)
                   .catch(reject);
               });
@@ -225,12 +225,13 @@ const humanizeFieldName = (fieldName: string): string => {
             // Add reCAPTCHA token to form data (Formspree expects this field name)
             formData.append('_g-recaptcha-response', recaptchaToken);
           } catch (recaptchaError) {
-            console.error('reCAPTCHA error:', recaptchaError);
+            console.error('reCAPTCHA Enterprise error:', recaptchaError);
             // Log detailed error for debugging
-            console.error('reCAPTCHA details:', {
+            console.error('reCAPTCHA Enterprise details:', {
               error: recaptchaError,
               siteKey: recaptchaSiteKey,
               grecaptchaAvailable: typeof window.grecaptcha !== 'undefined',
+              enterpriseAvailable: typeof window.grecaptcha !== 'undefined' && typeof window.grecaptcha.enterprise !== 'undefined',
               errorMessage: recaptchaError.message
             });
             
