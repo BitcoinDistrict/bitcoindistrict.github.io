@@ -190,13 +190,8 @@ const humanizeFieldName = (fieldName: string): string => {
           try {
             // grecaptcha.ready() handles race conditions and ensures library is loaded
             const recaptchaToken = await new Promise((resolve, reject) => {
-              // Check if grecaptcha exists (script may still be loading)
+              // Check if grecaptcha exists (script may still be loading or blocked)
               if (typeof window.grecaptcha === 'undefined') {
-                // If script hasn't loaded, wait for it with a timeout
-                const timeout = setTimeout(() => {
-                  reject(new Error('reCAPTCHA script timeout'));
-                }, 3000);
-                
                 // Poll for grecaptcha to be available
                 const checkGrecaptcha = setInterval(() => {
                   if (typeof window.grecaptcha !== 'undefined') {
@@ -209,6 +204,12 @@ const humanizeFieldName = (fieldName: string): string => {
                     });
                   }
                 }, 50);
+                
+                // If script hasn't loaded after 3 seconds, it's likely blocked
+                const timeout = setTimeout(() => {
+                  clearInterval(checkGrecaptcha);
+                  reject(new Error('reCAPTCHA script failed to load. The reCAPTCHA script may be blocked by an ad blocker. Please disable ad blockers for this site and try again.'));
+                }, 3000);
                 
                 return;
               }
@@ -224,9 +225,19 @@ const humanizeFieldName = (fieldName: string): string => {
             // Add reCAPTCHA token to form data (Formspree expects this field name)
             formData.append('_g-recaptcha-response', recaptchaToken);
           } catch (recaptchaError) {
-            console.warn('reCAPTCHA error:', recaptchaError);
-            // Continue with form submission even if reCAPTCHA fails
-            // This allows the form to work if reCAPTCHA is temporarily unavailable
+            console.error('reCAPTCHA error:', recaptchaError);
+            // Log detailed error for debugging
+            console.error('reCAPTCHA details:', {
+              error: recaptchaError,
+              siteKey: recaptchaSiteKey,
+              grecaptchaAvailable: typeof window.grecaptcha !== 'undefined',
+              errorMessage: recaptchaError.message
+            });
+            
+            // If reCAPTCHA fails, show user-friendly error message
+            const errorMsg = recaptchaError.message || 'reCAPTCHA verification failed';
+            handleFormError('reCAPTCHA verification failed. Please check your browser console for details or contact support.');
+            return; // Stop form submission if reCAPTCHA is required
           }
         }
         
