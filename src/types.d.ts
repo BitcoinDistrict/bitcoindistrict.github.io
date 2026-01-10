@@ -324,6 +324,8 @@ export interface DCBitPlebsEvent {
   venue: string;
   /** Venue address */
   address: string;
+  /** RSVP URL */
+  rsvp: string;
   /** Markdown content */
   content: string;
   /** Parsed HTML content */

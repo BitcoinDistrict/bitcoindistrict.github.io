@@ -74,3 +74,6 @@ forms:
 
 ui:
   theme: 'dark' # Values: "system" | "light" | "dark" | "light:only" | "dark:only"
+
+dcbitplebs:
+  defaultRsvpUrl: 'https://luma.com/bitcoindistrict'

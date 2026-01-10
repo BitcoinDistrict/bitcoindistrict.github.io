@@ -13,13 +13,21 @@ export interface Props {
 const { event, isFeatured = false } = Astro.props;
 const link = getPermalink(`dcbitplebs/${event.slug}`);
 const modalId = `event-${event.slug}`;
+
+// Check if event is in the future
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const eventDate = new Date(event.date);
+eventDate.setHours(0, 0, 0, 0);
+const isFutureEvent = eventDate >= today;
 ---
 
 {isFeatured ? (
-  <!-- Featured Event Card (Larger) -->
-  <article class="max-w-md mx-auto border border-gray-200 dark:border-slate-700 rounded-lg p-6 hover:shadow-lg transition-shadow">
-    <header class="mb-4">
-      <h2 class="text-xl sm:text-2xl font-bold leading-tight mb-2 font-heading dark:text-slate-300">
+  <!-- Featured Event Card -->
+  <article class="max-w-2xl mx-auto border-2 border-primary dark:border-blue-400 bg-primary/5 dark:bg-blue-400/10 rounded-lg p-4 hover:shadow-lg transition-shadow">
+    <!-- Mobile Layout -->
+    <div class="sm:hidden flex flex-col gap-2">
+      <h2 class="font-bold font-heading dark:text-slate-300">
         <a
           class="hover:text-primary dark:hover:text-blue-400 transition ease-in duration-200"
           href={link}
@@ -27,47 +35,36 @@ const modalId = `event-${event.slug}`;
           DC BitPlebs #{event.eventNumber}
         </a>
       </h2>
-      <p class="text-sm text-muted dark:text-slate-400">
-        <Icon name="tabler:calendar" class="w-3.5 h-3.5 inline-block -mt-0.5" />
-        <time datetime={event.date.toISOString()} class="inline-block ml-1">{getFormattedDate(event.date)}</time>
-        {' '}
-        · <Icon name="tabler:clock" class="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
-        <span class="inline-block ml-1">{event.time}</span>
-      </p>
-    </header>
-
-    <div class="space-y-2">
-      <div class="flex items-start">
-        <Icon name="tabler:map-pin" class="w-4 h-4 mt-0.5 mr-2 text-muted dark:text-slate-400 flex-shrink-0" />
-        <div>
-          <p class="font-semibold text-sm dark:text-slate-300">{event.venue}</p>
-          <p class="text-sm text-muted dark:text-slate-400">{event.address}</p>
-        </div>
+      <div class="flex items-center flex-wrap gap-2 text-xs text-muted dark:text-slate-400">
+        <span class="flex items-center">
+          <Icon name="tabler:calendar" class="w-3 h-3 mr-1" />
+          <time datetime={event.date.toISOString()}>{getFormattedDate(event.date)}</time>
+        </span>
+        <span class="flex items-center">
+          <Icon name="tabler:clock" class="w-3 h-3 mr-1" />
+          {event.time}
+        </span>
+        <span class="flex items-center truncate">
+          <Icon name="tabler:map-pin" class="w-3 h-3 mr-1 flex-shrink-0" />
+          <span class="truncate">{event.venue}</span>
+        </span>
       </div>
+      {isFutureEvent && (
+        <div class="flex justify-start">
+          <a
+            href={event.rsvp}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center px-2.5 py-1.5 bg-primary dark:bg-blue-500 text-white dark:text-white rounded-md hover:bg-primary/90 dark:hover:bg-blue-600 transition-colors text-sm font-medium"
+            title="RSVP for this event"
+          >
+            RSVP
+          </a>
+        </div>
+      )}
     </div>
-
-    <footer class="mt-4 flex items-center gap-3">
-      <button
-        type="button"
-        data-modal-open={`event-preview-${modalId}`}
-        class="inline-flex items-center text-primary dark:text-blue-400 hover:underline text-sm font-medium"
-      >
-        <Icon name="tabler:eye" class="w-4 h-4 mr-1" />
-        Preview
-      </button>
-      <a
-        href={link}
-        class="inline-flex items-center text-primary dark:text-blue-400 hover:underline text-sm font-medium"
-      >
-        View Agenda
-        <Icon name="tabler:arrow-right" class="w-4 h-4 ml-1" />
-      </a>
-    </footer>
-  </article>
-) : (
-  <!-- Condensed Event Card (Smaller, Vertical) -->
-  <article class="max-w-2xl mx-auto border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-    <div class="flex items-center justify-between gap-4">
+    <!-- Desktop Layout -->
+    <div class="hidden sm:flex items-center justify-between gap-4">
       <div class="flex-1 min-w-0 flex items-center gap-3 text-sm">
         <h2 class="font-bold font-heading dark:text-slate-300">
           <a
@@ -100,13 +97,106 @@ const modalId = `event-${event.slug}`;
         >
           <Icon name="tabler:eye" class="w-4 h-4" />
         </button>
+        {isFutureEvent && (
+          <a
+            href={event.rsvp}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center px-2.5 py-1.5 bg-primary dark:bg-blue-500 text-white dark:text-white rounded-md hover:bg-primary/90 dark:hover:bg-blue-600 transition-colors text-sm font-medium"
+            title="RSVP for this event"
+          >
+            RSVP
+          </a>
+        )}
+      </div>
+    </div>
+  </article>
+) : (
+  <!-- Condensed Event Card -->
+  <article class="max-w-2xl mx-auto border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+    <!-- Mobile Layout -->
+    <div class="sm:hidden flex flex-col gap-2">
+      <h2 class="font-bold font-heading dark:text-slate-300">
         <a
+          class="hover:text-primary dark:hover:text-blue-400 transition ease-in duration-200"
           href={link}
-          class="inline-flex items-center text-primary dark:text-blue-400 hover:underline"
-          title="View full agenda"
         >
-          <Icon name="tabler:arrow-right" class="w-4 h-4" />
+          DC BitPlebs #{event.eventNumber}
         </a>
+      </h2>
+      <div class="flex items-center flex-wrap gap-2 text-xs text-muted dark:text-slate-400">
+        <span class="flex items-center">
+          <Icon name="tabler:calendar" class="w-3 h-3 mr-1" />
+          <time datetime={event.date.toISOString()}>{getFormattedDate(event.date)}</time>
+        </span>
+        <span class="flex items-center">
+          <Icon name="tabler:clock" class="w-3 h-3 mr-1" />
+          {event.time}
+        </span>
+        <span class="flex items-center truncate">
+          <Icon name="tabler:map-pin" class="w-3 h-3 mr-1 flex-shrink-0" />
+          <span class="truncate">{event.venue}</span>
+        </span>
+      </div>
+      {isFutureEvent && (
+        <div class="flex justify-start">
+          <a
+            href={event.rsvp}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center px-2.5 py-1.5 bg-primary dark:bg-blue-500 text-white dark:text-white rounded-md hover:bg-primary/90 dark:hover:bg-blue-600 transition-colors text-sm font-medium"
+            title="RSVP for this event"
+          >
+            RSVP
+          </a>
+        </div>
+      )}
+    </div>
+    <!-- Desktop Layout -->
+    <div class="hidden sm:flex items-center justify-between gap-4">
+      <div class="flex-1 min-w-0 flex items-center gap-3 text-sm">
+        <h2 class="font-bold font-heading dark:text-slate-300">
+          <a
+            class="hover:text-primary dark:hover:text-blue-400 transition ease-in duration-200"
+            href={link}
+          >
+            DC BitPlebs #{event.eventNumber}
+          </a>
+        </h2>
+        <span class="text-muted dark:text-slate-400">·</span>
+        <span class="flex items-center text-xs text-muted dark:text-slate-400">
+          <Icon name="tabler:calendar" class="w-3 h-3 mr-1" />
+          <time datetime={event.date.toISOString()}>{getFormattedDate(event.date)}</time>
+        </span>
+        <span class="flex items-center text-xs text-muted dark:text-slate-400">
+          <Icon name="tabler:clock" class="w-3 h-3 mr-1" />
+          {event.time}
+        </span>
+        <span class="flex items-center text-xs text-muted dark:text-slate-400 truncate">
+          <Icon name="tabler:map-pin" class="w-3 h-3 mr-1 flex-shrink-0" />
+          <span class="truncate">{event.venue}</span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button
+          type="button"
+          data-modal-open={`event-preview-${modalId}`}
+          class="inline-flex items-center p-2 text-primary dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded transition-colors"
+          title="Preview agenda"
+        >
+          <Icon name="tabler:eye" class="w-4 h-4" />
+        </button>
+        {isFutureEvent && (
+          <a
+            href={event.rsvp}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center px-2.5 py-1.5 bg-primary dark:bg-blue-500 text-white dark:text-white rounded-md hover:bg-primary/90 dark:hover:bg-blue-600 transition-colors text-sm font-medium"
+            title="RSVP for this event"
+          >
+            RSVP
+          </a>
+        )}
       </div>
     </div>
   </article>

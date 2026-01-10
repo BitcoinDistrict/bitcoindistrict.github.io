@@ -1,29 +1,24 @@
 ---
-import HeroLayout from '~/layouts/HeroLayout.astro';
+import PageLayout from '~/layouts/PageLayout.astro';
 import Content from '~/components/widgets/Content.astro';
 import VideoTiles from '~/components/widgets/VideoTiles.astro';
 import ReferralCards from '~/components/widgets/ReferralCards.astro';
-import { createHero, HERO_IMAGES, SCROLL_INDICATOR_PRESETS } from '~/utils/hero';
 
 const metadata = {
   title: 'Learn',
 };
-
-// Configure hero with Lincoln image and events content
-const hero = createHero({
-  image: HERO_IMAGES.learn, // This is hero-lincoln.jpg
-  alt: 'Bitcoin District',
-  title: 'Learn ₿itcoin',
-  subtitle: 'Below are some resources to help you get started with Bitcoin.',
-  content: `<div class="mt-8"><img src="/images/plato.png" alt="Plato" class="max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg mx-auto" /></div>`,
-});
 ---
 
-<HeroLayout 
-  metadata={metadata} 
-  hero={hero}
-  scrollIndicator={SCROLL_INDICATOR_PRESETS.accent}
-  contentBackground={{ type: 'solid', opacityClass: 'opacity-90' }}>
+<PageLayout metadata={metadata}>
+  <section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mb-12 text-center">
+      <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+        Learn ₿itcoin
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+        Below are some resources to help you get started with Bitcoin.
+      </p>
+    </div>
   <!-- Starter Videos Section -->
   <VideoTiles
     id="starter-videos"
@@ -222,6 +217,5 @@ const hero = createHero({
     }}
     isReversed={false}
   />
-
-
-</HeroLayout>
+  </section>
+</PageLayout>

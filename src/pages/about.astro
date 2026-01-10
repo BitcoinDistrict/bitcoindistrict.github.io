@@ -1,55 +1,33 @@
 ---
-import { Image } from 'astro:assets';
-import HeroLayout from '~/layouts/HeroLayout.astro';
+import PageLayout from '~/layouts/PageLayout.astro';
 import Content from '~/components/widgets/Content.astro';
 import FAQs from '~/components/widgets/FAQs.astro';
-import featureImage from '~/assets/images/feature1.jpg';
 import { faqs } from '~/data/faqs';
-import { createHero, HERO_IMAGES } from '~/utils/hero';
 
 const metadata = {
   title: 'About Bitcoin District - Bitcoin District',
   description: 'Learn about Bitcoin District, a network of Bitcoiners in the greater DC, Maryland and Virginia metro area. Discover our community, mission, and how to get involved.',
 };
-
-const hero = createHero({
-  image: HERO_IMAGES.about,
-  title: 'About Bitcoin District',
-  subtitle: 'Bitcoin District is a network of Bitcoiners who live and work around the greater DC, Maryland and Virginia (DMV) metro area.',
-  alt: 'About Bitcoin District community',
-  // Using default opacity from HERO_OPACITY.light (opacity-15 dark:opacity-30)
-});
 ---
 
-<HeroLayout metadata={metadata} hero={hero} showScrollIndicator={false}>
-
-  <!-- Features3 Widget with Image ********** -->
-
-  <!-- Standalone Image Display -->
-  <div slot="hero-bottom" class="w-full mx-auto px-4 sm:px-6 lg:max-w-6xl mb-12">
-    <div class="relative w-full max-w-full overflow-hidden rounded-sm sm:rounded-l shadow-lg">
-      <Image
-        src={featureImage}
-        alt="Bitcoin District Photo"
-        class="w-full object-cover object-center"
-        width={1200}   />
+<PageLayout metadata={metadata}>
+  <section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mb-12 text-center">
+      <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+        About Bitcoin District
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+        Bitcoin District is a network of Bitcoiners who live and work around the greater DC, Maryland and Virginia (DMV) metro area.
+      </p>
     </div>
-  </div>
 
-  <!-- FAQs Widget ******************* -->
+    <FAQs
+      title="Frequently Asked Questions"
+      subtitle="Get answers to common questions about Bitcoin District, our community, and how you can get involved."
+      tagline="FAQs"
+      classes={{ container: 'max-w-6xl' }}
+      items={faqs.map(faq => ({ title: faq.question, description: faq.answer }))}
+    />
 
-  <FAQs
-    title="Frequently Asked Questions"
-    subtitle="Get answers to common questions about Bitcoin District, our community, and how you can get involved."
-    tagline="FAQs"
-    classes={{ container: 'max-w-6xl' }}
-    items={faqs.map(faq => ({ title: faq.question, description: faq.answer }))}
-  />
-
-  <Content
-    title="Volunteers"
-
-    subtitle="This website and any social media accounts are managed by volunteers from the community. If you'd like to help out, please email hey📧bitcoindistrict.org"
-    isAfterContent={false}
-  />
-</HeroLayout>
+  </section>
+</PageLayout>

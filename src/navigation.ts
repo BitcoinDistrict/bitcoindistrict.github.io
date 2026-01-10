@@ -11,21 +11,15 @@ export const headerData = {
       href: getPermalink('/meetups'),
     },
     {
-      text: 'DC BitPlebs',
-      href: getPermalink('/dcbitplebs'),
-    },
-    {
-      text: 'About',
-      href: getPermalink('/about'),
-    },
-    {
       text: 'News',
       href: getPermalink('https://news.bitcoindistrict.org'),
     },
     {
-      text: 'Resources',
+      text: 'More',
       links: [
+        { text: 'About', href: getPermalink('/about'), },
         { text: 'Learn', href: getPermalink('/learn') },
+        {text: 'DC BitPlebs', href: getPermalink('/dcbitplebs'), },
         { text: 'Merchants', href: getPermalink('/merchants') },
         { text: 'Nostr', href: getPermalink('/nostr') },
         { text: 'Thanks', href: getPermalink('/thanks') },

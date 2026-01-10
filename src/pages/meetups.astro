@@ -1,21 +1,13 @@
 ---
-import HeroLayout from '~/layouts/HeroLayout.astro';
+import PageLayout from '~/layouts/PageLayout.astro';
 import MeetupsMap from '~/components/widgets/MeetupsMap.astro';
 import MeetupFeatures from '~/components/widgets/MeetupFeatures.astro';
 import { meetupsData } from '~/data/meetups';
-import { createHero, HERO_IMAGES } from '~/utils/hero';
 
 const metadata = {
   title: 'Bitcoin Community Meetups - Bitcoin District',
   description: 'Discover Bitcoin meetups in the DC, Maryland & Virginia greater metro area. Connect with local Bitcoiners and join our community events.',
 };
-
-const hero = createHero({
-  image: HERO_IMAGES.meetups,
-  title: 'Bitcoin Community Meetups in the DMV',
-  subtitle: 'These are the Bitcoin meetups in and around the DC, Maryland & Virginia greater metro area. Connect with your community and learn more about Bitcoin and freedom tech!',
-  alt: 'Bitcoin meetups in the DC Metro area',
-});
 
 // Meetups data is now used directly in the MeetupFeatures component
 ---
@@ -26,32 +18,39 @@ const hero = createHero({
 <link rel="modulepreload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js" />
 <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style" />
 
-<HeroLayout metadata={metadata} hero={hero} showScrollIndicator={false}>
+<PageLayout metadata={metadata}>
+  <section class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="mb-12 text-center">
+      <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-5xl">
+        Bitcoin Community Meetups in the DMV
+      </h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+        These are the Bitcoin meetups in and around the DC, Maryland & Virginia greater metro area. Connect with your community and learn more about Bitcoin and freedom tech!
+      </p>
+    </div>
 
-  <!-- Interactive Map Section -->
-  <MeetupsMap
-    slot="hero-bottom"
-    title="Find Meetups Near You"
-    subtitle="Explore Bitcoin meetups across the DMV area on our interactive map. Many people living in the DMV are used to long drives, so we've added a few more meetups that are farther out."
-    meetups={meetupsData}
-    id="meetups-map-section"
-    classes={{
-      container: 'mb-6',
-    }}
-  />
+    <!-- Interactive Map Section -->
+    <MeetupsMap
+      meetups={meetupsData}
+      id="meetups-map-section"
+      classes={{
+        container: 'mb-6',
+      }}
+    />
 
-  <!-- Meetup Groups List -->
-  <MeetupFeatures
-    id="meetup-groups"
-    title="Local Bitcoin Communities"
-    subtitle="Join these established Bitcoin meetup groups in the greater Washington DC area"
-    meetups={meetupsData}
-    columns={3}
-    classes={{
-      container: 'max-w-6xl',
-    }}
-  />
-</HeroLayout>
+    <!-- Meetup Groups List -->
+    <MeetupFeatures
+      id="meetup-groups"
+      title="Local Bitcoin Communities"
+      subtitle="Join these established Bitcoin meetup groups in the greater Washington DC area"
+      meetups={meetupsData}
+      columns={3}
+      classes={{
+        container: 'max-w-6xl',
+      }}
+    />
+  </section>
+</PageLayout>
 
 <style>
   /* Ensure proper spacing and responsive design */

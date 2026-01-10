@@ -16,12 +16,28 @@ const AGENDA_DIR_OPTIONS = [
   path.join(__dirname, '../../agenda'),
 ];
 
+// Load default RSVP URL from config
+function getDefaultRsvpUrl(): string {
+  try {
+    const configPath = path.join(__dirname, '../config.yaml');
+    const configContent = fs.readFileSync(configPath, 'utf-8');
+    const config = yaml.load(configContent) as { dcbitplebs?: { defaultRsvpUrl?: string } };
+    return config.dcbitplebs?.defaultRsvpUrl || 'https://luma.com/bitcoindistrict';
+  } catch (error) {
+    console.warn('Failed to load default RSVP URL from config, using fallback');
+    return 'https://luma.com/bitcoindistrict';
+  }
+}
+
+const DEFAULT_RSVP_URL = getDefaultRsvpUrl();
+
 interface Frontmatter {
   eventNumber?: number;
   date: string;
   time: string;
   venue: string;
   address: string;
+  rsvp?: string;
 }
 
 /**
@@ -79,6 +95,7 @@ async function parseEventFile(filePath: string, filename: string): Promise<DCBit
       time: frontmatter.time,
       venue: frontmatter.venue,
       address: frontmatter.address,
+      rsvp: frontmatter.rsvp || DEFAULT_RSVP_URL,
       content: htmlContent,
     };
   } catch (error) {

@@ -24,6 +24,13 @@ if (!event) {
 
 const url = getCanonical(getPermalink(`dcbitplebs/${event.slug}`));
 
+// Check if event is in the future
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const eventDate = new Date(event.date);
+eventDate.setHours(0, 0, 0, 0);
+const isFutureEvent = eventDate >= today;
+
 const metadata = merge(
   {
     title: `DC BitPlebs #${event.eventNumber}`,
@@ -42,20 +49,32 @@ const metadata = merge(
 
 <Layout metadata={metadata}>
   <section class="px-6 sm:px-6 py-12 sm:py-16 lg:py-20 mx-auto max-w-4xl">
-    <header class="mb-8">
-      <div class="flex justify-between flex-col sm:flex-row mb-2 sm:items-center">
-        <p class="text-sm text-muted dark:text-slate-400">
-          <Icon name="tabler:calendar" class="w-4 h-4 inline-block -mt-0.5" />
-          <time datetime={event.date.toISOString()} class="inline-block ml-1">{getFormattedDate(event.date)}</time>
-          {' '}
-          · <Icon name="tabler:clock" class="w-4 h-4 inline-block -mt-0.5 ml-1" />
-          <span class="inline-block ml-1">{event.time}</span>
-        </p>
+    <header class="mb-8 relative">
+      <div class="flex justify-end mb-2">
+        {isFutureEvent && (
+          <a
+            href={event.rsvp}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center px-2.5 py-1.5 bg-primary dark:bg-blue-500 text-white dark:text-white rounded-md hover:bg-primary/90 dark:hover:bg-blue-600 transition-colors text-sm font-medium"
+          >
+            Register
+            <Icon name="tabler:external-link" class="w-3.5 h-3.5 ml-1.5" />
+          </a>
+        )}
       </div>
 
-      <h1 class="text-3xl md:text-4xl font-bold leading-tight tracking-tight font-heading mb-4">
+      <h1 class="text-3xl md:text-4xl font-bold leading-tight tracking-tight font-heading mb-2">
         DC BitPlebs #{event.eventNumber}
       </h1>
+
+      <p class="text-sm text-muted dark:text-slate-400 mb-4">
+        <Icon name="tabler:calendar" class="w-4 h-4 inline-block -mt-0.5" />
+        <time datetime={event.date.toISOString()} class="inline-block ml-1">{getFormattedDate(event.date)}</time>
+        {' '}
+        · <Icon name="tabler:clock" class="w-4 h-4 inline-block -mt-0.5 ml-1" />
+        <span class="inline-block ml-1">{event.time}</span>
+      </p>
 
       <div class="mb-6">
         <div class="flex items-start">
