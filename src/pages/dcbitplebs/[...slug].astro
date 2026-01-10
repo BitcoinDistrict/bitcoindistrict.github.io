@@ -1,0 +1,88 @@
+---
+import type { InferGetStaticPropsType, GetStaticPaths } from 'astro';
+import merge from 'lodash.merge';
+import Layout from '~/layouts/PageLayout.astro';
+import { Icon } from 'astro-icon/components';
+import { getCanonical, getPermalink } from '~/utils/permalinks';
+import { getFormattedDate } from '~/utils/utils';
+import { getStaticPathsEvents, findEventBySlug } from '~/utils/dcbitplebs';
+import type { MetaData } from '~/types';
+
+export const prerender = true;
+
+export const getStaticPaths = (async () => {
+  return await getStaticPathsEvents();
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { event } = Astro.props as Props;
+
+if (!event) {
+  return Astro.redirect('/dcbitplebs');
+}
+
+const url = getCanonical(getPermalink(`dcbitplebs/${event.slug}`));
+
+const metadata = merge(
+  {
+    title: `DC BitPlebs #${event.eventNumber}`,
+    description: `Socratic seminar event scheduled for ${getFormattedDate(event.date)} at ${event.venue}`,
+    robots: {
+      index: true,
+      follow: true,
+    },
+    openGraph: {
+      type: 'article',
+    },
+  },
+  {}
+) as MetaData;
+---
+
+<Layout metadata={metadata}>
+  <section class="px-6 sm:px-6 py-12 sm:py-16 lg:py-20 mx-auto max-w-4xl">
+    <header class="mb-8">
+      <div class="flex justify-between flex-col sm:flex-row mb-2 sm:items-center">
+        <p class="text-sm text-muted dark:text-slate-400">
+          <Icon name="tabler:calendar" class="w-4 h-4 inline-block -mt-0.5" />
+          <time datetime={event.date.toISOString()} class="inline-block ml-1">{getFormattedDate(event.date)}</time>
+          {' '}
+          · <Icon name="tabler:clock" class="w-4 h-4 inline-block -mt-0.5 ml-1" />
+          <span class="inline-block ml-1">{event.time}</span>
+        </p>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-bold leading-tight tracking-tight font-heading mb-4">
+        DC BitPlebs #{event.eventNumber}
+      </h1>
+
+      <div class="mb-6">
+        <div class="flex items-start">
+          <Icon name="tabler:map-pin" class="w-5 h-5 mt-0.5 mr-2 text-muted dark:text-slate-400 flex-shrink-0" />
+          <div>
+            <p class="font-semibold text-base dark:text-slate-300">{event.venue}</p>
+            <p class="text-sm text-muted dark:text-slate-400">{event.address}</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <div
+      class="mx-auto max-w-3xl prose prose-md lg:prose-lg dark:prose-invert dark:prose-headings:text-slate-300 prose-headings:font-heading prose-headings:leading-tight prose-headings:tracking-tight prose-headings:font-bold prose-a:text-primary dark:prose-a:text-blue-400 prose-img:rounded-md prose-img:shadow-lg prose-headings:scroll-mt-[80px] prose-li:my-0"
+    >
+      <Fragment set:html={event.content} />
+    </div>
+    
+    <div class="mx-auto max-w-3xl mt-8">
+      <a
+        href="/dcbitplebs"
+        class="inline-flex items-center text-primary dark:text-blue-400 hover:underline"
+      >
+        <Icon name="tabler:arrow-left" class="w-4 h-4 mr-1" />
+        Back to all events
+      </a>
+    </div>
+  </section>
+</Layout>
+

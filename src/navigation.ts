@@ -11,6 +11,10 @@ export const headerData = {
       href: getPermalink('/meetups'),
     },
     {
+      text: 'DC BitPlebs',
+      href: getPermalink('/dcbitplebs'),
+    },
+    {
       text: 'About',
       href: getPermalink('/about'),
     },

@@ -1,0 +1,40 @@
+---
+import type { InferGetStaticPropsType } from 'astro';
+import Layout from '~/layouts/PageLayout.astro';
+import EventList from '~/components/dcbitplebs/EventList.astro';
+import Headline from '~/components/blog/Headline.astro';
+import { fetchEvents } from '~/utils/dcbitplebs';
+
+export const prerender = true;
+
+const events = await fetchEvents();
+
+const metadata = {
+  title: 'DC BitPlebs',
+  description: 'Socratic seminar style events for Bitcoin enthusiasts in the DC area',
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+---
+
+<Layout metadata={metadata}>
+  <section class="px-6 sm:px-6 py-12 sm:py-16 lg:py-20 mx-auto max-w-4xl">
+    <Headline
+      subtitle="Socratic seminar style events for Bitcoin enthusiasts in the DC area. Join us for deep technical discussions and community building."
+    >
+      DC BitPlebs
+    </Headline>
+    {
+      events.length > 0 ? (
+        <EventList events={events} />
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-muted dark:text-slate-400">No events scheduled at this time. Check back soon!</p>
+        </div>
+      )
+    }
+  </section>
+</Layout>
+

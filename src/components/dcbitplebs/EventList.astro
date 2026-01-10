@@ -1,0 +1,105 @@
+---
+import EventCard from './EventCard.astro';
+import type { DCBitPlebsEvent } from '~/types';
+
+export interface Props {
+  events: Array<DCBitPlebsEvent>;
+}
+
+const { events } = Astro.props;
+
+// Get today's date normalized to midnight
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+// Categorize events into future and past
+const futureEvents = events.filter((event) => {
+  const eventDate = new Date(event.date);
+  eventDate.setHours(0, 0, 0, 0);
+  return eventDate >= today;
+});
+
+const pastEvents = events.filter((event) => {
+  const eventDate = new Date(event.date);
+  eventDate.setHours(0, 0, 0, 0);
+  return eventDate < today;
+});
+
+// Find the nearest future event (featured)
+const featuredEvent = futureEvents.length > 0
+  ? futureEvents.reduce((nearest, current) => {
+      const nearestDate = new Date(nearest.date);
+      const currentDate = new Date(current.date);
+      return currentDate < nearestDate ? current : nearest;
+    })
+  : null;
+
+// Get other future events (after the featured one)
+const otherFutureEvents = featuredEvent
+  ? futureEvents
+      .filter((event) => {
+        const eventDate = new Date(event.date);
+        const featuredDate = new Date(featuredEvent.date);
+        return eventDate.getTime() !== featuredDate.getTime();
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      })
+  : [];
+
+// Sort past events by date (most recent first)
+const sortedPastEvents = pastEvents.sort((a, b) => {
+  const dateA = new Date(a.date);
+  const dateB = new Date(b.date);
+  return dateB.getTime() - dateA.getTime();
+});
+
+const featuredSlug = featuredEvent?.slug;
+---
+
+<div class="space-y-6">
+  <!-- Featured Event -->
+  {featuredEvent && (
+    <div>
+      <div class="mb-3">
+        <h3 class="text-lg font-semibold font-heading dark:text-slate-300">Our Next BitPlebs</h3>
+      </div>
+      <EventCard event={featuredEvent} isFeatured={true} />
+    </div>
+  )}
+
+  <!-- Future BitPlebs -->
+  {otherFutureEvents.length > 0 && (
+    <div>
+      <div class="mb-3">
+        <h3 class="text-lg font-semibold font-heading dark:text-slate-300">Future BitPlebs</h3>
+      </div>
+      <ul class="space-y-4">
+        {otherFutureEvents.map((event) => (
+          <li>
+            <EventCard event={event} isFeatured={false} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  <!-- Past BitPlebs -->
+  {sortedPastEvents.length > 0 && (
+    <div>
+      <div class="mb-3">
+        <h3 class="text-lg font-semibold font-heading dark:text-slate-300">Past BitPlebs</h3>
+      </div>
+      <ul class="space-y-4">
+        {sortedPastEvents.map((event) => (
+          <li>
+            <EventCard event={event} isFeatured={false} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+

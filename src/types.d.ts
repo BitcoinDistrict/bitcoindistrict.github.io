@@ -310,3 +310,22 @@ export interface VideoTiles extends Omit<Headline, 'classes'>, Widget {
   videos?: Array<VideoItem>;
   columns?: number;
 }
+
+export interface DCBitPlebsEvent {
+  /** Event number (e.g., 1, 2, 3) */
+  eventNumber: number;
+  /** Event slug (e.g., "001", "002") */
+  slug: string;
+  /** Event date */
+  date: Date;
+  /** Event time (e.g., "7:00 PM") */
+  time: string;
+  /** Venue name */
+  venue: string;
+  /** Venue address */
+  address: string;
+  /** Markdown content */
+  content: string;
+  /** Parsed HTML content */
+  Content?: AstroComponentFactory;
+}

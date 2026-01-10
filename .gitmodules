@@ -1,0 +1,3 @@
+[submodule "agenda"]
+	path = dcbitplebs/agenda
+	url = https://github.com/BitcoinDistrict/dcbitplebs.git
