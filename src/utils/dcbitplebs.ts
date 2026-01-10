@@ -7,13 +7,14 @@ import type { DCBitPlebsEvent } from '~/types';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Submodule is at root/dcbitplebs/agenda, and markdown files are in agenda/agenda/ within the submodule
+// Submodule is at root/dcbitplebs/agenda, and markdown files are directly in the submodule directory
 // Try multiple possible paths to handle different submodule locations
 const AGENDA_DIR_OPTIONS = [
-  path.join(__dirname, '../../dcbitplebs/agenda/agenda'),
-  path.join(__dirname, '../../agenda/agenda'),
   path.join(__dirname, '../../dcbitplebs/agenda'),
   path.join(__dirname, '../../agenda'),
+  // Fallback paths for legacy nested structure (if submodule structure changes)
+  path.join(__dirname, '../../dcbitplebs/agenda/agenda'),
+  path.join(__dirname, '../../agenda/agenda'),
 ];
 
 // Load default RSVP URL from config
